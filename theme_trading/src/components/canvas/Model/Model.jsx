@@ -11,16 +11,18 @@ const Model = () => {
 
   useEffect(() => {
     if (!ref.current) return;
-
-    gsap.to(ref.current.rotation, {
-      y: Math.PI * 2,
-      scrollTrigger: {
-        trigger: document.body,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 1,
-      },
+    const ctx = gsap.context(() => {
+      gsap.to(ref.current.rotation, {
+        y: Math.PI * 2,
+        scrollTrigger: {
+          trigger: document.body,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1,
+        },
+      });
     });
+    return () => ctx.revert();
   }, []);
 
   return <primitive ref={ref} object={scene} scale={1.5} />;

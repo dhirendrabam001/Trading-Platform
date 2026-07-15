@@ -272,10 +272,29 @@
   z-index: 2;
   width: min(360px, 78vw);
   filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.6));
+  overflow: hidden;
+  border-radius: 34px; /* adjust to match your phone asset's own corner radius */
 }
 .hero-section .phone-mockup-wrap img {
   width: 100%;
   display: block;
+}
+
+/* Glossy light sweep across the screen, repositioned by GSAP on
+   mouse-move/tilt (see handleMouseMove in Hero.jsx). The gradient itself
+   stays fixed here; only background-position is animated from JS. */
+.hero-section .phone-glare {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.18),
+    transparent 60%
+  );
+  background-size: 220% 220%;
+  background-position: 50% 50%;
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
 
 .hero-section .floating-chip {

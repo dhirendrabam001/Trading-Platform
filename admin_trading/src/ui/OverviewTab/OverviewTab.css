@@ -1,0 +1,289 @@
+/* ==========================================================================
+   OVERVIEW TAB
+   ========================================================================== */
+
+/* ---------- Chain Pills ---------- */
+
+.chain-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-light);
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: all 0.35s ease;
+}
+
+.chain-pill:hover {
+  color: var(--text-primary);
+  border-color: var(--primary);
+  background: rgba(0, 255, 178, 0.05);
+  box-shadow: var(--glow-soft);
+  transform: translateY(-2px);
+}
+
+.chain-pill.active {
+  background: var(--primary-gradient);
+  color: var(--btn-primary-text);
+  border-color: transparent;
+  box-shadow: var(--glow-green);
+}
+
+.chain-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.chain-dot.eth {
+  background: var(--accent-purple);
+}
+
+.chain-dot.bsc {
+  background: var(--accent-orange);
+}
+
+.chain-dot.poly {
+  background: #9b51e0;
+}
+
+.chain-dot.arb {
+  background: var(--accent-blue);
+}
+
+.chain-dot.sol {
+  background: var(--primary);
+}
+
+.chain-pill.active .chain-dot {
+  background: #000;
+}
+
+/* ==========================================================================
+   Timeframe Pills
+   ========================================================================== */
+
+.timeframe-wrapper {
+  display: flex;
+  gap: 6px;
+
+  padding: 5px;
+
+  border-radius: 12px;
+
+  background: var(--bg-glass);
+
+  border: 1px solid var(--border-light);
+
+  backdrop-filter: blur(16px);
+}
+
+.time-pill {
+  padding: 7px 15px;
+
+  border: none;
+
+  background: transparent;
+
+  color: var(--text-muted);
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.time-pill:hover {
+  color: var(--text-primary);
+
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.time-pill.active {
+  color: var(--text-primary);
+
+  background: rgba(139, 92, 246, 0.18);
+
+  border: 1px solid rgba(139, 92, 246, 0.3);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 15px rgba(139, 92, 246, 0.18);
+}
+
+/* ==========================================================================
+   Chart Card
+   ========================================================================== */
+
+.chart-card {
+  background: var(--card-gradient);
+
+  border: 1px solid var(--border-light);
+
+  border-radius: 18px;
+
+  backdrop-filter: blur(20px);
+
+  box-shadow: var(--shadow-card);
+
+  overflow: hidden;
+
+  transition: 0.35s;
+}
+
+.chart-card:hover {
+  border-color: var(--border-medium);
+
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.65),
+    0 0 40px rgba(0, 255, 178, 0.08);
+}
+
+/* ==========================================================================
+   Chart Container
+   ========================================================================== */
+
+.chart-container-wrapper {
+  width: 100%;
+
+  margin-top: 16px;
+}
+
+/* ==========================================================================
+   Tooltip
+   ========================================================================== */
+
+.custom-chart-tooltip {
+  background: rgba(8, 12, 20, 0.96);
+
+  border: 1px solid var(--border-medium);
+
+  border-radius: 12px;
+
+  padding: 12px 14px;
+
+  backdrop-filter: blur(20px);
+
+  box-shadow: var(--shadow-card);
+}
+
+.custom-chart-tooltip .label {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-size: 11px;
+}
+
+.custom-chart-tooltip .value {
+  margin-top: 4px;
+
+  color: var(--primary);
+
+  font-size: 16px;
+
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Donut
+   ========================================================================== */
+
+.donut-chart-container {
+  width: 180px;
+
+  height: 180px;
+
+  margin: auto;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Legend
+   ========================================================================== */
+
+.legend-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.legend-item {
+  padding: 10px 12px;
+
+  border-radius: 10px;
+
+  transition: 0.3s;
+
+  border: 1px solid transparent;
+}
+
+.legend-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+
+  border-color: var(--border-light);
+}
+
+.legend-indicator {
+  width: 10px;
+
+  height: 10px;
+
+  border-radius: 50%;
+
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 576px) {
+  .chart-card {
+    padding: 20px !important;
+  }
+
+  .chain-pill {
+    font-size: 12px;
+
+    padding: 7px 14px;
+  }
+
+  .time-pill {
+    padding: 6px 10px;
+  }
+
+  .donut-chart-container {
+    width: 170px;
+
+    height: 170px;
+  }
+
+  .legend-list {
+    margin-top: 10px;
+  }
+}

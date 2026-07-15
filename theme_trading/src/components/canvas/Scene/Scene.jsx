@@ -13,10 +13,14 @@ const Scene = () => {
         left: 0,
         width: "100%",
         height: "100vh",
+        zIndex: -1,
+        pointerEvents: "none",
       }}
     >
       <Lights />
-      <Model />
+      <Suspense fallback={null}>
+        <Model />
+      </Suspense>
       <Environment preset="city" />
     </Canvas>
   );

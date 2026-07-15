@@ -35,6 +35,7 @@ const Hero = () => {
   const visualColRef = useRef(null);
   const phoneStageRef = useRef(null);
   const phoneRef = useRef(null);
+  const glareRef = useRef(null);
   const chip1Ref = useRef(null);
   const chip2Ref = useRef(null);
   const orbitRef = useRef(null);
@@ -61,13 +62,16 @@ const Hero = () => {
       const tl = gsap.timeline();
 
       if (!isReduced) {
-        // Prepare initial hidden state out-of-view for the 3D fly-in
+        // Prepare initial hidden state out-of-view for the 3D fly-in.
+        // filter: blur() is included so the phone resolves into focus as it
+        // settles, rather than just popping in at full sharpness.
         gsap.set(phoneRef.current, {
           opacity: 0,
           scale: 0.5,
           rotateY: -90,
           rotateX: 45,
           z: -300,
+          filter: "blur(8px) drop-shadow(0px 30px 60px rgba(0,0,0,0.6))",
           transformPerspective: 1200,
         });
 
@@ -78,6 +82,7 @@ const Hero = () => {
           rotateY: 0,
           rotateX: 0,
           z: 0,
+          filter: "blur(0px) drop-shadow(0px 30px 60px rgba(0,0,0,0.6))",
           duration: 1.8,
           ease: "power4.out",
           delay: 0.4, // Syncs with the text reveal timing
@@ -171,6 +176,16 @@ const Hero = () => {
         rotateY: relX * 14,
         rotateX: -relY * 14,
         transformPerspective: 1000,
+        // Shadow shifts opposite the tilt direction so the phone reads as
+        // physically lifting off the page, not just rotating in place.
+        filter: `drop-shadow(${-relX * 20}px ${20 - relY * 10}px 40px rgba(0,0,0,0.5))`,
+        duration: 0.8,
+        ease: "power2.out",
+      });
+
+      // Glare sweeps across the glossy screen surface as it tilts.
+      gsap.to(glareRef.current, {
+        backgroundPosition: `${50 + relX * 60}% ${50 + relY * 60}%`,
         duration: 0.8,
         ease: "power2.out",
       });
@@ -180,6 +195,13 @@ const Hero = () => {
       gsap.to(phone, {
         rotateY: 0,
         rotateX: 0,
+        filter: "drop-shadow(0px 20px 40px rgba(0,0,0,0.5))",
+        duration: 1.2,
+        ease: "power3.out",
+      });
+
+      gsap.to(glareRef.current, {
+        backgroundPosition: "50% 50%",
         duration: 1.2,
         ease: "power3.out",
       });
@@ -206,6 +228,20 @@ const Hero = () => {
         start: "top top",
         end: "bottom top",
         scrub: 0.6,
+      },
+    });
+
+    // Scroll-linked tilt on the phone stage. Mouse parallax is disabled on
+    // touch devices (see the "(hover: hover)" guard above), so this gives
+    // touch users an equivalent sense of depth/interactivity as they scroll.
+    gsap.to(phoneStageRef.current, {
+      rotateY: 8,
+      ease: "none",
+      scrollTrigger: {
+        trigger: el,
+        start: "top bottom",
+        end: "top top",
+        scrub: 0.8,
       },
     });
   }, []);
@@ -278,8 +314,8 @@ const Hero = () => {
               <div className="orbit-ring r2" ref={orbitRef} />
 
               <div className="phone-stage" ref={phoneStageRef}>
-                {/* 
-                  Framer Motion parameters removed from this div layer. 
+                {/*
+                  Framer Motion parameters removed from this div layer.
                   GSAP handles this exclusively using full 3D transform matrices now.
                 */}
                 <div className="phone-mockup-wrap" ref={phoneRef}>
@@ -287,6 +323,8 @@ const Hero = () => {
                     src={phoneMockup}
                     alt="Nexa wallet app showing balance and transaction history"
                   />
+                  {/* Glossy light sweep, repositioned on tilt via GSAP */}
+                  <div className="phone-glare" ref={glareRef} />
                 </div>
               </div>
 
