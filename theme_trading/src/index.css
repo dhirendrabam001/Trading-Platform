@@ -61,6 +61,17 @@
   /* ================= BUTTON ================= */
   --btn-primary-bg: var(--primary-gradient);
   --btn-primary-text: #000;
+
+  /* ================= AUTH / GLASS SURFACES ================= */
+  --bg-glass-dark: rgba(9, 13, 22, 0.72);
+  --bg-input-dark: rgba(6, 10, 18, 0.66);
+  --gradient-brand: linear-gradient(
+    95deg,
+    #06d6a0 0%,
+    #10b8d4 34%,
+    #4f74f0 68%,
+    #9b45f5 100%
+  );
 }
 
 *,
