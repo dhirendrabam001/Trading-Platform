@@ -1,11 +1,14 @@
 import { useState } from "react";
 import "./Login.css";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    role: "user",
     rememberMe: true,
   });
 
@@ -196,6 +199,41 @@ export default function Login() {
               </div>
             </div>
 
+            {/* Account Type */}
+            <div className="lp-field">
+              <label htmlFor="role">Account Type</label>
+              <div className="lp-input-wrap lp-select-wrap">
+                <svg
+                  className="lp-input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 3l7 3v5.1c0 4.3-2.9 7.9-7 9.9-4.1-2-7-5.6-7-9.9V6l7-3z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9.2 11.8l1.9 1.9 3.7-3.8"
+                  />
+                </svg>
+                <select
+                  id="role"
+                  name="role"
+                  className="lp-select"
+                  value={formData.role}
+                  onChange={handleChange}
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+
             {/* Remember + Forgot */}
             <div className="lp-row">
               <label className="lp-check">
@@ -260,11 +298,15 @@ export default function Login() {
               Google
             </button>
 
-            <button type="button" className="lp-social">
+            <button
+              onClick={() => navigate("/register")}
+              type="button"
+              className="lp-social"
+            >
               <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                <path d="M15 14c2.7 0 5 2.3 5 5v1H4v-1c0-2.7 2.3-5 5-5h6zm-3-2a4 4 0 100-8 4 4 0 000 8zm7 0h-2V9h-3V7h3V4h2v3h3v2h-3v3z" />
               </svg>
-              Apple
+              Create an Account
             </button>
           </div>
 
@@ -344,4 +386,6 @@ export default function Login() {
       </div>
     </div>
   );
-}
+};
+
+export default Login;

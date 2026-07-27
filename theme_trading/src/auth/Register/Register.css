@@ -1,0 +1,71 @@
+/* Two-Column Grid for Name Fields */
+.lp-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Note: .lp-select (Account Type) styling lives in Login.css alongside the
+   rest of the shared lp-* form theme — it is used by both auth screens. */
+
+/* Terms and Privacy Text styling */
+.lp-terms-text {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.lp-terms-text a {
+  color: #12e0a3;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.lp-terms-text a:hover {
+  color: #17a8e0;
+  text-decoration: underline;
+}
+
+/* Footer Link back to Login */
+.lp-footer-nav {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: #94a3b8;
+}
+
+.lp-link {
+  color: #12e0a3;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 4px;
+  transition: color 0.2s ease;
+}
+
+.lp-link:hover {
+  color: #17a8e0;
+  text-decoration: underline;
+}
+
+/* ── Mobile Responsive Adjustments ── */
+@media (max-width: 640px) {
+  /* Stack First & Last Name vertically on smaller mobile screens */
+  .lp-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .lp-card {
+    padding: 24px 18px;
+    margin: 12px;
+  }
+
+  .lp-socials {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .lp-social {
+    width: 100%;
+  }
+}

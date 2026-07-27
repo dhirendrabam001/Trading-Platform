@@ -1,8 +1,10 @@
 import React from "react";
 import "./Header.css";
 import TradeLogo from "/Images/trade-logo.png";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
   return (
     <nav className="navbar navbar-expand-lg custom-navbar px-3 px-lg-5">
       {/* ✅ LOGO */}
@@ -51,7 +53,12 @@ const Header = () => {
 
         {/* ✅ RIGHT BUTTON */}
         <div className="d-flex justify-content-center">
-          <button className="btn btn-get-started">Get Started →</button>
+          <button
+            onClick={() => navigate("/login")}
+            className="btn btn-get-started"
+          >
+            Get Started →
+          </button>
         </div>
       </div>
     </nav>

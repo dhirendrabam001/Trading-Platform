@@ -1,34 +1,22 @@
-/* ============================================================
-   Login Page  —  crypto illustration (mookup-img.webp) + glass card
-   Design tokens come from index.css :root
-   ============================================================ */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
 .lp-root {
   position: relative;
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
-  background: var(--bg-primary);
-  font-family: var(--font-primary);
   color: var(--text-primary);
+  font-family: var(--font-primary);
+  /* Full-page trading scene background */
+  background-color: var(--bg-primary);
+  background-image: url("/Images/login-main.webp");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
-/* ── Illustration background ─────────────────────────────────── */
+/* Illustration is now baked into the full-page background */
 .lp-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background-image: url("/Images/mookup-img.webp");
-  background-size: cover;
-  background-position: left center;
-  background-repeat: no-repeat;
-  animation: lpFloat 26s ease-in-out infinite alternate;
+  display: none;
 }
 
 @keyframes lpFloat {
@@ -40,45 +28,40 @@
   }
 }
 
-/* ── Depth / contrast overlay ────────────────────────────────── */
+/* Darken the right side so the card reads cleanly over the scene */
 .lp-overlay {
   position: fixed;
   inset: 0;
   z-index: 1;
-  background:
-    radial-gradient(
-      900px 700px at 18% 62%,
-      transparent 0%,
-      rgba(3, 5, 11, 0.35) 75%
-    ),
-    linear-gradient(
-      90deg,
-      rgba(3, 5, 11, 0) 0%,
-      rgba(3, 5, 11, 0.28) 42%,
-      rgba(3, 5, 11, 0.62) 100%
-    );
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(5, 7, 13, 0) 36%,
+    rgba(5, 7, 13, 0.4) 66%,
+    rgba(5, 7, 13, 0.72) 100%
+  );
 }
 
-/* ── Shell — card floats right, illustration shows left ──────── */
+/* ── Card sits on the right of the scene ─────────────────────── */
 .lp-shell {
   position: relative;
-  z-index: 10;
+  z-index: 2;
   min-height: 100vh;
-  max-width: 1240px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 40px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  padding: 25px;
 }
 
 /* ── Glass card with glowing gradient border ─────────────────── */
 .lp-card {
   position: relative;
-  width: 462px;
-  max-width: 100%;
-  padding: 34px 36px;
-  border-radius: 26px;
+  width: 100%;
+  max-width: 500px;
+  padding: 28px 32px;
+  border-radius: 24px;
   background: var(--bg-glass-dark);
   backdrop-filter: blur(26px);
   -webkit-backdrop-filter: blur(26px);
@@ -118,14 +101,14 @@
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  margin-bottom: 26px;
+  margin-bottom: 20px;
 }
 
 .lp-hex {
   position: relative;
   flex-shrink: 0;
-  width: 58px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,11 +119,7 @@
   position: absolute;
   inset: 6px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(0, 255, 178, 0.28),
-    transparent 70%
-  );
+  background: radial-gradient(circle, rgba(0, 255, 178, 0.28), transparent 70%);
   filter: blur(6px);
   z-index: -1;
 }
@@ -165,11 +144,11 @@
 
 .lp-title {
   font-family: var(--font-heading);
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: -0.8px;
-  margin: 3px 0 6px;
+  margin: 3px 0 5px;
   color: var(--text-primary);
 }
 
@@ -184,13 +163,13 @@
 .lp-form {
   display: flex;
   flex-direction: column;
-  gap: 17px;
+  gap: 14px;
 }
 
 .lp-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .lp-field label {
@@ -221,7 +200,7 @@
 
 .lp-input-wrap input {
   width: 100%;
-  height: 50px;
+  height: 48px;
   padding: 0 46px 0 46px;
   background: var(--bg-input-dark);
   border: 1px solid var(--border-light);
@@ -269,6 +248,67 @@
 
 .lp-eye:hover {
   color: var(--text-primary);
+}
+
+/* ── Select (Account Type) — mirrors .lp-input-wrap input ────── */
+.lp-select {
+  width: 100%;
+  height: 48px;
+  padding: 0 44px 0 46px;
+  background-color: var(--bg-input-dark);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 14.5px;
+  font-family: var(--font-primary);
+  font-weight: 500;
+  line-height: 48px;
+  outline: none;
+  cursor: pointer;
+  /* kill the native arrow so the themed chevron below can show */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  /* dark native dropdown popup instead of the default white one */
+  color-scheme: dark;
+  /* themed chevron */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px 18px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background-color 0.2s;
+}
+
+.lp-select:hover {
+  border-color: var(--border-medium);
+}
+
+.lp-select:focus {
+  border-color: rgba(0, 255, 178, 0.65);
+  box-shadow: 0 0 0 3px rgba(0, 255, 178, 0.14);
+  background-color: rgba(6, 10, 18, 0.9);
+  /* chevron turns brand green on focus */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ffb2' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* :focus-within above only covers inputs — do the same for the select */
+.lp-select-wrap:focus-within .lp-input-icon {
+  stroke: var(--primary);
+}
+
+/* Dropdown list items (Windows/Linux render these white without this) */
+.lp-select option {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 10px;
+}
+
+.lp-select option:checked {
+  background-color: rgba(0, 255, 178, 0.14);
+  color: var(--primary);
 }
 
 /* ── Remember / Forgot ───────────────────────────────────────── */
@@ -338,8 +378,8 @@
 /* ── Submit ──────────────────────────────────────────────────── */
 .lp-submit {
   width: 100%;
-  height: 54px;
-  margin-top: 5px;
+  height: 52px;
+  margin-top: 4px;
   border: none;
   border-radius: 13px;
   background: var(--gradient-brand);
@@ -383,7 +423,7 @@
 .lp-divider {
   display: flex;
   align-items: center;
-  margin: 20px 0 16px;
+  margin: 16px 0 13px;
 }
 
 .lp-divider::before,
@@ -409,7 +449,7 @@
 }
 
 .lp-social {
-  height: 50px;
+  height: 48px;
   background: var(--bg-glass);
   border: 1px solid var(--border-light);
   border-radius: 12px;
@@ -445,8 +485,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 18px;
-  padding: 14px 16px;
+  margin-top: 14px;
+  padding: 12px 16px;
   border-radius: 14px;
   background: var(--bg-card);
   border: 1px solid var(--border-light);
@@ -514,35 +554,50 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
-/* ── Responsive ──────────────────────────────────────────────── */
-@media (max-width: 1080px) {
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+/* Mid widths — keep the card on the right, tighten padding */
+@media (max-width: 1024px) {
   .lp-shell {
-    justify-content: center;
+    padding: 32px 30px;
+  }
+}
+
+/* Stack — card centers over the darkened scene */
+@media (max-width: 860px) {
+  .lp-root {
+    background-position: 30% center;
   }
   .lp-overlay {
     background: linear-gradient(
       180deg,
-      rgba(3, 5, 11, 0.35) 0%,
-      rgba(3, 5, 11, 0.72) 100%
+      rgba(4, 6, 12, 0.68) 0%,
+      rgba(4, 6, 12, 0.86) 100%
     );
   }
-  .lp-bg {
-    background-size: cover;
-    background-position: center 30%;
+  .lp-shell {
+    justify-content: center;
+    padding: 28px 18px;
   }
 }
 
-@media (max-width: 560px) {
+/* Phones */
+@media (max-width: 520px) {
   .lp-shell {
-    padding: 22px 16px;
     align-items: flex-start;
+    padding: 22px 14px;
   }
   .lp-card {
-    padding: 28px 22px;
-    border-radius: 22px;
+    padding: 24px 20px;
+    border-radius: 20px;
   }
   .lp-title {
-    font-size: 28px;
+    font-size: 27px;
+  }
+  .lp-socials {
+    grid-template-columns: 1fr;
   }
   .lp-secure-badge svg {
     width: 54px;
