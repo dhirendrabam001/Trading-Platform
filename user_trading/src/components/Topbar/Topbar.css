@@ -1,0 +1,137 @@
+/* ================= TOPBAR ================= */
+.topbar {
+    
+  /* background: var(--bg-secondary); */
+  /* border-bottom: 1px solid var(--border-light); */
+  width: 100%;
+}
+
+/* ---- Greeting (left side) ---- */
+.topbar-welcome {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.topbar-username {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wave-emoji {
+  display: inline-block;
+  font-size: 18px;
+  animation: wave 1.8s ease-in-out infinite;
+  transform-origin: 70% 70%;
+}
+
+@keyframes wave {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(14deg); }
+  40% { transform: rotate(-4deg); }
+}
+
+.topbar-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ---- Actions (right side) ---- */
+.topbar-actions {
+  flex-shrink: 0;
+}
+
+.btn-topbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.btn-topbar svg {
+  flex-shrink: 0;
+}
+
+/* Deposit — outlined green, dark filled interior */
+.btn-deposit {
+  background: rgba(0, 255, 178, 0.08);
+  color: var(--primary);
+  border: 1px solid var(--border-strong);
+}
+
+.btn-deposit:hover {
+  background: rgba(0, 255, 178, 0.14);
+  box-shadow: var(--glow-green);
+  transform: translateY(-1px);
+}
+
+/* Withdraw — solid purple accent */
+.btn-withdraw {
+  background: var(--accent-purple);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-purple);
+}
+
+.btn-withdraw:hover {
+  background: #7c4ded;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Trade Now — neutral glass button */
+.btn-trade {
+  background: var(--bg-glass);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+}
+
+.btn-trade:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 767.98px) {
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    width: 100%;
+  }
+
+  .btn-topbar {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 420px) {
+  .btn-topbar span {
+    display: none;
+  }
+
+  .btn-topbar {
+    padding: 10px;
+  }
+
+  .btn-topbar svg {
+    width: 18px;
+    height: 18px;
+  }
+}

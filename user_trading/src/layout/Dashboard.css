@@ -1,0 +1,38 @@
+/* MAIN LAYOUT */
+.dashboard-layout {
+  min-height: 100vh;
+  background: var(--dashboard-bg);
+}
+
+/* MAIN CONTENT AREA */
+.main-content {
+  margin-left: 260px;
+  width: 100%;
+  transition: 0.3s;
+  min-height: 100vh;
+}
+.dashboard-main {
+  width: 100%;
+  padding: 15px 25px;
+  transition: 0.3s;
+}
+
+.dashboard-layout.sidebar-collapsed .main-content {
+  margin-left: 88px;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+  .dashboard-main {
+    padding: 10px 25px;
+  }
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  z-index: 1500;
+}

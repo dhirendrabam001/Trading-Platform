@@ -1,0 +1,278 @@
+/* ================= PASTE YOUR ROOT VARIABLES HERE ================= */
+/* Example placeholder of your variables: */
+/*
+
+.overview-container {
+  padding: 24px;
+}
+
+/* --- Professional Grid for Cards --- */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+/* --- Card Basic Styling --- */
+.card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Card Header (Title & View All) --- */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.card-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
+
+.view-all-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary); /* Using your primary #00ffb2 for links */
+  transition: all 0.3s ease;
+}
+
+.view-all-link:hover {
+  color: var(--primary-light);
+  text-shadow: var(--glow-green);
+}
+
+/* --- Card Content --- */
+.card-content {
+  flex: 1;
+}
+
+/* --- General Table Styles --- */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th, 
+.data-table td {
+  padding: 14px 10px;
+  text-align: right; /* Default align-right for values */
+  vertical-align: middle;
+}
+
+/* Align first columns left */
+.data-table th:first-child,
+.data-table td:first-child {
+  text-align: left;
+  padding-left: 0;
+}
+
+/* Table Head Styling */
+.data-table thead th {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Table Row Hover (Subtle) */
+.data-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+  background: var(--bg-tertiary);
+}
+
+/* --- Asset Cell (Icon + Name) --- */
+.asset-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.asset-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary); /* For fallback */
+  border: 1px solid var(--border-medium);
+}
+
+.asset-icon {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+.asset-names {
+  display: flex;
+  flex-direction: column;
+}
+
+.asset-primary-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.asset-slash-name {
+  color: var(--text-muted);
+}
+
+/* --- Status Badges (Long/Buy/Sell) --- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Colors from accent variables */
+.status-badge.long, .status-badge.buy {
+  background: rgba(34, 197, 94, 0.15); /* Accent Green Bright */
+  color: var(--accent-green-bright);
+}
+
+.status-badge.sell {
+  background: rgba(239, 68, 68, 0.15); /* Accent Red */
+  color: var(--accent-red);
+}
+
+/* --- Profit & Loss Colors --- */
+.pnl-value.positive {
+  color: var(--accent-green); /* Using your primary glow green */
+  font-weight: 600;
+}
+
+.pnl-value.negative {
+  color: var(--accent-red);
+}
+
+/* ================= D3 CHART & LEGEND STYLING ================= */
+
+.chart-and-legend-container {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.chart-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 200px;
+  height: 200px;
+}
+
+/* Styling for D3 SVG text elements */
+.chart-label-text {
+  fill: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.chart-value-text {
+  fill: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  font-family: var(--font-heading);
+}
+
+/* Legend Styling */
+.legend-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+}
+
+.legend-name {
+  flex: 1;
+  text-align: left;
+}
+
+.legend-percentage {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ================= RESPONSIVE MEDIA QUERIES ================= */
+
+/* Medium Devices (e.g., Tablets, Small Laptops) - Stack to 2 columns or vertical based on design space */
+@media (max-width: 1200px) {
+  .overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Small Devices (e.g., Mobile Phones) - Full Vertical Stack */
+@media (max-width: 768px) {
+  .overview-container {
+    padding: 16px;
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr; /* Single column stack */
+    gap: 16px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .card-header {
+    margin-bottom: 16px;
+  }
+
+  .chart-and-legend-container {
+    flex-direction: column; /* Stack chart and legend vertically */
+    gap: 16px;
+  }
+
+  .chart-wrapper {
+    width: 160px; /* Scale chart slightly smaller */
+    height: 160px;
+  }
+  
+  /* Update SVG dimensions dynamically with CSS */
+  .chart-wrapper svg {
+    width: 160px;
+    height: 160px;
+  }
+
+  /* Optional: Adjust table font sizes if needed, but tables remain horizontal scrollable by default or compact enough */
+}

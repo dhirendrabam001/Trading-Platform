@@ -1,0 +1,141 @@
+.dashboard-info { width: 100%; }
+
+/* ── Card ──────────────────────────────────────────────── */
+.dc-card {
+  background: var(--card-gradient,
+    linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01))
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 18px 18px 14px;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  backdrop-filter: blur(14px);
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+/* shimmer */
+.dc-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    rgba(255,255,255,0.04) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: dcSweep 7s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+.dc-card > * { position: relative; z-index: 1; }
+
+.dc-card:hover {
+  transform: translateY(-5px) scale(1.012);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.42);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* ── Row 1 — icon + badge ──────────────────────────────── */
+.dc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.dc-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+.dc-icon--green  { background: linear-gradient(135deg, #00a86b, #00ffb2); }
+.dc-icon--blue   { background: linear-gradient(135deg, #1d4ed8, #60a5fa); }
+.dc-icon--purple { background: linear-gradient(135deg, #6d28d9, #a78bfa); }
+.dc-icon--red    { background: linear-gradient(135deg, #c0392b, #f87171); }
+
+.dc-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.dc-badge--up      { background: rgba(0,255,178,0.13);   color: #00ffb2; }
+.dc-badge--down    { background: rgba(248,113,113,0.15); color: #f87171; }
+.dc-badge--neutral { background: rgba(139,92,246,0.22);  color: #c4b5fd; }
+
+/* ── Row 2 — title ─────────────────────────────────────── */
+.dc-title {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-muted, #8892a4);
+  margin: 0 0 6px;
+}
+
+/* ── Row 3 — big value ─────────────────────────────────── */
+.dc-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.3px;
+}
+
+/* ── Row 4 — footer ────────────────────────────────────── */
+.dc-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 10px;
+  min-height: 52px;
+}
+
+.dc-sub {
+  font-size: 11.5px;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.45;
+  flex: 1;
+  min-width: 0;
+  align-self: flex-end;
+}
+.dc-sub--green { color: #00ffb2; }
+.dc-sub--muted { color: var(--text-muted, #8892a4); }
+.dc-sub--red   { color: #f87171; }
+
+/* ── Sparkline — right side, ~55% card width, 52px tall ── */
+.dc-spark {
+  width: 55%;
+  max-width: 155px;
+  height: 52px;
+  flex-shrink: 0;
+}
+
+/* chart.js canvas fills its container */
+.dc-spark canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Sweep ─────────────────────────────────────────────── */
+@keyframes dcSweep {
+  0%   { transform: translateX(-100%); }
+  45%  { transform: translateX(220%);  }
+  100% { transform: translateX(220%);  }
+}
