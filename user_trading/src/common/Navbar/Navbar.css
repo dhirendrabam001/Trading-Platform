@@ -12,6 +12,16 @@
   z-index: 1000;
 }
 
+/* Own the gap rather than Bootstrap's .gap-3, which is !important and so
+   cannot be tightened at mobile widths */
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
 /* ICON BUTTON */
 .nav-icon {
   width: 44px;
@@ -32,6 +42,8 @@
 .nav-icons {
   width: 70px;
   height: 44px;
+  padding: 0;
+  flex-shrink: 0;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -203,7 +215,58 @@
 }
 /* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
+  .navbar-custom {
+    height: 62px;
+    padding: 0 14px;
+  }
+
   .search-box {
     display: none;
+  }
+
+  /* The hamburger is a 70px pill on desktop; square it up on phones */
+  .nav-icons {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .nav-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .nav-left,
+  .nav-right {
+    gap: 8px;
+  }
+
+  /* Five controls plus the hamburger overflow a 360px screen. Notifications
+     and the profile carry state worth seeing; the rest live in the menu. */
+  .nav-icon--optional {
+    display: none;
+  }
+
+  .profile-dropdown {
+    top: 52px;
+    width: min(260px, calc(100vw - 28px));
+  }
+}
+
+@media (max-width: 360px) {
+  .navbar-custom {
+    padding: 0 10px;
+  }
+
+  .nav-left,
+  .nav-right {
+    gap: 6px;
+  }
+
+  .nav-icons,
+  .nav-icon {
+    width: 38px;
+    height: 38px;
   }
 }

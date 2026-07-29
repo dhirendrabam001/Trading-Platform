@@ -1,9 +1,16 @@
 /* ================= TOPBAR ================= */
 .topbar {
-    
+
   /* background: var(--bg-secondary); */
   /* border-bottom: 1px solid var(--border-light); */
   width: 100%;
+  /* The actions never shrink, so let them drop to their own line rather than
+     push the row wider than the content column */
+  flex-wrap: wrap;
+}
+
+.topbar-greeting {
+  min-width: 0;
 }
 
 /* ---- Greeting (left side) ---- */

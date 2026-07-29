@@ -1,9 +1,15 @@
 import { useState } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { USER_API_END_POINT, dashboardUrlForRole } from "../../apis/apis";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/autSlice";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -20,9 +26,48 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", formData);
+    try {
+      const promise = axios.post(`${USER_API_END_POINT}/login`, formData, {
+        withCredentials: true,
+      });
+      toast.promise(promise, {
+        pending: "Login processing...",
+        success: "Login Successfully",
+        error: {
+          render({ data }) {
+            return data?.response?.data?.message || "Something is wrong";
+          },
+        },
+      });
+
+      const res = await promise;
+      if (res.data.success) {
+        // The API nests role inside `user` — `res.data.role` is undefined
+        const { token, user } = res.data;
+
+        localStorage.setItem("token", token);
+        dispatch(setUser(user));
+
+        if (!user?.role) {
+          // Falls through to the user dashboard below; surface it rather than
+          // silently sending an admin to the wrong app.
+          console.warn("Login response carried no user.role", res.data);
+        }
+
+        // Each dashboard is a separate Vite app on its own origin, so this is
+        // a full page load rather than a router navigate. localStorage does
+        // not cross origins either, so the token rides along in the URL and
+        // the target app moves it into its own storage on boot.
+        const target = dashboardUrlForRole(user?.role);
+        window.location.replace(
+          `${target}/?token=${encodeURIComponent(token)}`,
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

@@ -6,9 +6,10 @@
 
 /* MAIN CONTENT AREA */
 .main-content {
+  flex: 1 1 0;
+  min-width: 0;
   margin-left: 260px;
-  width: 100%;
-  transition: 0.3s;
+  transition: margin-left 0.3s ease;
   min-height: 100vh;
 }
 .dashboard-main {
@@ -22,11 +23,23 @@
 }
 
 @media (max-width: 768px) {
-  .main-content {
+  /* The sidebar is an overlay here, so the content takes the full width.
+     This has to match the specificity of the .sidebar-collapsed rule above —
+     a media query adds none of its own, so a plain `.main-content` would
+     lose and leave an 88px gutter on phones. */
+  .dashboard-layout .main-content,
+  .dashboard-layout.sidebar-collapsed .main-content {
     margin-left: 0;
   }
+
   .dashboard-main {
-    padding: 10px 25px;
+    padding: 12px 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .dashboard-main {
+    padding: 10px 11px;
   }
 }
 
@@ -34,5 +47,22 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(2px);
   z-index: 1500;
+  animation: backdropFade 0.3s ease;
+}
+
+@keyframes backdropFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-backdrop {
+    animation: none;
+  }
 }

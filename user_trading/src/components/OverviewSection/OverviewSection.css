@@ -1,0 +1,417 @@
+/* ================= OVERVIEW SECTION (Positions / Trades / Allocation) ================= */
+
+.ov-section {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* --- Grid ---
+   The three cards need very different widths: Open Positions carries 6 columns,
+   Recent Trades 5, Asset Allocation none. A 12-column framework grid can't
+   express that ratio, so the track sizes below come from each card's real
+   minimum width. Breakpoints are the viewport at which that minimum fits,
+   accounting for the 260px sidebar + 50px page padding. */
+.ov-grid {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Two across: a half row can now hold the widest table */
+@media (min-width: 1160px) {
+  .ov-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ov-card--allocation {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Three across — the reference layout */
+@media (min-width: 1310px) {
+  .ov-grid {
+    grid-template-columns:
+      minmax(0, 1.55fr)
+      minmax(0, 1.27fr)
+      minmax(0, 1fr);
+  }
+
+  .ov-card--allocation {
+    grid-column: auto;
+  }
+}
+
+/* --- Card Shell --- */
+.ov-card {
+  background: var(--card-gradient);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  position: relative; /* containing block for the sweep */
+  overflow: hidden; /* clips the beam to the rounded corners */
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+  /* Contents size against this card's real width (cqi units below) rather
+     than against the viewport, so the fit holds at any screen size or
+     sidebar state without hand-tuned breakpoints. */
+  container-type: inline-size;
+}
+
+/* Shimmer — same beam and cadence as .dc-card and .cd-card so every card row
+   on the dashboard sweeps alike. Absolute positioning keeps it out of the
+   flex flow. */
+.ov-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: ovSweep 7s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Lift content above the beam */
+.ov-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Stagger so the beam reads as one wave crossing the row */
+.ov-card:nth-child(2)::before {
+  animation-delay: 0.85s;
+}
+
+.ov-card:nth-child(3)::before {
+  animation-delay: 1.7s;
+}
+
+.ov-card:hover {
+  transform: translateY(-5px) scale(1.012);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.42);
+  border-color: var(--border-medium);
+}
+
+/* ── Sweep ─────────────────────────────────────────────── */
+/* Crosses in the first 45%, then rests off-screen for the remainder, so the
+   cards stay calm between passes instead of shimmering constantly. */
+@keyframes ovSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  45% {
+    transform: translateX(220%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-card::before {
+    animation: none;
+  }
+
+  .ov-card:hover {
+    transform: none;
+  }
+}
+
+/* --- Card Header (Title & View All) --- */
+.ov-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.ov-card-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: clamp(14px, 3.6cqi, 16px);
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.ov-view-all {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: clamp(11px, 2.9cqi, 13px);
+  font-weight: 500;
+  color: var(--primary);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.ov-view-all:hover {
+  color: var(--primary-light);
+  text-shadow: var(--glow-green);
+}
+
+/* --- Table ---
+   overflow-x is a safety net, not the plan: the sizing below is meant to fit.
+   It only engages on genuinely narrow screens, and clipped prices would be
+   worse than a thin scrollbar. */
+.ov-table-scroll {
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-medium) transparent;
+}
+
+/* index.css styles the global scrollbar bright green and 8px — too loud here */
+.ov-table-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.ov-table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ov-table-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 4px;
+}
+
+.ov-table {
+  width: 100%;
+  border-collapse: collapse;
+  /* 2.6cqi ≈ 11px in a 425px card, relaxing to 13px as the card grows */
+  font-size: clamp(10px, 2.6cqi, 13px);
+  white-space: nowrap;
+}
+
+.ov-table th,
+.ov-table td {
+  padding: clamp(10px, 2.4cqi, 12px) clamp(3px, 1.1cqi, 10px);
+  text-align: right; /* Default align-right for values */
+  vertical-align: middle;
+}
+
+/* Align first column left */
+.ov-table th:first-child,
+.ov-table td:first-child {
+  text-align: left;
+  padding-left: 0;
+}
+
+.ov-table th:last-child,
+.ov-table td:last-child {
+  padding-right: 0;
+}
+
+.ov-table thead th {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: clamp(8.5px, 2.1cqi, 11px);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--border-light);
+  padding-top: 0;
+  /* Let "Current Price" wrap rather than force the column wider than its data */
+  white-space: normal;
+}
+
+.ov-table tbody td {
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.ov-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ov-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.ov-table tbody tr:hover {
+  background: var(--bg-tertiary);
+}
+
+.ov-muted {
+  color: var(--text-muted) !important;
+}
+
+/* --- Asset Cell (Icon + Symbol) --- */
+.ov-asset {
+  display: flex;
+  align-items: center;
+  gap: clamp(5px, 1.2cqi, 10px);
+}
+
+.ov-asset-icon {
+  width: clamp(17px, 4.6cqi, 26px);
+  height: clamp(17px, 4.6cqi, 26px);
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(9px, 2.4cqi, 13px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.ov-asset-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* --- Type Badges (Long / Buy / Sell) --- */
+.ov-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px clamp(6px, 1.6cqi, 10px);
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: clamp(9px, 2.1cqi, 11px);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+.ov-badge--long,
+.ov-badge--buy {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--accent-green-bright);
+}
+
+.ov-badge--sell {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--accent-red);
+}
+
+/* --- Profit & Loss --- */
+.ov-pnl {
+  font-weight: 600;
+}
+
+.ov-pnl.is-positive {
+  color: var(--accent-green) !important;
+}
+
+.ov-pnl.is-negative {
+  color: var(--accent-red) !important;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 767.98px) {
+  .ov-section {
+    margin-top: 16px;
+  }
+
+  .ov-grid {
+    gap: 12px;
+  }
+
+  .ov-card {
+    padding: 16px 14px;
+  }
+
+  .ov-card-header {
+    margin-bottom: 12px;
+  }
+
+  .ov-card-title {
+    font-size: 15px;
+  }
+
+  .ov-asset-icon {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+
+  /* Six nowrap columns cannot fit a phone at a readable size, so each row
+     becomes its own block: the header row is dropped and every cell prints
+     its label from data-label. Nothing is clipped, nothing scrolls sideways. */
+  .ov-table-scroll {
+    overflow-x: visible;
+  }
+
+  .ov-table,
+  .ov-table tbody,
+  .ov-table tr,
+  .ov-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .ov-table thead {
+    display: none;
+  }
+
+  .ov-table {
+    white-space: normal;
+    font-size: 13px;
+  }
+
+  .ov-table tbody tr {
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .ov-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .ov-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .ov-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .ov-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+  }
+
+  /* The asset is the block's heading, so it spans the row without a label */
+  .ov-table tbody td.is-asset {
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .ov-table tbody td.is-asset::before {
+    display: none;
+  }
+}

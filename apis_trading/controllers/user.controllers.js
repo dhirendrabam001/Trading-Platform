@@ -57,6 +57,7 @@ const register = async (req, res) => {
       email,
       phoneNumber,
       password: hashPassword,
+      role,
       agreeTerms,
     });
 
@@ -92,6 +93,13 @@ const login = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "Invalid credentials!" });
+    }
+
+    // check role
+    if (user.role !== role) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid role selected" });
     }
 
     // matched password

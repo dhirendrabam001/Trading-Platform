@@ -1,105 +1,148 @@
-import React, { useEffect, useRef } from 'react';
-import * as d3 from 'd3';
-import './AssetAllocationChart.css'; // The shared CSS file contains chart variables
+import "./AssetAllocationChart.css"; // The shared CSS file contains chart variables
 
-const AssetAllocationChart = ({ data }) => {
-  const chartRef = useRef(null);
+// Mock allocation — totals the $847,234.56 shown in PortfolioPerformance
+const defaultData = [
+  {
+    name: "Bitcoin",
+    symbol: "BTC",
+    value: 40.2,
+    usdValue: 340588.29,
+    color: "#f59e0b",
+  },
+  {
+    name: "Ethereum",
+    symbol: "ETH",
+    value: 25.1,
+    usdValue: 212655.87,
+    color: "#3b82f6",
+  },
+  {
+    name: "Solana",
+    symbol: "SOL",
+    value: 15.3,
+    usdValue: 129626.89,
+    color: "#22c55e",
+  },
+  {
+    name: "BNB",
+    symbol: "BNB",
+    value: 8.7,
+    usdValue: 73709.41,
+    color: "#eab308",
+  },
+  {
+    name: "Others",
+    value: 10.7,
+    usdValue: 90654.1,
+    color: "#6b7280",
+  },
+];
 
-  // Define color mapping from root variables
-  const colorMap = {
-    '#f59e0b': 'var(--accent-orange)', // Bitcoin
-    '#3b82f6': 'var(--accent-blue)', // Ethereum
-    '#22c55e': 'var(--accent-green-bright)', // Solana (bright green needed for visibility)
-    '#eab308': 'var(--accent-yellow)', // BNB
-    '#6b7280': 'var(--text-muted)' // Others
-  };
+// --- Chart Dimensions ---
+// The 70/90 inner/outer radii are drawn as a single stroked circle, so the
+// 10px corner radius of the original design becomes a round line cap.
+const SIZE = 200;
+const CENTER = SIZE / 2;
+const RADIUS = 80; // midpoint between the inner and outer radius
+const STROKE = 20; // outerRadius - innerRadius
+const GAP = 8; // circumference px between segments
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-  useEffect(() => {
-    if (!data || data.length === 0 || !chartRef.current) return;
+// Define color mapping from root variables
+const colorMap = {
+  "#f59e0b": "var(--accent-orange)", // Bitcoin
+  "#3b82f6": "var(--accent-blue)", // Ethereum
+  "#22c55e": "var(--accent-green-bright)", // Solana (bright green needed for visibility)
+  "#eab308": "var(--accent-yellow)", // BNB
+  "#6b7280": "var(--text-muted)", // Others
+};
 
-    // --- Chart Data & Dimensions ---
-    const width = 200;
-    const height = 200;
-    const innerRadius = 70; // This controls the donut hole size
-    const outerRadius = 90;
+const resolveColor = (color) => colorMap[color] || color; // Use mapped color or fallback
 
-    // --- Setup SVG and Container ---
-    const svg = d3.select(chartRef.current);
-    svg.selectAll("*").remove(); // Clear previous rendering on data change
+const AssetAllocationChart = ({ data = defaultData }) => {
+  const items = Array.isArray(data) ? data.filter(Boolean) : [];
 
-    const container = svg
-      .append("g")
-      .attr("transform", `translate(${width / 2}, ${height / 2})`);
+  if (items.length === 0) return null;
 
-    // --- Color Scale ---
-    const color = d3.scaleOrdinal()
-      .domain(data.map(d => d.name))
-      .range(data.map(d => colorMap[d.color] || d.color)); // Use mapped color or fallback
+  const totalWeight = items.reduce((sum, item) => sum + (item.value || 0), 0);
 
-    // --- Compute Arc & Pie ---
-    const pie = d3.pie()
-      .value(d => d.value)
-      .sort(null);
+  // --- Calculate Total Portfolio Value ---
+  const totalValue = items.reduce((sum, item) => sum + (item.usdValue || 0), 0);
+  const formattedTotal = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(totalValue);
 
-    const arc = d3.arc()
-      .innerRadius(innerRadius)
-      .outerRadius(outerRadius)
-      .cornerRadius(10) // Matches the rounded look in image
-      .padAngle(0.04); // Adds space between segments
+  // --- Compute Arcs ---
+  // Walk the ring once, turning each weight into a dash along the circle.
+  const isSingle = items.length === 1;
+  let travelled = 0;
 
-    // --- Generate Arcs ---
-    const arcs = container.selectAll(".arc")
-      .data(pie(data))
-      .enter()
-      .append("g")
-      .attr("class", "arc");
-
-    arcs.append("path")
-      .attr("d", arc)
-      .attr("fill", d => color(d.data.name))
-      .style("transition", "all 0.3s ease")
-      .on("mouseover", function() {
-        d3.select(this).style("filter", "drop-shadow(var(--glow-soft))");
-      })
-      .on("mouseout", function() {
-        d3.select(this).style("filter", "none");
-      });
-
-    // --- Calculate Total Portfolio Value ---
-    const totalValue = data.reduce((sum, item) => sum + item.usdValue, 0);
-    const formattedTotal = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalValue);
-
-    // --- Center Text (Total Label & Value) ---
-    const textGroup = container.append("g")
-      .attr("text-anchor", "middle")
-      .attr("dy", "0.35em");
-
-    textGroup.append("text")
-      .attr("class", "chart-label-text")
-      .attr("y", -10)
-      .text("Total");
-
-    textGroup.append("text")
-      .attr("class", "chart-value-text")
-      .attr("y", 15)
-      .text(formattedTotal);
-
-  }, [data]);
+  const segments = items.map((item) => {
+    const arcLength =
+      totalWeight > 0 ? ((item.value || 0) / totalWeight) * CIRCUMFERENCE : 0;
+    // Round caps overhang STROKE/2 at both ends, so shorten the dash to match.
+    const dash = Math.max(arcLength - GAP - STROKE, 0.01);
+    const segment = {
+      dash,
+      dashOffset: -(travelled + (GAP + STROKE) / 2),
+      color: resolveColor(item.color),
+    };
+    travelled += arcLength;
+    return segment;
+  });
 
   return (
     <div className="chart-and-legend-container">
       <div className="chart-wrapper">
-        <svg ref={chartRef} width={200} height={200}></svg>
+        <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
+          {/* Rotate so the first segment starts at 12 o'clock */}
+          <g transform={`rotate(-90 ${CENTER} ${CENTER})`}>
+            {segments.map((segment, index) => (
+              <circle
+                key={index}
+                className="donut-segment"
+                cx={CENTER}
+                cy={CENTER}
+                r={RADIUS}
+                fill="none"
+                stroke={segment.color}
+                strokeWidth={STROKE}
+                strokeLinecap={isSingle ? "butt" : "round"}
+                strokeDasharray={
+                  isSingle
+                    ? undefined
+                    : `${segment.dash} ${CIRCUMFERENCE - segment.dash}`
+                }
+                strokeDashoffset={isSingle ? undefined : segment.dashOffset}
+              />
+            ))}
+          </g>
+
+          {/* --- Center Text (Total Label & Value) --- */}
+          <g textAnchor="middle" dominantBaseline="middle">
+            <text className="chart-label-text" x={CENTER} y={CENTER - 10}>
+              Total
+            </text>
+            <text className="chart-value-text" x={CENTER} y={CENTER + 15}>
+              {formattedTotal}
+            </text>
+          </g>
+        </svg>
       </div>
       <div className="legend-wrapper">
-        {data.map((item, index) => (
+        {items.map((item, index) => (
           <div key={index} className="legend-item">
-            <span 
-              className="legend-dot" 
-              style={{ backgroundColor: colorMap[item.color] || item.color }} 
+            <span
+              className="legend-dot"
+              style={{ backgroundColor: resolveColor(item.color) }}
             />
-            <span className="legend-name text-muted">{item.name} ({item.symbol})</span>
-            <span className="legend-percentage">{item.value.toFixed(1)}%</span>
+            <span className="legend-name">
+              {item.symbol ? `${item.name} (${item.symbol})` : item.name}
+            </span>
+            <span className="legend-percentage">
+              {Number(item.value || 0).toFixed(1)}%
+            </span>
           </div>
         ))}
       </div>

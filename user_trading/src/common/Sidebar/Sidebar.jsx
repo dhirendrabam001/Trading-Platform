@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   CandlestickChart,
@@ -57,10 +58,15 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
       <div className="sidebar-section">
         <p className="section-title">MAIN</p>
 
-        <a href="#" className="menu-item active">
+        <NavLink
+          to="/dashboard"
+          className={({ isActive }) =>
+            isActive ? "menu-item active" : "menu-item"
+          }
+        >
           <LayoutDashboard size={18} />
           <span>Dashboard</span>
-        </a>
+        </NavLink>
       </div>
       {/* MARKET */}
 

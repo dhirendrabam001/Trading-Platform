@@ -1,0 +1,274 @@
+/* ================= DASHBOARD FOOTER ================= */
+/* Theme variables come from src/index.css */
+
+.ft {
+  width: 100%;
+  margin-top: 24px;
+  padding: 28px 25px 22px;
+  background: var(--card-gradient);
+  border-top: 1px solid var(--border-light);
+  backdrop-filter: blur(12px);
+}
+
+/* --- Top: brand + link columns --- */
+.ft-top {
+  display: grid;
+  gap: 26px 32px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 620px) {
+  .ft-top {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Brand spans the full row until there is room for it alongside */
+  .ft-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 992px) {
+  .ft-top {
+    grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  }
+
+  .ft-brand {
+    grid-column: auto;
+  }
+}
+
+/* --- Brand --- */
+.ft-brand {
+  min-width: 0;
+}
+
+.ft-logo {
+  width: 168px;
+  height: 44px;
+  object-fit: contain;
+  object-position: left center;
+  display: block;
+}
+
+.ft-tagline {
+  margin: 12px 0 0;
+  max-width: 320px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* --- Socials --- */
+.ft-socials {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.ft-social {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-light);
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.ft-social svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ft-social:hover {
+  color: var(--primary);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 255, 178, 0.14);
+}
+
+/* --- Link columns --- */
+.ft-col {
+  min-width: 0;
+}
+
+.ft-col-title {
+  margin: 0 0 14px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.ft-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ft-col a {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition:
+    color 0.25s ease,
+    padding-left 0.25s ease;
+}
+
+.ft-col a:hover {
+  color: var(--primary);
+  padding-left: 3px;
+}
+
+/* --- Divider --- */
+.ft-divider {
+  height: 1px;
+  margin: 24px 0 18px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-medium),
+    transparent
+  );
+}
+
+/* --- Bottom bar --- */
+.ft-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+.ft-copy {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* --- Status pill --- */
+.ft-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+  background: rgba(0, 255, 178, 0.08);
+  border: 1px solid rgba(0, 255, 178, 0.2);
+  white-space: nowrap;
+}
+
+.ft-status-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: ftPulse 2.4s ease-out infinite;
+}
+
+@keyframes ftPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 178, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(0, 255, 178, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 178, 0);
+  }
+}
+
+/* --- Legal links --- */
+.ft-legal {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.ft-legal a {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.ft-legal a:hover {
+  color: var(--primary);
+}
+
+/* --- Risk note --- */
+.ft-disclaimer {
+  margin: 16px 0 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 767.98px) {
+  .ft {
+    margin-top: 18px;
+    padding: 24px 14px 20px;
+  }
+
+  .ft-top {
+    gap: 22px;
+  }
+
+  .ft-logo {
+    width: 150px;
+    height: 40px;
+  }
+
+  .ft-divider {
+    margin: 20px 0 16px;
+  }
+
+  /* Stacked and left-aligned reads better than a squeezed single row */
+  .ft-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .ft {
+    padding: 20px 11px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-status-dot {
+    animation: none;
+  }
+
+  .ft-social:hover {
+    transform: none;
+  }
+}

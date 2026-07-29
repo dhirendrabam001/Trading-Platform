@@ -31,10 +31,15 @@ const Navbar = ({ toggleSidebar }) => {
   return (
     <div className="navbar-custom d-flex align-items-center justify-content-between">
       {/* LEFT */}
-      <div className="d-flex align-items-center gap-3">
-        <div className="nav-icons" onClick={toggleSidebar}>
+      <div className="nav-left">
+        <button
+          type="button"
+          className="nav-icons"
+          onClick={toggleSidebar}
+          aria-label="Toggle navigation menu"
+        >
           <Menu size={18} />
-        </div>
+        </button>
 
         <div className="search-box d-none d-md-flex">
           <Search size={16} />
@@ -43,8 +48,8 @@ const Navbar = ({ toggleSidebar }) => {
       </div>
 
       {/* RIGHT */}
-      <div className="d-flex align-items-center gap-3">
-        <div className="nav-icon">
+      <div className="nav-right">
+        <div className="nav-icon nav-icon--optional">
           <Zap size={18} />
         </div>
 
@@ -53,7 +58,7 @@ const Navbar = ({ toggleSidebar }) => {
           <span className="nav-badge">5</span>
         </div>
 
-        <div className="nav-icon">
+        <div className="nav-icon nav-icon--optional">
           <Sun size={18} />
         </div>
 
