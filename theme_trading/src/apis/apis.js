@@ -12,3 +12,6 @@ export const ADMIN_APP_URL =
 
 export const dashboardUrlForRole = (role) =>
   role === "admin" ? ADMIN_APP_URL : USER_APP_URL;
+
+// const api = "admin";
+// const apis = "admins";
