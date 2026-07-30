@@ -7,7 +7,7 @@
 /* MAIN CONTENT AREA */
 .main-content {
   margin-left: 260px;
-  width: 100%;
+  width: calc(100% - 260px);
   transition: 0.3s;
   min-height: 100vh;
 }
@@ -19,11 +19,13 @@
 
 .dashboard-layout.sidebar-collapsed .main-content {
   margin-left: 88px;
+  width: calc(100% - 88px);
 }
 
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;
+    width: 100%;
   }
   .dashboard-main {
     padding: 10px 25px;

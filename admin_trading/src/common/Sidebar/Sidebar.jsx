@@ -1,24 +1,29 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   LayoutDashboard,
-  BarChart3,
-  Wallet,
-  ChevronDown,
-  Activity,
-  Cpu,
-  Layers,
-  PieChart,
+  Users,
+  ShieldCheck,
+  UserCheck,
+  FileText,
+  LineChart,
+  ArrowRightLeft,
   Coins,
-  Database,
-  TrendingUp,
-  Store,
-  LayoutGrid,
+  FolderTree,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Receipt,
+  Percent,
+  ListOrdered,
+  Layers,
+  History,
+  Megaphone,
+  LifeBuoy,
+  BarChart,
   Settings,
-  Bell,
   Shield,
-  UserPlus,
-  CreditCard,
-  HelpCircle,
+  Key,
+  Puzzle,
+  ChevronDown,
   X,
 } from "lucide-react";
 import "./Sidebar.css";
@@ -33,7 +38,9 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
 
   return (
     <div
-      className={`sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}
+      className={`sidebar ${collapsed ? "collapsed" : ""} ${
+        mobileOpen ? "mobile-open" : ""
+      }`}
     >
       {/* LOGO */}
       <div className="sidebar-header d-flex align-items-center justify-content-between">
@@ -48,170 +55,144 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
       <p className="sub text-center">AI Trading Platform</p>
       <hr />
 
-      {/* MAIN */}
+      {/* DASHBOARD */}
       <div className="sidebar-section">
-        <p className="section-title">MAIN</p>
-
         <a href="#" className="menu-item active">
           <LayoutDashboard size={18} />
           <span>Dashboard</span>
         </a>
-
-        <a href="#" className="menu-item">
-          <Wallet size={18} />
-          <span>My Assets</span>
-        </a>
-
-        <a href="#" className="menu-item">
-          <BarChart3 size={18} />
-          <span>My Analytics</span>
-        </a>
       </div>
 
-      {/* TRADING & BOTS */}
+      {/* USER MANAGEMENT */}
       <div className="sidebar-section">
-        <p className="section-title">TRADING & BOTS</p>
+        <p className="section-title">USER MANAGEMENT</p>
 
         <a href="#" className="menu-item">
-          <Activity size={18} />
-          <span>Trading</span>
+          <Users size={18} />
+          <span>Users</span>
         </a>
-
-        {/* DROPDOWN */}
-        <div className="dropdown-wrapper">
-          <a
-            href="#"
-            className="menu-item"
-            onClick={() => toggleMenu("control")}
-          >
-            <Cpu size={18} />
-            <span>Control Panel</span>
-            <ChevronDown
-              size={16}
-              className={`arrow ${openMenu === "control" ? "rotate" : ""}`}
-            />
-          </a>
-
-          <div className={`submenu ${openMenu === "control" ? "show" : ""}`}>
-            <a href="#">Overview</a>
-            <a href="#">Bot Settings</a>
-            <a href="#">Strategy</a>
-          </div>
-        </div>
-
-        {/* DROPDOWN */}
-        <div className="dropdown-wrapper">
-          <a
-            href="#"
-            className="menu-item"
-            onClick={(e) => {
-              e.preventDefault();
-              toggleMenu("aiBot");
-            }}
-          >
-            <Cpu size={18} />
-            <span>AI BOT</span>
-            <ChevronDown
-              size={16}
-              className={`arrow ${openMenu === "aiBot" ? "rotate" : ""}`}
-            />
-          </a>
-
-          <div className={`submenu ${openMenu === "aiBot" ? "show" : ""}`}>
-            <a href="#">Signal Bot</a>
-            <a href="#">DCA Bot</a>
-            <a href="#">Arbitrage Bot</a>
-            <a href="#">Pump Screener</a>
-          </div>
-        </div>
+        <a href="#" className="menu-item">
+          <ShieldCheck size={18} />
+          <span>KYC Verification</span>
+        </a>
+        <a href="#" className="menu-item">
+          <UserCheck size={18} />
+          <span>Roles & Permissions</span>
+        </a>
+        <a href="#" className="menu-item">
+          <FileText size={18} />
+          <span>Activity Logs</span>
+        </a>
       </div>
 
-      {/* DEFI */}
+      {/* MARKET MANAGEMENT */}
       <div className="sidebar-section">
-        <p className="section-title">DEFI & PORTFOLIO</p>
+        <p className="section-title">MARKET MANAGEMENT</p>
 
         <a href="#" className="menu-item">
-          <Database size={16} />
-          <span>DeFi Center</span>
+          <LineChart size={18} />
+          <span>Markets</span>
         </a>
         <a href="#" className="menu-item">
-          <TrendingUp size={16} />
-          <span>Yield Farming</span>
+          <ArrowRightLeft size={18} />
+          <span>Trading Pairs</span>
         </a>
         <a href="#" className="menu-item">
-          <BarChart3 size={16} />
-          <span>Liquidity Tracker</span>
+          <Coins size={18} />
+          <span>Assets</span>
         </a>
         <a href="#" className="menu-item">
-          <PieChart size={16} />
-          <span>Portfolio Tracker</span>
-        </a>
-        <a href="#" className="menu-item">
-          <Wallet size={16} />
-          <span>Wallets</span>
-        </a>
-        <a href="#" className="menu-item">
-          <Layers size={16} />
-          <span>DeFi Protocols</span>
+          <FolderTree size={18} />
+          <span>Categories</span>
         </a>
       </div>
 
-      {/* MARKETPLACE */}
+      {/* FINANCIAL MANAGEMENT */}
       <div className="sidebar-section">
-        <p className="section-title">MARKETPLACE</p>
+        <p className="section-title">FINANCIAL MANAGEMENT</p>
 
         <a href="#" className="menu-item">
-          <Store size={20} />
-          <span>Strategie Marketplace</span>
+          <ArrowDownCircle size={18} />
+          <span>Deposits</span>
         </a>
         <a href="#" className="menu-item">
-          <LayoutGrid size={20} />
-          <span>Bot Templates</span>
+          <ArrowUpCircle size={18} />
+          <span>Withdrawals</span>
+        </a>
+        <a href="#" className="menu-item">
+          <Receipt size={18} />
+          <span>Transactions</span>
+        </a>
+        <a href="#" className="menu-item">
+          <Percent size={18} />
+          <span>Fees & Charges</span>
         </a>
       </div>
 
-      {/* ACCOUNT */}
+      {/* TRADING MANAGEMENT */}
       <div className="sidebar-section">
-        <p className="section-title">ACCOUNT</p>
+        <p className="section-title">TRADING MANAGEMENT</p>
 
         <a href="#" className="menu-item">
-          <Settings size={20} />
-          <span>Preferences</span>
-        </a>
-        <a
-          href="#"
-          className="menu-item d-flex align-items-center justify-content-between"
-        >
-          <div className="d-flex align-items-center gap-2">
-            <Bell size={20} />
-            <span>Notifications</span>
-          </div>
-          <span className="badge notification-badge">5</span>
+          <ListOrdered size={18} />
+          <span>Orders</span>
         </a>
         <a href="#" className="menu-item">
-          <Shield size={20} />
-          <span>Security & API Keys</span>
+          <Layers size={18} />
+          <span>Open Positions</span>
         </a>
         <a href="#" className="menu-item">
-          <UserPlus size={20} />
-          <span>Invite Friends</span>
-        </a>
-        <a
-          href="#"
-          className="menu-item d-flex align-items-center justify-content-between"
-        >
-          <div className="d-flex align-items-center gap-2">
-            <CreditCard size={20} />
-            <span>Subscription</span>
-          </div>
-          <span className="pro-badge">PRO</span>
+          <ArrowRightLeft size={18} />
+          <span>Trades</span>
         </a>
         <a href="#" className="menu-item">
-          <HelpCircle size={20} />
-          <span>Help Center</span>
+          <History size={18} />
+          <span>Order History</span>
         </a>
       </div>
+
+      {/* PLATFORM MANAGEMENT */}
+      <div className="sidebar-section">
+        <p className="section-title">PLATFORM MANAGEMENT</p>
+
+        <a href="#" className="menu-item">
+          <Megaphone size={18} />
+          <span>Announcements</span>
+        </a>
+        <a href="#" className="menu-item">
+          <LifeBuoy size={18} />
+          <span>Support Tickets</span>
+        </a>
+        <a href="#" className="menu-item">
+          <BarChart size={18} />
+          <span>Reports</span>
+        </a>
+      </div>
+
+      {/* SYSTEM SETTINGS */}
+      <div className="sidebar-section">
+        <p className="section-title">SYSTEM SETTINGS</p>
+
+        <a href="#" className="menu-item">
+          <Settings size={18} />
+          <span>System Settings</span>
+        </a>
+        <a href="#" className="menu-item">
+          <Shield size={18} />
+          <span>Security</span>
+        </a>
+        <a href="#" className="menu-item">
+          <Key size={18} />
+          <span>API Management</span>
+        </a>
+        <a href="#" className="menu-item">
+          <Puzzle size={18} />
+          <span>Integrations</span>
+        </a>
+      </div>
+
       <hr />
+
       {/* USER PROFILE */}
       <div className="sidebar-user mt-auto">
         <div className="user-card">

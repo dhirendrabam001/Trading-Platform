@@ -1,0 +1,413 @@
+/* ================= RECENT ACTIVITY ROW ================= */
+.recent-activity {
+  margin-top: 16px;
+}
+
+/* ================= CARD SHELL (same recipe as .overview-card) ================= */
+.ra-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px 18px;
+  background: var(--card-gradient);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+  animation: raRise 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.recent-activity > div:nth-child(2) .ra-card {
+  animation-delay: 0.1s;
+}
+
+.ra-card:hover {
+  border-color: rgba(0, 255, 178, 0.2);
+}
+
+/* ================= CARD HEADER ================= */
+.ra-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.ra-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+
+.ra-link {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.ra-link:hover {
+  opacity: 0.75;
+  color: var(--primary);
+}
+
+/* ================= TABLE ================= */
+/* fixed layout + percentage columns = never overflows, so no scroll container */
+.ra-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+.ra-table th,
+.ra-table td {
+  padding: 12px 8px;
+  font-size: 13px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: none;
+}
+
+.ra-table th:first-child,
+.ra-table td:first-child {
+  padding-left: 0;
+}
+
+.ra-table th:last-child,
+.ra-table td:last-child {
+  padding-right: 0;
+}
+
+/* Header */
+.ra-table thead th {
+  padding-top: 6px;
+  padding-bottom: 10px;
+  font-family: var(--font-primary);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Rows */
+.ra-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background-color 0.2s ease;
+}
+
+.ra-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.ra-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* ================= COLUMN WIDTHS ================= */
+.ra-table--txn th:nth-child(1) {
+  width: 19%;
+}
+.ra-table--txn th:nth-child(2) {
+  width: 17%;
+}
+.ra-table--txn th:nth-child(3) {
+  width: 13%;
+}
+.ra-table--txn th:nth-child(4) {
+  width: 10%;
+}
+.ra-table--txn th:nth-child(5) {
+  width: 15%;
+}
+.ra-table--txn th:nth-child(6) {
+  width: 14%;
+}
+.ra-table--txn th:nth-child(7) {
+  width: 12%;
+}
+
+.ra-table--users th:nth-child(1) {
+  width: 42%;
+}
+.ra-table--users th:nth-child(2) {
+  width: 35%;
+}
+.ra-table--users th:nth-child(3) {
+  width: 23%;
+}
+
+/* ================= CELL TYPOGRAPHY ================= */
+.ra-strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.ra-muted {
+  color: var(--text-muted);
+}
+
+.ra-txn-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.ra-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.ra-right {
+  text-align: right;
+}
+
+/* mobile-only duplicates of the columns that collapse below 576px */
+.ra-asset-inline,
+.ra-email-inline {
+  display: none;
+}
+
+/* ================= TYPE + STATUS ================= */
+.ra-type {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.ra-type--deposit {
+  color: var(--primary);
+}
+
+.ra-type--withdraw {
+  color: var(--accent-red);
+}
+
+.ra-pill {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.ra-pill--completed {
+  background: rgba(0, 255, 178, 0.12);
+  color: var(--primary);
+  border: 1px solid rgba(0, 255, 178, 0.22);
+}
+
+.ra-pill--pending {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--accent-orange);
+  border: 1px solid rgba(245, 158, 11, 0.24);
+}
+
+/* ================= USER CELL ================= */
+.ra-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ra-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ra-user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ra-user-meta > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ra-email {
+  font-size: 12.5px;
+}
+
+/* ================= KEYFRAMES ================= */
+@keyframes raRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+
+/* Narrowest the 7/12 card ever gets: sidebar is expanded but the viewport is
+   only just past the xl breakpoint. Trim the cells and give Status the slack it
+   needs so the "Completed" pill can't clip. */
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  .ra-table th,
+  .ra-table td {
+    padding: 12px 5px;
+    font-size: 12.5px;
+  }
+
+  .ra-table--txn th:nth-child(1) {
+    width: 17%;
+  }
+  .ra-table--txn th:nth-child(3) {
+    width: 12%;
+  }
+  .ra-table--txn th:nth-child(4) {
+    width: 9%;
+  }
+  .ra-table--txn th:nth-child(6) {
+    width: 17%;
+  }
+}
+
+/* Cards go full width below xl, so there is more room — just ease the padding */
+@media (max-width: 1199.98px) {
+  .ra-table th,
+  .ra-table td {
+    padding: 12px 6px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .ra-table th,
+  .ra-table td {
+    font-size: 12.5px;
+  }
+
+  .ra-table thead th {
+    font-size: 10px;
+    letter-spacing: 0.4px;
+  }
+}
+
+/* Phones: 7 columns cannot fit without scrolling, so each row reflows into a
+   3-line block. Every value from the desktop table is still shown. */
+@media (max-width: 575.98px) {
+  .ra-card {
+    padding: 14px;
+  }
+
+  .ra-table,
+  .ra-table tbody,
+  .ra-table tr,
+  .ra-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .ra-table thead {
+    display: none;
+  }
+
+  .ra-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 10px;
+    row-gap: 3px;
+    padding: 11px 0;
+  }
+
+  .ra-table td {
+    padding: 0 !important;
+    font-size: 12.5px;
+  }
+
+  /* --- transactions: user/amount · txn-id/time · type/status --- */
+  .ra-table--txn td:nth-child(2) {
+    grid-area: 1 / 1 / 2 / 2;
+    font-size: 13.5px;
+  }
+  .ra-table--txn td:nth-child(5) {
+    grid-area: 1 / 2 / 2 / 3;
+    text-align: right;
+    font-size: 13.5px;
+  }
+  .ra-table--txn td:nth-child(1) {
+    grid-area: 2 / 1 / 3 / 2;
+  }
+  .ra-table--txn td:nth-child(7) {
+    grid-area: 2 / 2 / 3 / 3;
+    text-align: right;
+  }
+  .ra-table--txn td:nth-child(3) {
+    grid-area: 3 / 1 / 4 / 2;
+  }
+  .ra-table--txn td:nth-child(6) {
+    grid-area: 3 / 2 / 4 / 3;
+    text-align: right;
+  }
+  /* Asset column folds into the amount line */
+  .ra-table--txn td:nth-child(4) {
+    display: none;
+  }
+
+  .ra-asset-inline {
+    display: inline;
+    margin-left: 6px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  /* --- users: avatar + name/email stacked, joined on the right --- */
+  .ra-table--users tbody tr {
+    align-items: center;
+    row-gap: 0;
+  }
+
+  .ra-table--users td:nth-child(1) {
+    grid-area: 1 / 1 / 2 / 2;
+  }
+  .ra-table--users td:nth-child(3) {
+    grid-area: 1 / 2 / 2 / 3;
+    text-align: right;
+  }
+  /* Email column folds under the user name */
+  .ra-table--users td:nth-child(2) {
+    display: none;
+  }
+
+  .ra-email-inline {
+    display: block;
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ra-card {
+    animation: none;
+  }
+}

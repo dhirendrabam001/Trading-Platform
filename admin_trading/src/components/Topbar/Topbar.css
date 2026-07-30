@@ -1,0 +1,270 @@
+/* ================= TOPBAR ================= */
+.topbar {
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.topbar-greeting {
+  min-width: 0;
+}
+
+/* ---- Greeting (left side) ---- */
+.topbar-username {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+}
+
+.wave-emoji {
+  display: inline-block;
+  font-size: 18px;
+  animation: wave 1.8s ease-in-out infinite;
+  transform-origin: 70% 70%;
+}
+
+@keyframes wave {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(14deg);
+  }
+  20% {
+    transform: rotate(-8deg);
+  }
+  30% {
+    transform: rotate(14deg);
+  }
+  40% {
+    transform: rotate(-4deg);
+  }
+}
+
+.topbar-subtitle {
+  font-size: 13px;
+  color: var(--text-muted, #8a8d93);
+  margin-top: 4px;
+}
+
+/* ---- Actions (right side) ---- */
+.topbar-actions {
+  flex-shrink: 0;
+}
+
+/* ---- Date Range Picker (custom listbox, not a native select) ---- */
+.date-picker {
+  position: relative;
+}
+
+.date-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: var(
+    --card-gradient,
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.01)
+    )
+  );
+  border: 1px solid var(--border-medium);
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.date-trigger:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-strong);
+}
+
+.date-picker.is-open .date-trigger,
+.date-trigger:focus-visible {
+  outline: none;
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px rgba(0, 255, 178, 0.13);
+}
+
+/* Fixed width so the control does not resize between "Jul 13 - Jul 19, 2025"
+   and "This Month" */
+.date-value {
+  flex: 1;
+  min-width: 148px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.picker-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color 0.25s ease;
+}
+
+.date-trigger:hover .picker-icon,
+.date-picker.is-open .picker-icon {
+  color: var(--primary);
+}
+
+.chevron-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.date-picker.is-open .chevron-icon {
+  color: var(--primary);
+  transform: rotate(180deg);
+}
+
+/* ---- Menu panel ---- */
+.date-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 100%;
+  z-index: 1200;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  background: linear-gradient(180deg, #0b0f1a, #05070d);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(14px);
+  animation: dateMenuIn 0.18s ease;
+}
+
+@keyframes dateMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.date-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.date-option:hover,
+.date-option:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
+
+.date-option.is-active {
+  color: var(--primary);
+  background: rgba(0, 255, 178, 0.08);
+}
+
+.date-check {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .date-menu {
+    animation: none;
+  }
+}
+
+/* Export Report Button — Outlined Green Style */
+.btn-topbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: var(--font-primary, sans-serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.btn-export {
+  background: rgba(0, 255, 178, 0.04);
+  color: #00ffb2;
+  border: 1px solid rgba(0, 255, 178, 0.25);
+}
+
+.btn-export:hover {
+  background: rgba(0, 255, 178, 0.12);
+  border-color: rgba(0, 255, 178, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(0, 255, 178, 0.15);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 767.98px) {
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    width: 100%;
+  }
+
+  .btn-export {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  /* Fill the row: icon left, label filling, chevron right */
+  .date-picker {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .date-value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

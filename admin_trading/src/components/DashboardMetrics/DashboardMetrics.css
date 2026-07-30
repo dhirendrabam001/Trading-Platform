@@ -1,0 +1,448 @@
+/* ================= DASHBOARD METRICS ROW ================= */
+.dashboard-metrics {
+  margin-top: 16px;
+}
+
+/* ================= CARD SHELL (same recipe as .ra-card / .overview-card) ================= */
+.dm-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px 10px;
+  background: var(
+    --card-gradient,
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.01)
+    )
+  );
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.08));
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card, 0 10px 40px rgba(0, 0, 0, 0.6));
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+  animation: dmRise 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.dashboard-metrics > div:nth-child(2) .dm-card {
+  animation-delay: 0.1s;
+}
+.dashboard-metrics > div:nth-child(3) .dm-card {
+  animation-delay: 0.2s;
+}
+
+.dm-card:hover {
+  border-color: rgba(0, 255, 178, 0.2);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
+}
+
+/* ================= CARD HEADER ================= */
+.dm-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.dm-title {
+  margin: 0;
+  font-family: var(--font-heading, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+.dm-link {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--primary, #00ffb2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.dm-link:hover {
+  opacity: 0.75;
+  color: var(--primary, #00ffb2);
+}
+
+/* ================= KYC: DOUGHNUT + LEGEND ================= */
+.dm-kyc-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 0;
+}
+
+.dm-donut-wrapper {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.dm-donut-wrapper:hover {
+  transform: scale(1.03);
+}
+
+.dm-kyc-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dm-legend-item {
+  --i: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  animation: dmFadeUp 0.45s ease-out both;
+  animation-delay: calc(0.25s + var(--i) * 90ms);
+}
+
+.dm-legend-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.dm-legend-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.dm-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.dm-legend-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary, #a1a1aa);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dm-legend-right {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.dm-legend-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  font-variant-numeric: tabular-nums;
+}
+
+.dm-legend-pct {
+  font-size: 11.5px;
+  color: var(--text-muted, #6b7280);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ================= TOP TRADING PAIRS TABLE ================= */
+/* fixed layout + percentage columns = never overflows, so no scroll container */
+.dm-table {
+  width: 100%;
+  flex: 1;
+  table-layout: fixed;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+.dm-table th,
+.dm-table td {
+  padding: 10px 6px;
+  font-size: 13px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: none;
+}
+
+.dm-table th:first-child,
+.dm-table td:first-child {
+  padding-left: 0;
+}
+
+.dm-table th:last-child,
+.dm-table td:last-child {
+  padding-right: 0;
+}
+
+.dm-table th:nth-child(1) {
+  width: 44%;
+}
+.dm-table th:nth-child(2) {
+  width: 30%;
+}
+.dm-table th:nth-child(3) {
+  width: 26%;
+}
+
+.dm-table thead th {
+  padding-top: 0;
+  padding-bottom: 10px;
+  font-family: var(--font-primary, sans-serif);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-muted, #6b7280);
+  border-bottom: 1px solid var(--border-light, rgba(255, 255, 255, 0.08));
+}
+
+.dm-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background-color 0.2s ease;
+}
+
+.dm-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.dm-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.dm-right {
+  text-align: right;
+}
+
+.dm-pair {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.dm-pair-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.dm-pair-name {
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dm-volume {
+  color: var(--text-secondary, #a1a1aa);
+  font-variant-numeric: tabular-nums;
+}
+
+.dm-change {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  width: 100%;
+  font-weight: 700;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dm-change.is-up {
+  color: var(--primary, #00ffb2);
+}
+
+.dm-change.is-down {
+  color: var(--accent-red, #ef4444);
+}
+
+/* ================= SYSTEM HEALTH ================= */
+.dm-health-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dm-health-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.dm-health-item:last-child {
+  border-bottom: none;
+}
+
+.dm-health-left {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.dm-service-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(0, 255, 178, 0.08);
+  border: 1px solid rgba(0, 255, 178, 0.18);
+  color: var(--primary, #00ffb2);
+}
+
+.dm-service-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-primary, #ffffff);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dm-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--primary, #00ffb2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dm-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary, #00ffb2);
+  box-shadow: 0 0 0 0 rgba(0, 255, 178, 0.6);
+  animation: dmPulse 2s ease-out infinite;
+}
+
+/* ================= KEYFRAMES ================= */
+@keyframes dmRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dmFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dmPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 178, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(0, 255, 178, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 178, 0);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1199.98px) {
+  .dm-table th,
+  .dm-table td {
+    padding: 10px 5px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .dm-card {
+    padding: 14px;
+  }
+
+  .dm-kyc-body {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .dm-donut-wrapper {
+    width: 118px;
+    height: 118px;
+    align-self: center;
+  }
+
+  .dm-table th,
+  .dm-table td {
+    padding: 9px 4px;
+    font-size: 12.5px;
+  }
+
+  .dm-table thead th {
+    font-size: 10px;
+    letter-spacing: 0.4px;
+  }
+
+  .dm-pair-icon {
+    width: 23px;
+    height: 23px;
+    font-size: 11px;
+  }
+
+  .dm-service-name {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dm-card,
+  .dm-legend-item {
+    animation: none;
+  }
+
+  .dm-status-dot {
+    animation: none;
+  }
+}

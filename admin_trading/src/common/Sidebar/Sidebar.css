@@ -12,7 +12,24 @@
     transform 0.3s ease;
   z-index: 2000;
 }
+/* ACTIVE MENU ITEM - Emerald indicator bar on right side */
+.menu-item.active {
+  background: rgba(0, 255, 178, 0.08);
+  color: var(--primary, #00ffb2);
+  border-left: 3px solid var(--primary, #00ffb2);
+  font-weight: 600;
+}
 
+/* SECTION HEADING LETTER SPACING */
+.section-title {
+  font-size: 10.5px;
+  color: var(--text-muted, #6b7280);
+  margin-bottom: 8px;
+  margin-top: 6px;
+  letter-spacing: 0.8px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
 .sidebar.collapsed {
   width: 88px;
 }

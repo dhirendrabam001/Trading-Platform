@@ -1,0 +1,427 @@
+/* ================= TRADING OVERVIEW ROW ================= */
+.trading-overview {
+  margin-top: 16px;
+}
+
+/* ================= CARD SHELL ================= */
+.overview-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px;
+  background: var(
+    --card-gradient,
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.01)
+    )
+  );
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.08));
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+  /* rises into place on mount, matching the chart growing off the baseline */
+  animation: ovRise 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.trading-overview > div:nth-child(2) .overview-card {
+  animation-delay: 0.1s;
+}
+
+.overview-card:hover {
+  border-color: rgba(0, 255, 178, 0.2);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
+}
+
+/* ================= HEADER ================= */
+.ov-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  white-space: nowrap;
+}
+
+.ov-tag {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted, #6b7280);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.08));
+  border-radius: 999px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+/* ================= SEGMENTED TIMEFRAME SWITCH ================= */
+.tf-switch {
+  --tf-i: 0;
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 3px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.08));
+}
+
+/* sliding pill that tracks the active segment */
+.tf-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / 3);
+  height: calc(100% - 6px);
+  border-radius: 7px;
+  background: rgba(0, 255, 178, 0.12);
+  border: 1px solid rgba(0, 255, 178, 0.3);
+  transform: translateX(calc(var(--tf-i) * 100%));
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.tf-btn {
+  position: relative;
+  z-index: 1;
+  min-width: 40px;
+  padding: 4px 10px;
+  border: 0;
+  background: transparent;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--text-muted, #6b7280);
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.tf-btn:hover {
+  color: var(--text-secondary, #a1a1aa);
+}
+
+.tf-btn.is-active {
+  color: var(--primary, #00ffb2);
+}
+
+/* ================= HEADLINE STAT ================= */
+.ov-stat {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.stat-amount {
+  margin: 0;
+  font-family: var(--font-heading, sans-serif);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  color: var(--text-primary, #ffffff);
+}
+
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--primary, #00ffb2);
+  background: rgba(0, 255, 178, 0.1);
+  border: 1px solid rgba(0, 255, 178, 0.18);
+  padding: 2px 7px;
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+.stat-period {
+  font-size: 11.5px;
+  color: var(--text-muted, #6b7280);
+}
+
+/* ================= LINE CHART ================= */
+.chart-container {
+  position: relative;
+  width: 100%;
+}
+
+.line-chart-wrapper {
+  flex: 1;
+  min-height: 172px;
+  height: 172px;
+}
+
+/* Chart.js writes an inline width onto the canvas (566.7px), so this needs
+   !important to win. Swap 603.7px for 100% if you want it to follow the card. */
+.line-chart-wrapper canvas {
+  display: block;
+  width: 603.7px !important;
+  height: 172px !important;
+}
+
+/* slow light sweep across the plot so the panel never reads as a static image */
+.line-chart-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 35%,
+    rgba(0, 255, 178, 0.07) 50%,
+    transparent 65%
+  );
+  transform: translateX(-100%);
+  animation: ovSweep 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ================= DOUGHNUT + LEGEND ================= */
+.ov-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 0;
+}
+
+.doughnut-wrapper {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.doughnut-wrapper:hover {
+  transform: scale(1.03);
+}
+
+.market-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.legend-item {
+  --i: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12.5px;
+  padding: 4px 6px;
+  border-radius: 7px;
+  transition: background 0.2s ease;
+  animation: ovFadeUp 0.45s ease-out both;
+  animation-delay: calc(0.25s + var(--i) * 70ms);
+}
+
+.legend-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.legend-left,
+.legend-right {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.legend-left {
+  gap: 8px;
+}
+
+.legend-right {
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.color-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.market-name {
+  color: var(--text-secondary, #a1a1aa);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.market-percent {
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  font-variant-numeric: tabular-nums;
+}
+
+.market-amount {
+  color: var(--text-muted, #6b7280);
+  font-size: 12px;
+  width: 56px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ================= CARD FOOTER ================= */
+.ov-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light, rgba(255, 255, 255, 0.08));
+  font-size: 11.5px;
+  color: var(--text-muted, #6b7280);
+}
+
+.live-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-secondary, #a1a1aa);
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary, #00ffb2);
+  box-shadow: 0 0 0 0 rgba(0, 255, 178, 0.6);
+  animation: ovPulse 2s ease-out infinite;
+}
+
+.ov-foot-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ================= KEYFRAMES ================= */
+@keyframes ovRise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ovFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ovSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  55% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes ovPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 178, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(0, 255, 178, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 178, 0);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1199.98px) {
+  .line-chart-wrapper {
+    min-height: 200px;
+    height: 200px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .overview-card {
+    padding: 14px;
+  }
+
+  .ov-head {
+    flex-wrap: wrap;
+  }
+
+  .stat-amount {
+    font-size: 20px;
+  }
+
+  .line-chart-wrapper {
+    min-height: 165px;
+    height: 165px;
+    /* card padding drops to 14px here */
+    margin-left: -14px;
+    margin-right: -14px;
+  }
+
+  /* 603.7px can't fit a phone — fall back to the card width below 576px */
+  .line-chart-wrapper canvas {
+    width: 100% !important;
+    height: 165px !important;
+  }
+
+  .ov-body {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .doughnut-wrapper {
+    width: 140px;
+    height: 140px;
+  }
+
+  .market-legend {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overview-card,
+  .legend-item {
+    animation: none;
+  }
+
+  .line-chart-wrapper::after,
+  .live-dot {
+    animation: none;
+  }
+}

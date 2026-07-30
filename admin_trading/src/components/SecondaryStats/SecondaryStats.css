@@ -1,0 +1,176 @@
+/* ================= MAIN CONTAINER CARD ================= */
+.secondary-stats-card {
+  background: var(--card-gradient, linear-gradient(145deg, #0b0f1a, #05070d));
+  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.08));
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card, 0 8px 32px 0 rgba(0, 0, 0, 0.37));
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover Effect on Card */
+.secondary-stats-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0, 255, 178, 0.25);
+  box-shadow:
+    0 12px 35px -8px rgba(0, 255, 178, 0.12),
+    0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* FLEX LAYOUT FOR STATS ITEMS */
+.stats-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  padding: 4px 8px;
+  transition: transform 0.25s ease;
+}
+
+.stat-item:hover {
+  transform: scale(1.03);
+}
+
+/* ================= GLOWING ICON BADGES ================= */
+.icon-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+/* EMERALD (Green) Theme */
+.badge-emerald {
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 178, 0.25) 0%,
+    rgba(0, 255, 178, 0.05) 70%
+  );
+  color: var(--primary, #00ffb2);
+  border: 1px solid rgba(0, 255, 178, 0.3);
+  box-shadow: 0 0 15px rgba(0, 255, 178, 0.18);
+}
+
+/* BLUE Theme */
+.badge-blue {
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.25) 0%,
+    rgba(59, 130, 246, 0.05) 70%
+  );
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.18);
+}
+
+/* RED Theme */
+.badge-red {
+  background: radial-gradient(
+    circle,
+    rgba(239, 68, 68, 0.25) 0%,
+    rgba(239, 68, 68, 0.05) 70%
+  );
+  color: var(--accent-red, #ef4444);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.18);
+}
+
+/* AMBER (Yellow) Theme */
+.badge-amber {
+  background: radial-gradient(
+    circle,
+    rgba(245, 158, 11, 0.25) 0%,
+    rgba(245, 158, 11, 0.05) 70%
+  );
+  color: var(--accent-orange, #f59e0b);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.18);
+}
+
+/* ================= STAT LABELS & VALUES ================= */
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-title {
+  font-size: 12.5px;
+  color: var(--text-muted, #6b7280);
+  font-weight: 500;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.stat-value-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+  font-family: var(--font-heading, sans-serif);
+  line-height: 1.1;
+}
+
+.stat-badge {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.text-positive {
+  color: var(--primary, #00ffb2);
+}
+
+.text-negative {
+  color: var(--accent-red, #ef4444);
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 1200px) {
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .stat-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding-bottom: 12px;
+  }
+
+  .stat-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
