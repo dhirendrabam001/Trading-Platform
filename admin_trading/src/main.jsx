@@ -5,6 +5,11 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App.jsx";
+import { captureSessionFromUrl } from "./auth/session";
+
+// Runs before render so the token is out of the URL and in storage
+// before the first paint or API call.
+captureSessionFromUrl();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

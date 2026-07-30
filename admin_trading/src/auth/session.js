@@ -1,14 +1,13 @@
 export const TOKEN_KEY = "token";
 
 /**
- * Promotes the token handed over by Login's post-login redirect into this
- * origin's own storage.
+ * Promotes the token handed over by the login app's post-login redirect into
+ * this origin's own storage.
  *
  * localStorage is scoped per origin, so a token written by the login app on
- * one port is not readable by the admin app on another — the query string is
- * the handoff channel. The value is removed from the URL immediately so it
- * does not sit in the address bar, the history entry, or any outgoing
- * Referer header.
+ * one port/domain is not readable here — the query string is the handoff
+ * channel. The value is removed from the URL immediately so it does not sit
+ * in the address bar, the history entry, or any outgoing Referer header.
  */
 export const captureSessionFromUrl = () => {
   const params = new URLSearchParams(window.location.search);

@@ -8,10 +8,6 @@ import { ToastContainer } from "react-toastify";
 import "./index.css";
 import App from "./App.jsx";
 import store from "./redux/Store.js";
-import { captureSessionFromUrl } from "./auth/session";
-
-// Runs before render so the token is in storage by the first API call
-captureSessionFromUrl();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
