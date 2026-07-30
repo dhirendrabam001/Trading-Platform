@@ -3,7 +3,11 @@ import "./Login.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { USER_API_END_POINT, dashboardUrlForRole } from "../../apis/apis";
+import {
+  ADMIN_APP_URL,
+  USER_API_END_POINT,
+  USER_APP_URL,
+} from "../../apis/apis";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/autSlice";
 
@@ -48,22 +52,13 @@ const Login = () => {
         const { token, user } = res.data;
 
         localStorage.setItem("token", token);
-        dispatch(setUser(user));
+        dispatch(setUser(res.data.user));
 
-        if (!user?.role) {
-          // Falls through to the user dashboard below; surface it rather than
-          // silently sending an admin to the wrong app.
-          console.warn("Login response carried no user.role", res.data);
+        if (user.role === "admin") {
+          window.location.href = ADMIN_APP_URL;
+        } else {
+          window.location.href = USER_APP_URL;
         }
-
-        // Each dashboard is a separate Vite app on its own origin, so this is
-        // a full page load rather than a router navigate. localStorage does
-        // not cross origins either, so the token rides along in the URL and
-        // the target app moves it into its own storage on boot.
-        const target = dashboardUrlForRole(user?.role);
-        window.location.replace(
-          `${target}/?token=${encodeURIComponent(token)}`,
-        );
       }
     } catch (error) {
       console.error(error);
