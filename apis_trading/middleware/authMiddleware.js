@@ -2,8 +2,12 @@ const jwt = require("jsonwebtoken");
 
 const authMiddleware = (req, res, next) => {
   try {
+    console.log("Origin:", req.headers.origin);
+    console.log("Cookies:", req.cookies);
+
     const token = req.cookies.token;
-    console.log("token", token);
+    // console.log("Cookies:", req.cookies);
+    // console.log("Token:", req.cookies.token);
 
     if (!token) {
       return res
@@ -11,7 +15,7 @@ const authMiddleware = (req, res, next) => {
         .json({ success: false, message: "Please login first" });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("decode", decoded);
+    // console.log("decode", decoded);
     req.user = decoded;
     next();
   } catch (error) {

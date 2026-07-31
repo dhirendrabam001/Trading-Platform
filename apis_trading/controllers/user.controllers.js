@@ -127,6 +127,7 @@ const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -151,7 +152,9 @@ const login = async (req, res) => {
 
 const profile = async (req, res) => {
   try {
+    console.log("Decoded:", req.user);
     const user = await User.findById(req.user.id).select("-password");
+    console.log("user", user);
 
     if (!user) {
       return res
