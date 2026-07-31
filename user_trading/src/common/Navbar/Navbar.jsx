@@ -11,9 +11,36 @@ import {
   HelpCircle,
   LogOut,
 } from "lucide-react";
+import axios from "axios";
+import { useDispatch } from "react-redux";
 import "./Navbar.css";
+import { THEME_APP_URL, USER_API_END_POINT } from "../../apis/apis";
+import { setUser } from "../../redux/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ toggleSidebar }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const logoutHandler = async () => {
+    try {
+      const res = await axios.post(
+        `${USER_API_END_POINT}/logout`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+
+      if (res.data.success) {
+        dispatch(setUser(null));
+        window.location.href = THEME_APP_URL;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const [openProfile, setOpenProfile] = useState(false);
   const dropdownRef = useRef();
 
@@ -101,8 +128,13 @@ const Navbar = ({ toggleSidebar }) => {
 
               <div className="divider"></div>
 
-              <div className="dropdown-item logout">
-                <LogOut size={16} /> <span>Logout</span>
+              <div
+                className="dropdown-item logout"
+                onClick={logoutHandler}
+                style={{ cursor: "pointer" }}
+              >
+                <LogOut size={16} />
+                <span>Logout</span>
               </div>
             </div>
           )}

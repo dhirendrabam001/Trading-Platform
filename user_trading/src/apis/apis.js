@@ -2,6 +2,7 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const USER_API_END_POINT = `${BASE_URL}/api/user`;
 
+export const THEME_APP_URL = import.meta.env.VITE_THEME_APP_URL;
 export const USER_APP_URL = import.meta.env.VITE_USER_APP_URL;
 
 export const ADMIN_APP_URL = import.meta.env.VITE_ADMIN_APP_URL;
