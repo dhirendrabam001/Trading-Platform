@@ -49,10 +49,8 @@ const Login = () => {
       const res = await promise;
       if (res.data.success) {
         // The API nests role inside `user` — `res.data.role` is undefined
-        const { token, user } = res.data;
-
-        localStorage.setItem("token", token);
-        dispatch(setUser(res.data.user));
+        const { user } = res.data;
+        dispatch(setUser(user));
 
         if (user.role === "admin") {
           window.location.href = ADMIN_APP_URL;

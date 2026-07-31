@@ -1,6 +1,6 @@
 const express = require("express");
-
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 // required all important
@@ -30,6 +30,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 // all routes
 const userRoutes = require("./routes/user.routes");

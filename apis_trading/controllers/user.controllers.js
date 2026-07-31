@@ -122,6 +122,14 @@ const login = async (req, res) => {
       },
     );
 
+    // save cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
     return res.status(200).json({
       success: true,
       message: "Login Successfully",
@@ -143,7 +151,8 @@ const login = async (req, res) => {
 
 const profile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select("-password");
+    const user = await User.findById(req.user.id).select("-password");
+
     if (!user) {
       return res
         .status(404)
