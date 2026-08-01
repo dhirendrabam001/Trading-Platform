@@ -51,6 +51,26 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    // New fields
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
+
+    loginCount: {
+      type: Number,
+      default: 0,
+    },
+
+    kycStatus: {
+      type: Boolean,
+      default: false,
+    },
+
+    profileImage: {
+      type: String,
+      default: "",
+    },
     agreeTerms: {
       type: Boolean,
       required: true,

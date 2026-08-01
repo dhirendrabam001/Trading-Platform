@@ -46,9 +46,10 @@
 .ft-logo {
   width: 168px;
   height: 44px;
-  object-fit: contain;
+  object-fit: cover;
   object-position: left center;
   display: block;
+  margin-left: -38px;
 }
 
 .ft-tagline {

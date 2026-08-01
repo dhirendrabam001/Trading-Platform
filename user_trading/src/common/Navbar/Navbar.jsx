@@ -12,13 +12,17 @@ import {
   LogOut,
 } from "lucide-react";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "./Navbar.css";
 import { THEME_APP_URL, USER_API_END_POINT } from "../../apis/apis";
 import { setUser } from "../../redux/authSlice";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ toggleSidebar }) => {
+  const { user } = useSelector((store) => store.auth);
+
+  const avatar = `${user?.firstName?.charAt(0) || ""}${user?.lastName?.charAt(0) || ""}`;
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -95,7 +99,7 @@ const Navbar = ({ toggleSidebar }) => {
             className="profile d-flex align-items-center gap-2"
             onClick={() => setOpenProfile(!openProfile)}
           >
-            <div className="avatar-sm">JD</div>
+            <div className="avatar-sm">{avatar}</div>
             <ChevronDown size={16} />
           </div>
 
@@ -114,7 +118,10 @@ const Navbar = ({ toggleSidebar }) => {
               <div className="divider"></div>
 
               {/* MENU */}
-              <div className="dropdown-item">
+              <div
+                className="dropdown-item"
+                onClick={() => navigate("/profile")}
+              >
                 <User size={16} /> <span>My Profile</span>
               </div>
 

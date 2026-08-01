@@ -143,12 +143,16 @@ a:hover {
 }
 
 /* ================= CARD ================= */
+/* Bootstrap's own `.card` sets a near-black `color` intended for light
+   backgrounds. Without an explicit color here, every plain element inside a
+   card inherits that and renders almost invisibly on this dark theme. */
 .card {
   background: var(--card-gradient);
   border: 1px solid var(--border-light);
   border-radius: 14px;
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-card);
+  color: var(--text-primary);
 }
 
 /* ================= BUTTON ================= */
@@ -169,12 +173,19 @@ a:hover {
 }
 
 /* ================= UTILITIES ================= */
+/* Bootstrap declares these same utilities with `!important` (a grey meant for
+   light backgrounds, and its default blue). Matching that weight is what keeps
+   muted text readable and "primary" the brand green rather than Bootstrap blue. */
 .text-muted {
-  color: var(--text-muted);
+  color: var(--text-muted) !important;
 }
 
 .text-primary {
-  color: var(--primary);
+  color: var(--primary) !important;
+}
+
+.text-danger {
+  color: var(--accent-red) !important;
 }
 
 .bg-card {

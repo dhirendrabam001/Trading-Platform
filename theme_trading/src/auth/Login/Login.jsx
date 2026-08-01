@@ -8,12 +8,10 @@ import {
   USER_API_END_POINT,
   USER_APP_URL,
 } from "../../apis/apis";
-import { useDispatch } from "react-redux";
-import { setUser } from "../../redux/autSlice";
 
 const Login = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -50,7 +48,6 @@ const Login = () => {
       if (res.data.success) {
         // The API nests role inside `user` — `res.data.role` is undefined
         const { user } = res.data;
-        dispatch(setUser(user));
 
         if (user.role === "admin") {
           window.location.href = ADMIN_APP_URL;

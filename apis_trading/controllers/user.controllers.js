@@ -110,6 +110,11 @@ const login = async (req, res) => {
         .json({ success: false, message: "Invalid credentials!" });
     }
 
+    // save login info
+    user.lastLogin = new Date();
+    user.loginCount += 1;
+    await user.save();
+
     // create jwt token
     const token = jwt.sign(
       {
@@ -152,24 +157,47 @@ const login = async (req, res) => {
 
 const profile = async (req, res) => {
   try {
-    console.log("Decoded:", req.user);
     const user = await User.findById(req.user.id).select("-password");
-    console.log("user", user);
 
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
-    return res.status(200).json({ success: true, user });
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        role: user.role,
+
+        isVerified: user.isVerified,
+        isActive: user.isActive,
+        agreeTerms: user.agreeTerms,
+
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+
+        lastLogin: user.lastLogin,
+        loginCount: user.loginCount,
+        kycStatus: user.kycStatus,
+        profileImage: user.profileImage,
+      },
+    });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
-
 const logout = async (req, res) => {
   try {
     res.clearCookie("token", {
@@ -182,6 +210,16 @@ const logout = async (req, res) => {
       success: true,
       message: "Logout Successfully",
     });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
   } catch (error) {
     console.error(error);
     return res

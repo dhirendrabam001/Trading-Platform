@@ -1,13 +1,17 @@
 import "./Topbar.css";
+import { useSelector } from "react-redux";
+const Topbar = () => {
+  const { user } = useSelector((store) => store.auth);
 
-const Topbar = ({ userName = "Dhirendra Bam" }) => {
+  const fullName = `${user?.firstName} ${user?.lastName}`;
+
   return (
     <div className="topbar d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 py-2 mb-2">
       {/* Left: greeting */}
       <div className="topbar-greeting">
         <p className="mb-0 topbar-welcome">Welcome back,</p>
         <h4 className="mb-0 topbar-username d-flex align-items-center gap-2">
-          {userName}
+          {fullName}
           <span className="wave-emoji" role="img" aria-label="wave">
             👋
           </span>
