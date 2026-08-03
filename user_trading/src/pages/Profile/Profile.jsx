@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   FiUser,
   FiShield,
@@ -28,6 +28,12 @@ import "./Profile.css";
 import { useSelector } from "react-redux";
 
 const Profile = () => {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const fileInputRef = useRef(null);
   const { user } = useSelector((store) => store.auth);
   const avatar = `${user?.firstName?.charAt(0) || ""}${user?.lastName?.charAt(0) || ""}`;
   const fullName = `${user?.firstName || ""} ${user?.lastName || ""}`;
@@ -51,12 +57,6 @@ const Profile = () => {
       })
     : "--";
 
-  console.log(joinDate);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const [formData, setFormData] = useState({
     bio: "Passionate about algorithmic trading and AI technology. Building the future of automated trading.",
   });
@@ -64,6 +64,20 @@ const Profile = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    setProfileImage(URL.createObjectURL(file));
+
+    console.log(file);
+    // Later you can upload to backend here
   };
 
   return (
@@ -257,17 +271,27 @@ const Profile = () => {
           <div className="card profile-section">
             <div className="section-head">
               <h3 className="section-title">Personal Information</h3>
-              <button className="btn-primary">Save Changes</button>
+              <button className="btn-primary">Update Profile</button>
             </div>
 
             <div className="personal-info-body">
               <div className="form-inputs-left">
                 <div className="field-group">
-                  <label>Full Name</label>
+                  <label>First Name</label>
                   <input
                     type="text"
-                    name="fullName"
-                    value={formData.fullName}
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
+                </div>
+                <div className="field-group">
+                  <label>Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
                     onChange={handleInputChange}
                     className="form-control"
                   />
@@ -288,8 +312,8 @@ const Profile = () => {
                   <label>Phone Number</label>
                   <input
                     type="text"
-                    name="phone"
-                    value={formData.phone}
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
                     onChange={handleInputChange}
                     className="form-control"
                   />
@@ -321,17 +345,43 @@ const Profile = () => {
               {/* Profile Avatar Box */}
               <div className="avatar-upload-area">
                 <span className="upload-title">Profile Picture</span>
+
                 <div className="big-avatar-wrapper">
-                  <div className="big-avatar-circle">DB</div>
-                  <button className="btn-big-avatar-edit">
+                  <div className="big-avatar-circle">
+                    {profileImage ? (
+                      <img src={profileImage} alt="Profile" />
+                    ) : (
+                      avatar
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn-big-avatar-edit"
+                    onClick={handleUploadClick}
+                  >
                     <FiEdit2 size={13} />
                   </button>
                 </div>
+
                 <p className="upload-note">JPG, PNG or GIF. Max size of 2MB.</p>
-                <button className="btn-upload-new">
-                  <FiUpload size={14} style={{ marginRight: "6px" }} /> Upload
-                  New Picture
+
+                <button
+                  type="button"
+                  className="btn-upload-new"
+                  onClick={handleUploadClick}
+                >
+                  <FiUpload size={14} style={{ marginRight: "6px" }} />
+                  Upload New Picture
                 </button>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                />
               </div>
             </div>
           </div>

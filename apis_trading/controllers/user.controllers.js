@@ -157,7 +157,12 @@ const login = async (req, res) => {
 
 const profile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const { firstName, lastName, email, phoneNumber, location, bio } = req.body;
+    const userId = req.user.id;
+    console.log("userId", userId);
+
+    const user = await User.findById(userId).select("-password");
+    console.log("id", userId);
 
     if (!user) {
       return res.status(404).json({
@@ -166,28 +171,14 @@ const profile = async (req, res) => {
       });
     }
 
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email;
+    ((user.phoneNumber = phoneNumber), (user.location = location));
+    user.bio = bio;
+
     return res.status(200).json({
       success: true,
-      user: {
-        _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        role: user.role,
-
-        isVerified: user.isVerified,
-        isActive: user.isActive,
-        agreeTerms: user.agreeTerms,
-
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-
-        lastLogin: user.lastLogin,
-        loginCount: user.loginCount,
-        kycStatus: user.kycStatus,
-        profileImage: user.profileImage,
-      },
     });
   } catch (error) {
     console.error(error);
