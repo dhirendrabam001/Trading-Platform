@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 import {
   FiUser,
   FiShield,
@@ -25,14 +27,15 @@ import {
   FiUploadCloud,
 } from "react-icons/fi";
 import "./Profile.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { USER_API_END_POINT } from "../../apis/apis";
+import { setUser } from "../../redux/authSlice";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [profileImage, setProfileImage] = useState(null);
   const fileInputRef = useRef(null);
   const { user } = useSelector((store) => store.auth);
   const avatar = `${user?.firstName?.charAt(0) || ""}${user?.lastName?.charAt(0) || ""}`;
@@ -58,12 +61,6 @@ const Profile = () => {
     : "--";
 
   const [formData, setFormData] = useState({
-    bio: "Passionate about algorithmic trading and AI technology. Building the future of automated trading.",
-  });
-
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [input, setInput] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -71,10 +68,15 @@ const Profile = () => {
     location: "",
     bio: "",
   });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!user) return;
-    setInput({
+    setFormData({
       firstName: user.firstName || "",
       lastName: user.lastName || "",
       email: user.email || "",
@@ -94,14 +96,65 @@ const Profile = () => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-
+    const file = e.target.files?.[0];
     if (!file) return;
+    setSelectedFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
 
-    setProfileImage(URL.createObjectURL(file));
+  const handleProfileUpdate = async () => {
+    setLoading(true);
+    setStatusMessage("");
 
-    console.log(file);
-    // Later you can upload to backend here
+    try {
+      const profileData = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        profileData.append(key, value || "");
+      });
+
+      if (selectedFile) {
+        profileData.append("profileImage", selectedFile);
+      }
+
+      const promise = axios.put(`${USER_API_END_POINT}/profile`, profileData, {
+        withCredentials: true,
+      });
+
+      toast.promise(promise, {
+        pending: "Updating...",
+        success: "Profile updated successfully",
+        error: {
+          render({ data }) {
+            return (
+              data?.response?.data?.message ||
+              "Something is wrong profile updated"
+            );
+          },
+        },
+      });
+
+      const res = await promise;
+      if (res.data.success) {
+        const updatedUser = res.data.user;
+        dispatch(setUser(updatedUser));
+        setFormData({
+          firstName: updatedUser.firstName || "",
+          lastName: updatedUser.lastName || "",
+          email: updatedUser.email || "",
+          phoneNumber: updatedUser.phoneNumber || "",
+          location: updatedUser.location || "",
+          bio: updatedUser.bio || "",
+        });
+        setImagePreview(updatedUser.profileImage || imagePreview);
+        setSelectedFile(null);
+      } else {
+        setStatusMessage(res.data.message || "Unable to update profile.");
+      }
+    } catch (error) {
+      console.error("Profile update failed:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -295,7 +348,19 @@ const Profile = () => {
           <div className="card profile-section">
             <div className="section-head">
               <h3 className="section-title">Personal Information</h3>
-              <button className="btn-primary">Update Profile</button>
+              <div className="action-row">
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={handleProfileUpdate}
+                  disabled={loading}
+                >
+                  {loading ? "Saving..." : "Update Profile"}
+                </button>
+                {statusMessage && (
+                  <span className="status-message">{statusMessage}</span>
+                )}
+              </div>
             </div>
 
             <div className="personal-info-body">
@@ -372,8 +437,8 @@ const Profile = () => {
 
                 <div className="big-avatar-wrapper">
                   <div className="big-avatar-circle">
-                    {profileImage ? (
-                      <img src={profileImage} alt="Profile" />
+                    {imagePreview ? (
+                      <img src={imagePreview} alt="Profile" />
                     ) : (
                       avatar
                     )}
