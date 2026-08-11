@@ -8,7 +8,7 @@ const useGetCurrentUser = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const res = await axios.get(`${USER_API_END_POINT}/profile`, {
+        const res = await axios.get(`${USER_API_END_POINT}/getProfile`, {
           withCredentials: true,
         });
 

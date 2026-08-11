@@ -61,6 +61,30 @@ const Profile = () => {
     bio: "Passionate about algorithmic trading and AI technology. Building the future of automated trading.",
   });
 
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [input, setInput] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    location: "",
+    bio: "",
+  });
+
+  useEffect(() => {
+    if (!user) return;
+    setInput({
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      email: user.email || "",
+      phoneNumber: user.phoneNumber || "",
+      location: user.location || "",
+      bio: user.bio || "",
+    });
+    setImagePreview(user.profileImage || null);
+  }, [user]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

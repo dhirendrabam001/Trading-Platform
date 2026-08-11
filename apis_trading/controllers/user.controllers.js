@@ -1,6 +1,7 @@
 const { User } = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const uploadToCloudinary = require("../utils/uploadCloudinary");
 const register = async (req, res) => {
   try {
     const {
@@ -155,14 +156,11 @@ const login = async (req, res) => {
   }
 };
 
-const profile = async (req, res) => {
+const getProfile = async (req, res) => {
   try {
-    const { firstName, lastName, email, phoneNumber, location, bio } = req.body;
     const userId = req.user.id;
-    console.log("userId", userId);
 
     const user = await User.findById(userId).select("-password");
-    console.log("id", userId);
 
     if (!user) {
       return res.status(404).json({
@@ -171,17 +169,55 @@ const profile = async (req, res) => {
       });
     }
 
-    user.firstName = firstName;
-    user.lastName = lastName;
-    user.email = email;
-    ((user.phoneNumber = phoneNumber), (user.location = location));
-    user.bio = bio;
-
     return res.status(200).json({
       success: true,
+      user,
     });
   } catch (error) {
     console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const profile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const updateData = { ...req.body };
+
+    // Upload profile image
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      updateData.profileImage = result.secure_url;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateData },
+      {
+        new: true,
+        runValidators: true,
+      },
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user,
+    });
+  } catch (error) {
+    console.error("Profile update error:", error);
 
     return res.status(500).json({
       success: false,
@@ -223,5 +259,6 @@ module.exports = {
   register,
   login,
   profile,
+  getProfile,
   logout,
 };
