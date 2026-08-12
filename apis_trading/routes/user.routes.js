@@ -5,6 +5,7 @@ const {
   profile,
   logout,
   getProfile,
+  changePassword,
 } = require("../controllers/user.controllers");
 const { authMiddleware } = require("../middleware/authMiddleware");
 const upload = require("../middleware/multer.middleware");
@@ -14,6 +15,7 @@ router.post("/register", register);
 router.post("/login", login);
 router.get("/getProfile", authMiddleware, getProfile);
 router.put("/profile", authMiddleware, upload.single("profileImage"), profile);
+router.put("/changePass", authMiddleware, changePassword);
 router.post("/logout", logout);
 
 module.exports = router;

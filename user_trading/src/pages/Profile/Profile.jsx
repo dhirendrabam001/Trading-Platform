@@ -68,6 +68,12 @@ const Profile = () => {
     location: "",
     bio: "",
   });
+
+  const [password, setPassword] = useState({
+    currentPass: "",
+    newPass: "",
+    confirmPass: "",
+  });
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -100,6 +106,14 @@ const Profile = () => {
     if (!file) return;
     setSelectedFile(file);
     setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleChangePass = (e) => {
+    const { name, value } = e.target;
+    setPassword((pre) => ({
+      ...pre,
+      [name]: value,
+    }));
   };
 
   const handleProfileUpdate = async () => {
@@ -154,6 +168,36 @@ const Profile = () => {
       console.error("Profile update failed:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const changePassHandler = async (e) => {
+    try {
+      const promise = axios.put(`${USER_API_END_POINT}/changePass`, password, {
+        withCredentials: true,
+      });
+
+      toast.promise(promise, {
+        pending: "Password updating...",
+        success: "Password updated successfully",
+        error: {
+          render({ data }) {
+            return data?.response?.data?.message || "Something is wrong";
+          },
+        },
+      });
+
+      const res = await promise;
+      if (res.data.success) {
+        dispatch(setUser(res.data.user));
+        setPassword({
+          currentPass: "",
+          newPass: "",
+          confirmPass: "",
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -226,7 +270,17 @@ const Profile = () => {
           <div className="card user-summary-card">
             <div className="user-profile-left">
               <div className="avatar-holder">
-                <div className="profile-avatar-circle">{avatar}</div>
+                <div className="profile-avatar-circle">
+                  {user?.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt="Profile"
+                      className="big-avatar-circle"
+                    />
+                  ) : (
+                    <span>{avatar}</span>
+                  )}
+                </div>
                 <button className="btn-avatar-edit">
                   <FiEdit2 size={11} />
                 </button>
@@ -347,7 +401,7 @@ const Profile = () => {
           {/* Form: Personal Information */}
           <div className="card profile-section">
             <div className="section-head">
-              <h3 className="section-title">Personal Information</h3>
+              <h3 className="section-titles">Personal Information</h3>
               <div className="action-row">
                 <button
                   type="button"
@@ -478,8 +532,10 @@ const Profile = () => {
           {/* Form: Security Settings */}
           <div className="card profile-section">
             <div className="section-head">
-              <h3 className="section-title">Security Settings</h3>
-              <button className="btn-yellow">Change Password</button>
+              <h3 className="section-titles">Security Settings</h3>
+              <button onClick={changePassHandler} className="btn-yellow">
+                Change Password
+              </button>
             </div>
 
             <div className="security-settings-grid">
@@ -488,8 +544,10 @@ const Profile = () => {
                   <label>Current Password</label>
                   <div className="password-wrapper">
                     <input
-                      type={showCurrentPassword ? "text" : "password"}
-                      defaultValue="123456789012"
+                      type="password"
+                      onChange={handleChangePass}
+                      name="currentPass"
+                      value={password.currentPass}
                       className="form-control"
                     />
                     <button
@@ -513,8 +571,10 @@ const Profile = () => {
                     <label>New Password</label>
                     <div className="password-wrapper">
                       <input
-                        type={showNewPassword ? "text" : "password"}
-                        defaultValue="123456789012"
+                        type="text"
+                        onChange={handleChangePass}
+                        name="newPass"
+                        value={password.newPass}
                         className="form-control"
                       />
                       <button
@@ -535,8 +595,10 @@ const Profile = () => {
                     <label>Confirm New Password</label>
                     <div className="password-wrapper">
                       <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        defaultValue="123456789012"
+                        type="text"
+                        onChange={handleChangePass}
+                        name="confirmPass"
+                        value={password.confirmPass}
                         className="form-control"
                       />
                       <button

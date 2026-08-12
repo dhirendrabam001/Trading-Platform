@@ -225,6 +225,65 @@ const profile = async (req, res) => {
     });
   }
 };
+
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { currentPass, newPass } = req.body || {};
+    // Validate required fields
+    if (!currentPass || !newPass) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password and new password are required",
+      });
+    }
+    // validation new pass
+    if (newPass.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be 6 character long",
+      });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User is not found" });
+    }
+
+    // check current password
+    const checkCurrentPass = await bcrypt.compare(currentPass, user.password);
+    if (!checkCurrentPass) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Current password is incorrect" });
+    }
+
+    // check new password match current password
+    const isSamePassword = await bcrypt.compare(newPass, user.password);
+    if (isSamePassword) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be different from current password",
+      });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPass, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ success: false, message: "Passowrd changed successfully" });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
 const logout = async (req, res) => {
   try {
     res.clearCookie("token", {
@@ -260,5 +319,6 @@ module.exports = {
   login,
   profile,
   getProfile,
+  changePassword,
   logout,
 };
