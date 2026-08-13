@@ -189,7 +189,6 @@ const Profile = () => {
 
       const res = await promise;
       if (res.data.success) {
-        dispatch(setUser(res.data.user));
         setPassword({
           currentPass: "",
           newPass: "",

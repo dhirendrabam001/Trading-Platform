@@ -2,6 +2,8 @@ const { User } = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uploadToCloudinary = require("../utils/uploadCloudinary");
+const { Session } = require("../models/session.model");
+const { createSession } = require("./session.controllers");
 const register = async (req, res) => {
   try {
     const {
@@ -115,6 +117,17 @@ const login = async (req, res) => {
     user.lastLogin = new Date();
     user.loginCount += 1;
     await user.save();
+
+    // session create
+    await createSession(user._id, req);
+    // await Session.create({
+    //   user: user._id,
+    //   device: req.headers["user-agent"] || "Unknown",
+    //   location: user.location || "Unknown",
+    //   ipAddress: req.ip || "Unknown",
+    //   lastActive: new Date(),
+    //   status: "Active",
+    // });
 
     // create jwt token
     const token = jwt.sign(
@@ -275,7 +288,7 @@ const changePassword = async (req, res) => {
 
     return res
       .status(200)
-      .json({ success: false, message: "Passowrd changed successfully" });
+      .json({ success: true, message: "Password changed successfully" });
   } catch (error) {
     console.error(error);
     return res
@@ -304,15 +317,15 @@ const logout = async (req, res) => {
   }
 };
 
-const updateProfile = async (req, res) => {
-  try {
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
-  }
-};
+// const updateProfile = async (req, res) => {
+//   try {
+//   } catch (error) {
+//     console.error(error);
+//     return res
+//       .status(500)
+//       .json({ success: false, message: "Internal server error" });
+//   }
+// };
 
 module.exports = {
   register,

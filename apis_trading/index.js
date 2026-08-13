@@ -34,9 +34,11 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 // all routes
 const userRoutes = require("./routes/user.routes");
+const sessionRoutes = require("./routes/session.routes");
 
 // apis
 app.use("/api/user", userRoutes);
+app.use("/api/session", sessionRoutes);
 connectDB(); // database connection add
 app.get("/", (req, res) => {
   res.send("APIs Running...");

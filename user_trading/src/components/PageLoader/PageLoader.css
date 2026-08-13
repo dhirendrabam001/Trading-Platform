@@ -1,0 +1,215 @@
+/* ================= FULL SCREEN PAGE LOADER ================= */
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* Same base as the dashboard, so the loader dissolves into the page instead
+     of cutting to a different surface */
+  background: var(--dashboard-bg, #04060b);
+  opacity: 1;
+  transition:
+    opacity 0.45s ease,
+    visibility 0.45s ease;
+}
+
+/* Duration here must match FADE_MS in PageLoader.jsx */
+.page-loader--exit {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ================= ANIMATED BACKDROP ================= */
+
+.page-loader__backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Vignette sits above the aurora and grid but below the cube, so the corners
+   fall away and the eye lands on the centre */
+.page-loader__backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 25%,
+    rgba(4, 6, 11, 0.55) 68%,
+    rgba(4, 6, 11, 0.9) 100%
+  );
+}
+
+/* --- Aurora ---
+   Two soft colour fields on slow, offset cycles. Different durations (18s vs
+   22s) keep them from syncing up into an obvious pulse. */
+.page-loader__aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  will-change: transform;
+}
+
+.page-loader__aurora--one {
+  width: min(46vw, 620px);
+  height: min(46vw, 620px);
+  top: -14%;
+  right: -6%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 178, 0.42),
+    transparent 70%
+  );
+  animation: page-loader-drift-a 18s ease-in-out infinite;
+}
+
+.page-loader__aurora--two {
+  width: min(40vw, 540px);
+  height: min(40vw, 540px);
+  bottom: -20%;
+  left: -8%;
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.34),
+    transparent 70%
+  );
+  animation: page-loader-drift-b 22s ease-in-out infinite;
+}
+
+@keyframes page-loader-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-6vw, 6vh, 0) scale(1.18);
+  }
+}
+
+@keyframes page-loader-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.12);
+  }
+  50% {
+    transform: translate3d(7vw, -5vh, 0) scale(0.94);
+  }
+}
+
+/* --- Perspective floor ---
+   A real 3D transform, not a fake: the plane is laid down with rotateX inside
+   a perspective context, so the grid squares converge toward the horizon on
+   their own. Scrolling background-position by exactly one cell makes it run
+   toward the viewer forever with no seam. */
+.page-loader__grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 58%;
+  overflow: hidden;
+  perspective: 260px;
+  perspective-origin: 50% 0%;
+  /* Dissolve the horizon rather than ending the plane on a hard line */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 42%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 42%,
+    #000 100%
+  );
+}
+
+.page-loader__grid::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 250%;
+  height: 320%;
+  transform: rotateX(74deg);
+  transform-origin: 50% 0%;
+  background-image:
+    linear-gradient(to right, rgba(0, 255, 178, 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 178, 0.2) 1px, transparent 1px);
+  background-size: 56px 56px;
+  animation: page-loader-grid 2.6s linear infinite;
+  will-change: background-position;
+}
+
+/* Travels exactly one cell, so frame 0 and the last frame are identical */
+@keyframes page-loader-grid {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 56px;
+  }
+}
+
+/* ================= 3D STAGE ================= */
+
+/* Fixed box rather than a flexed child: WebGL writes the canvas size in
+   pixels, so a shrink-to-fit parent would feed its own size back on resize. */
+.page-loader__stage {
+  position: relative;
+  z-index: 1; /* above the backdrop */
+  width: min(320px, 62vw);
+  height: min(320px, 62vw);
+  filter: drop-shadow(0 18px 45px rgba(0, 0, 0, 0.55));
+}
+
+.page-loader__stage canvas {
+  display: block;
+}
+
+/* Soft green pool under the cube, picked up from --primary */
+.page-loader__stage::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  width: 58%;
+  height: 26px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 255, 178, 0.28),
+    transparent 70%
+  );
+  filter: blur(9px);
+  pointer-events: none;
+}
+
+/* Cheaper backdrop on small screens, where the blur radius costs the most */
+@media (max-width: 768px) {
+  .page-loader__aurora {
+    filter: blur(48px);
+  }
+
+  .page-loader__grid {
+    height: 48%;
+  }
+}
+
+/* Hold the scene still for anyone who asked for less motion. The cube's own
+   morph is driven from JS and is left alone -- it is the content here, not
+   decoration. */
+@media (prefers-reduced-motion: reduce) {
+  .page-loader__aurora,
+  .page-loader__grid::before {
+    animation: none;
+  }
+}
