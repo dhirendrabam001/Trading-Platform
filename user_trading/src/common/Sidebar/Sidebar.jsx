@@ -72,11 +72,14 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
 
       <div className="sidebar-section">
         <p className="section-title">MARKET</p>
-
-        <a href="#" className="menu-item">
+        <NavLink to="/livemarket" className="menu-item">
           <CandlestickChart size={18} />
           <span>Live Market</span>
-        </a>
+        </NavLink>
+        {/* <a href="#" className="menu-item">
+          <CandlestickChart size={18} />
+          <span>Live Market</span>
+        </a> */}
         <a href="#" className="menu-item">
           <Eye size={18} />
           <span>Watchlist</span>

@@ -23,9 +23,10 @@ function App() {
         <Route path="/" element={<Dashboard />}></Route>
         <Route path="/dashboard" element={<Dashboard />}></Route>
 
-        {/* pages alll import */}
+        {/* pages all import */}
 
-        <Route path="/profile" element={<PagesLayout />}></Route>
+        <Route path="/profile" element={<PagesLayout page="profile" />} />
+        <Route path="/livemarket" element={<PagesLayout page="livemarket" />} />
       </Routes>
     </>
   );

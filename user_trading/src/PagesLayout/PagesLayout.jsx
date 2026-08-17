@@ -5,6 +5,7 @@ import "./PagesLayout.css";
 
 import Footer from "../common/Footer/Footer";
 import Profile from "../pages/Profile/Profile";
+import LiveMarket from "../pages/LiveMarket/LiveMarket";
 
 const PagesLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -74,6 +75,7 @@ const PagesLayout = () => {
           {/* DASHBOARD CARD MAIN DASHBOARD AREA */}
           <div className="dashboard-main">
             <Profile />
+            <LiveMarket />
           </div>
 
           <Footer />
