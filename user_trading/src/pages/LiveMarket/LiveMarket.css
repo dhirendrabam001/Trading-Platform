@@ -8,7 +8,7 @@
 }
 
 /* ================= SIDEBAR ================= */
-.sidebar {
+.market-page .sidebar {
   width: 240px;
   background: var(--bg-secondary);
   border-right: 1px solid var(--border-light);
@@ -22,14 +22,14 @@
   z-index: 100;
 }
 
-.sidebar-logo {
+.market-page .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 24px;
 }
 
-.logo-icon {
+.market-page .logo-icon {
   width: 36px;
   height: 36px;
   background: var(--primary-gradient);
@@ -42,18 +42,18 @@
   font-family: var(--font-heading);
 }
 
-.sidebar-logo h2 {
+.market-page .sidebar-logo h2 {
   font-size: 18px;
   margin: 0;
   line-height: 1;
 }
 
-.sidebar-logo span {
+.market-page .sidebar-logo span {
   font-size: 11px;
   color: var(--text-muted);
 }
 
-.sidebar-menu {
+.market-page .sidebar-menu {
   flex: 1;
   overflow-y: auto;
   display: flex;
@@ -61,20 +61,20 @@
   gap: 16px;
 }
 
-.menu-group {
+.market-page .menu-group {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.group-title {
+.market-page .group-title {
   font-size: 10px;
   color: var(--text-muted);
   letter-spacing: 1px;
   margin-bottom: 4px;
 }
 
-.nav-item {
+.market-page .nav-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -85,13 +85,13 @@
   transition: all 0.2s ease;
 }
 
-.nav-item:hover,
-.nav-item.active {
+.market-page .nav-item:hover,
+.market-page .nav-item.active {
   background: rgba(0, 255, 178, 0.08);
   color: var(--primary);
 }
 
-.sidebar-help {
+.market-page .sidebar-help {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -103,7 +103,7 @@
 }
 
 /* ================= MAIN CONTAINER ================= */
-.market-main {
+.market-page .market-main {
   margin-left: 240px;
   flex: 1;
   padding: 16px 24px;
@@ -113,14 +113,14 @@
 }
 
 /* TOPBAR */
-.topbar {
+.market-page .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
 
-.search-bar {
+.market-page .search-bar {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -131,7 +131,7 @@
   width: 320px;
 }
 
-.search-bar input {
+.market-page .search-bar input {
   background: transparent;
   border: none;
   color: var(--text-primary);
@@ -140,13 +140,13 @@
   width: 100%;
 }
 
-.topbar-actions {
+.market-page .topbar-actions {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.icon-btn {
+.market-page .icon-btn {
   background: var(--bg-secondary);
   border: 1px solid var(--border-light);
   color: var(--text-secondary);
@@ -160,7 +160,7 @@
   position: relative;
 }
 
-.notification-btn .badge {
+.market-page .notification-btn .badge {
   position: absolute;
   top: 4px;
   right: 4px;
@@ -175,14 +175,14 @@
   justify-content: center;
 }
 
-.user-profile {
+.market-page .user-profile {
   display: flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
 }
 
-.user-profile .avatar {
+.market-page .user-profile .avatar {
   width: 34px;
   height: 34px;
   background: var(--primary);
@@ -732,10 +732,10 @@ td {
 }
 
 @media (max-width: 992px) {
-  .sidebar {
+  .market-page .sidebar {
     display: none;
   }
-  .market-main {
+  .market-page .market-main {
     margin-left: 0;
   }
   .info-panels-grid {
@@ -744,15 +744,249 @@ td {
 }
 
 @media (max-width: 576px) {
-  .topbar {
+  .market-page .topbar {
     flex-direction: column;
     gap: 10px;
   }
-  .search-bar {
+  .market-page .search-bar {
     width: 100%;
   }
   .ticker-bar {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+/* ================= DASHBOARD-ALIGNED PAGE ================= */
+.market-page {
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  color: var(--text-primary);
+}
+
+.market-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 4px 0 22px;
+}
+
+.market-eyebrow {
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  margin: 0 0 5px;
+}
+
+.market-page-header h1 {
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.market-subtitle {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 7px 0 0;
+}
+
+.market-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  background: rgba(0, 255, 178, 0.07);
+  border: 1px solid rgba(0, 255, 178, 0.18);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.market-status span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
+
+.market-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.market-content .ticker-bar,
+.market-content .chart-card,
+.market-content .info-card,
+.market-content .orders-card,
+.market-content .order-book,
+.market-content .trade-form {
+  background: linear-gradient(145deg, rgba(17, 23, 36, 0.92), rgba(5, 8, 15, 0.8));
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+}
+
+.market-content .ticker-bar {
+  min-height: 92px;
+  padding: 18px 20px;
+  gap: 22px;
+}
+
+.market-content .ticker-stats {
+  flex: 1;
+  justify-content: flex-end;
+  gap: clamp(14px, 3vw, 34px);
+}
+
+.market-content .ticker-stats strong,
+.market-content .info-rows strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.market-content .dashboard-grid {
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
+  gap: 16px;
+}
+
+.market-content .chart-card {
+  min-width: 0;
+}
+
+.market-content .chart-body {
+  height: clamp(260px, 32vw, 360px);
+}
+
+.market-content .chart-header,
+.market-content .orders-header,
+.market-content .order-book-header {
+  min-height: 32px;
+}
+
+.market-content .tab:focus-visible,
+.market-content button:focus-visible,
+.market-content select:focus-visible,
+.market-content input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1200px) {
+  .market-content .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .market-content .right-column {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+@media (max-width: 768px) {
+  .market-page-header {
+    align-items: flex-start;
+    margin: 2px 0 16px;
+  }
+
+  .market-status {
+    margin-top: 2px;
+  }
+
+  .market-content .ticker-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .market-content .ticker-price {
+    align-items: flex-end;
+  }
+
+  .market-content .ticker-stats {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    justify-content: initial;
+  }
+
+  .market-content .btn-watchlist {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+
+  .market-content .right-column {
+    grid-template-columns: 1fr;
+  }
+
+  .market-content .info-panels-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .market-content .chart-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .market-content .chart-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .market-content .timeframe-selector {
+    flex: 1;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .market-page-header h1 {
+    font-size: 26px;
+  }
+
+  .market-subtitle {
+    max-width: 230px;
+    line-height: 1.45;
+  }
+
+  .market-status {
+    padding: 6px 9px;
+    font-size: 11px;
+  }
+
+  .market-content .ticker-pair h3,
+  .market-content .ticker-price .price {
+    font-size: 16px;
+  }
+
+  .market-content .chart-card,
+  .market-content .orders-card,
+  .market-content .order-book,
+  .market-content .trade-form,
+  .market-content .info-card {
+    padding: 13px;
+  }
+
+  .market-content .chart-tabs {
+    width: 100%;
+    gap: 8px;
+    justify-content: space-between;
+  }
+
+  .market-content .chart-tabs .tab {
+    font-size: 11px;
+  }
+
+  .market-content .chart-body {
+    height: 230px;
   }
 }

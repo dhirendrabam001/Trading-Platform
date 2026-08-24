@@ -12,30 +12,7 @@ import {
   Filler,
 } from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
-import {
-  Search,
-  Bell,
-  Sun,
-  Star,
-  ChevronDown,
-  Plus,
-  Minus,
-  LayoutDashboard,
-  TrendingUp,
-  Bookmark,
-  ShoppingBag,
-  Clock,
-  History,
-  Briefcase,
-  Wallet,
-  ShieldCheck,
-  Settings,
-  HelpCircle,
-  UserCheck,
-  Maximize2,
-  Sliders,
-  Compass,
-} from "lucide-react";
+import { Star, ChevronDown, Plus, Minus, Maximize2 } from "lucide-react";
 import "./LiveMarket.css";
 
 ChartJS.register(
@@ -55,9 +32,7 @@ const LiveMarket = () => {
   const [tabType, setTabType] = useState("Limit");
   const [timeframe, setTimeframe] = useState("5m");
 
-  // Chart Mock Data
   const labels = ["06:00", "09:00", "12:00", "15:00", "18:00", "21:00"];
-
   const chartData = {
     labels,
     datasets: [
@@ -94,10 +69,7 @@ const LiveMarket = () => {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    interaction: {
-      mode: "index",
-      intersect: false,
-    },
+    interaction: { mode: "index", intersect: false },
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -119,115 +91,26 @@ const LiveMarket = () => {
         grid: { color: "rgba(255, 255, 255, 0.03)" },
         ticks: { color: "#6b7280" },
       },
-      y1: {
-        type: "linear",
-        position: "left",
-        display: false,
-        max: 10000,
-      },
+      y1: { type: "linear", position: "left", display: false, max: 10000 },
     },
   };
 
   return (
-    <div className="market-layout">
-      {/* SIDEBAR */}
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <div className="logo-icon">N</div>
-          <div>
-            <h2>nexa</h2>
-            <span>AI Trading Platform</span>
-          </div>
+    <section className="market-page">
+      <header className="market-page-header">
+        <div>
+          <p className="market-eyebrow">MARKET TERMINAL</p>
+          <h1>Live Market</h1>
+          <p className="market-subtitle">
+            Track prices, liquidity and execute trades in real time.
+          </p>
         </div>
-
-        <nav className="sidebar-menu">
-          <div className="menu-group">
-            <span className="group-title">MAIN</span>
-            <a href="#" className="nav-item">
-              <LayoutDashboard size={18} /> Dashboard
-            </a>
-          </div>
-
-          <div className="menu-group">
-            <span className="group-title">MARKET</span>
-            <a href="#" className="nav-item active">
-              <TrendingUp size={18} /> Live Market
-            </a>
-            <a href="#" className="nav-item">
-              <Bookmark size={18} /> Watchlist
-            </a>
-          </div>
-
-          <div className="menu-group">
-            <span className="group-title">TRADING</span>
-            <a href="#" className="nav-item">
-              <ShoppingBag size={18} /> Buy & Sell
-            </a>
-            <a href="#" className="nav-item">
-              <Clock size={18} /> Open Orders
-            </a>
-            <a href="#" className="nav-item">
-              <History size={18} /> Order History
-            </a>
-          </div>
-
-          <div className="menu-group">
-            <span className="group-title">PORTFOLIO</span>
-            <a href="#" className="nav-item">
-              <Briefcase size={18} /> My Portfolio
-            </a>
-            <a href="#" className="nav-item">
-              <Wallet size={18} /> Wallet Balance
-            </a>
-          </div>
-
-          <div className="menu-group">
-            <span className="group-title">ACCOUNT</span>
-            <a href="#" className="nav-item">
-              <UserCheck size={18} /> Profile
-            </a>
-            <a href="#" className="nav-item">
-              <ShieldCheck size={18} /> Security
-            </a>
-            <a href="#" className="nav-item">
-              <Settings size={18} /> Settings
-            </a>
-          </div>
-        </nav>
-
-        <div className="sidebar-help">
-          <HelpCircle size={20} />
-          <div>
-            <strong>Need Help?</strong>
-            <p>Help Center</p>
-          </div>
+        <div className="market-status">
+          <span /> Market open
         </div>
-      </aside>
+      </header>
 
-      {/* MAIN CONTAINER */}
-      <main className="market-main">
-        {/* TOP NAVBAR */}
-        <header className="topbar">
-          <div className="search-bar">
-            <Search size={16} />
-            <input type="text" placeholder="Search coins, pairs, markets..." />
-          </div>
-
-          <div className="topbar-actions">
-            <button className="icon-btn">
-              <Sun size={18} />
-            </button>
-            <button className="icon-btn notification-btn">
-              <Bell size={18} />
-              <span className="badge">0</span>
-            </button>
-            <div className="user-profile">
-              <div className="avatar">DT</div>
-              <ChevronDown size={14} />
-            </div>
-          </div>
-        </header>
-
+      <div className="market-content">
         {/* TOP BAR TICKER INFO */}
         <div className="ticker-bar card">
           <div className="ticker-pair">
@@ -644,8 +527,8 @@ const LiveMarket = () => {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </section>
   );
 };
 

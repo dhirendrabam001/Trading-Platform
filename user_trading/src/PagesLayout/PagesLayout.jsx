@@ -7,7 +7,7 @@ import Footer from "../common/Footer/Footer";
 import Profile from "../pages/Profile/Profile";
 import LiveMarket from "../pages/LiveMarket/LiveMarket";
 
-const PagesLayout = () => {
+const PagesLayout = ({ page }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -74,10 +74,9 @@ const PagesLayout = () => {
           <Navbar toggleSidebar={toggleSidebar} />
           {/* DASHBOARD CARD MAIN DASHBOARD AREA */}
           <div className="dashboard-main">
-            <Profile />
-            <LiveMarket />
+            {page === "profile" && <Profile />}
+            {page === "livemarket" && <LiveMarket />}
           </div>
-
           <Footer />
         </div>
       </div>
