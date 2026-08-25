@@ -29,6 +29,7 @@ function App() {
         <Route path="/livemarket" element={<PagesLayout page="livemarket" />} />
         <Route path="/watchlist" element={<PagesLayout page="watchlist" />} />
         <Route path="/buysell" element={<PagesLayout page="buysell" />} />
+        <Route path="/open-position" element={<PagesLayout page="open-position" />} />
       </Routes>
     </>
   );

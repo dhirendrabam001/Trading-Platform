@@ -1,0 +1,1394 @@
+/* =====================================================================
+   OPEN POSITIONS
+
+   Same material as LiveMarket / Watchlist / BuySell: every colour comes from
+   the tokens in index.css, so this page themes with the rest of the app. No
+   literal rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.op-page {
+  width: 100%;
+  container-type: inline-size;
+  /* Figures must not jitter as they update, and columns of numbers should
+     line up digit for digit */
+  font-variant-numeric: tabular-nums;
+
+  --op-radius: 16px;
+  --op-gap: 14px;
+  --op-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.op-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.op-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.op-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.op-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.op-subtitle {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.op-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* --- Buttons --- */
+.op-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.op-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+.op-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.op-btn--danger {
+  border-color: var(--down-line);
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.op-btn--danger:hover:not(:disabled) {
+  color: var(--down);
+  border-color: var(--down);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.op-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--op-pad);
+  border-radius: var(--op-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: opRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes opRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.op-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: opSweep 7s ease-in-out infinite;
+}
+
+@keyframes opSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.op-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.op-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.op-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.op-card:hover::after {
+  opacity: 1;
+}
+
+.op-card-title {
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.op-metrics {
+  display: grid;
+  gap: var(--op-gap);
+  /* Keep the four account summaries comparable at a glance on phones: two
+     cards per row, matching the dashboard overview. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--op-gap);
+}
+
+@container (min-width: 560px) {
+  .op-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1040px) {
+  .op-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.op-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.op-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.op-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.op-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.op-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.op-metric:hover {
+  transform: translateY(-4px);
+}
+
+.op-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.op-metric.is-up .op-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.op-metric.is-down .op-metric-icon {
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.op-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.op-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.op-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.op-metric.is-up .op-metric-value {
+  color: var(--up);
+}
+
+.op-metric.is-down .op-metric-value {
+  color: var(--down);
+}
+
+.op-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.op-grid {
+  display: grid;
+  gap: var(--op-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.op-side {
+  display: grid;
+  gap: var(--op-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a wide table would push the whole column out */
+.op-grid > *,
+.op-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the three rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .op-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .op-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .op-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1240px) {
+  .op-grid {
+    grid-template-columns: minmax(0, 1fr) 310px;
+  }
+
+  .op-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1520px) {
+  .op-grid {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+
+/* ============================== TOOLBAR ============================= */
+
+.op-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 11px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.op-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+}
+
+.op-tab {
+  position: relative;
+  padding: 8px 12px 10px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.op-tab:hover {
+  color: var(--text-secondary);
+}
+
+.op-tab.is-active {
+  color: var(--primary);
+}
+
+/* Underline on a pseudo-element so switching tabs cannot shift row height */
+.op-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary-vivid);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.op-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.op-tab-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background: var(--down);
+  vertical-align: middle;
+}
+
+.op-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.op-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.op-sort select {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.op-sort select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.op-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.op-search:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.op-search input {
+  width: 130px;
+  max-width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.op-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Chrome's own clear button sits oddly inside a custom field */
+.op-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* =============================== TABLE ============================== */
+
+.op-table-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--op-pad) * -1);
+  padding: 0 var(--op-pad);
+}
+
+.op-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.op-table thead th {
+  padding: 12px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.op-table .op-num {
+  text-align: right;
+}
+
+.op-table tbody td {
+  padding: 12px 9px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.op-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.op-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+/* A row whose mark price is near liquidation gets a red edge - a colour cue
+   that does not depend on reading the distance column */
+.op-table tbody tr.is-risky td:first-child {
+  box-shadow: inset 2px 0 0 var(--down);
+}
+
+.op-table tbody tr.is-open {
+  background: var(--surface-2);
+}
+
+.op-table tbody tr.is-open td {
+  border-bottom-color: transparent;
+}
+
+.op-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.op-muted {
+  color: var(--text-muted);
+}
+
+.op-up {
+  color: var(--up);
+}
+
+.op-down {
+  color: var(--down);
+}
+
+/* --- Pair cell --- */
+.op-cell-pair {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.op-coin {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-style: normal;
+  /* White on a saturated brand fill: correct in BOTH themes, so this one is
+     deliberately literal rather than a token */
+  color: #ffffff;
+  box-shadow: var(--shadow-pop);
+}
+
+.op-coin--sm {
+  width: 20px;
+  height: 20px;
+  font-size: 9.5px;
+  box-shadow: none;
+}
+
+.op-pair-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.op-pair-text b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.op-pair-text small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* --- Side pill --- */
+.op-side-cell,
+.op-side {
+  min-width: 0;
+}
+
+.op-table .op-side,
+span.op-side {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+span.op-side.is-long {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+span.op-side.is-short {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* --- P&L --- */
+.op-pnl {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.3;
+}
+
+.op-pnl b {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.op-pnl small {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.op-pnl.is-up {
+  color: var(--up);
+}
+
+.op-pnl.is-down {
+  color: var(--down);
+}
+
+/* --- Liquidation distance meter --- */
+.op-risk {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 96px;
+}
+
+.op-risk-track {
+  flex: 1 1 auto;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.op-risk-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.op-risk.is-safe .op-risk-fill {
+  background: var(--primary-vivid);
+}
+
+.op-risk.is-warn .op-risk-fill {
+  background: var(--accent-orange);
+}
+
+.op-risk.is-danger .op-risk-fill {
+  background: var(--down);
+}
+
+.op-risk small {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.op-risk.is-danger small {
+  color: var(--down);
+}
+
+/* --- Actions --- */
+.op-cell-actions {
+  text-align: right;
+}
+
+.op-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.op-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.op-icon-btn:hover {
+  color: var(--primary);
+  border-color: var(--accent-line);
+}
+
+.op-icon-btn svg {
+  transition: transform 0.25s ease;
+}
+
+.op-icon-btn svg.is-flipped {
+  transform: rotate(180deg);
+}
+
+.op-close-btn {
+  padding: 6px 13px;
+  border-radius: 8px;
+  border: 1px solid var(--down-line);
+  background: var(--down-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--down);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.op-close-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--down);
+}
+
+/* --- Expanded detail row --- */
+.op-detail-row td {
+  padding: 0 9px 13px !important;
+  background: var(--surface-2);
+}
+
+.op-detail {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 13px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  white-space: normal;
+}
+
+@container (min-width: 720px) {
+  .op-detail {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    align-items: center;
+  }
+}
+
+.op-detail-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.op-detail-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.op-detail-block b {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.op-detail-block small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.op-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.op-detail-actions .op-btn {
+  padding: 8px 13px;
+  font-size: 11.5px;
+}
+
+/* --- Empty state --- */
+.op-empty-row td {
+  border-bottom: none;
+}
+
+.op-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 42px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  white-space: normal;
+}
+
+.op-empty p {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ============================= ALLOCATION =========================== */
+
+.op-alloc {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2cqi, 18px);
+  flex-wrap: wrap;
+}
+
+.op-donut {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  flex-shrink: 0;
+  margin-inline: auto;
+}
+
+/* Centred label as a plain overlay rather than a Chart.js plugin: the text is
+   static, and a plugin would have to redraw it on every theme change */
+.op-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.op-donut-center strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.op-donut-center span {
+  font-size: 9px;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.op-legend {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 120px;
+  min-width: 110px;
+}
+
+.op-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.op-legend i {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.op-legend b {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.op-alloc-empty {
+  margin: 0;
+  font-size: 12.5px;
+}
+
+/* ============================ RISK OVERVIEW ========================= */
+
+.op-health {
+  margin-bottom: 13px;
+}
+
+.op-health-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+  font-size: 12px;
+}
+
+.op-health-top b {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.op-health-track {
+  display: block;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.op-health-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.op-health-fill.is-safe {
+  background: linear-gradient(90deg, var(--primary-dark), var(--primary-vivid));
+}
+
+.op-health-fill.is-warn {
+  background: linear-gradient(90deg, var(--accent-orange), var(--down));
+}
+
+.op-risk-list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.op-risk-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.op-risk-list > div:hover {
+  background: var(--surface-hover);
+}
+
+.op-risk-list dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.op-risk-list dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* =========================== P&L BY POSITION ======================== */
+
+.op-pnl-list {
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+}
+
+.op-pnl-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.op-pnl-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.op-pnl-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.op-pnl-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.op-pnl-bar i.is-up {
+  background: var(--primary-vivid);
+}
+
+.op-pnl-bar i.is-down {
+  background: var(--down);
+}
+
+.op-pnl-list b {
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ============================== FOCUS =============================== */
+
+.op-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Ten nowrap columns cannot fit a phone at a readable size, so each position
+   becomes its own block and every cell prints its own label. Nothing is
+   clipped and nothing scrolls sideways - same pattern as .ov-table,
+   .lm-table, .wl-table and .bs-table elsewhere in the app. */
+@container (max-width: 820px) {
+  .op-table-scroll {
+    overflow-x: visible;
+  }
+
+  .op-table,
+  .op-table tbody,
+  .op-table tr,
+  .op-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .op-table thead {
+    display: none;
+  }
+
+  .op-table {
+    white-space: normal;
+  }
+
+  .op-table tbody tr {
+    margin-bottom: 10px;
+    padding: 13px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+
+  .op-table tbody tr.is-risky {
+    border-color: var(--down-line);
+  }
+
+  /* The inset edge marker relies on a first cell that no longer exists as a
+     table cell here, so the whole card takes the cue instead */
+  .op-table tbody tr.is-risky td:first-child {
+    box-shadow: none;
+  }
+
+  .op-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .op-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The pair is the block's heading, so it spans the row unlabelled */
+  .op-table tbody td.op-cell-pair {
+    justify-content: flex-start;
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .op-table tbody td.op-cell-pair::before {
+    content: none;
+  }
+
+  .op-pnl {
+    align-items: flex-end;
+  }
+
+  .op-table tbody td.op-cell-actions {
+    justify-content: flex-end;
+    padding-top: 11px;
+    margin-top: 5px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .op-table tbody td.op-cell-actions::before {
+    content: none;
+  }
+
+  .op-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* The detail row is a sibling <tr>; as a block it needs to sit flush under
+     the card it belongs to rather than floating with its own margin */
+  .op-detail-row {
+    margin-top: -10px;
+    margin-bottom: 10px;
+  }
+
+  .op-detail-row td {
+    padding: 0 !important;
+    background: none;
+  }
+
+  .op-detail-row td::before {
+    content: none;
+  }
+
+  .op-empty-row td,
+  .op-empty-row td::before {
+    display: block;
+    content: none;
+  }
+}
+
+@container (max-width: 560px) {
+  .op-metrics {
+    gap: 10px;
+  }
+
+  .op-metric {
+    gap: 9px;
+    min-height: 104px;
+    padding: 12px;
+  }
+
+  .op-metric-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+  }
+
+  .op-metric-label {
+    min-height: 30px;
+    font-size: 10.5px;
+    line-height: 1.35;
+  }
+
+  .op-metric-value {
+    font-size: clamp(16px, 4.7cqi, 20px);
+    letter-spacing: -0.035em;
+    white-space: nowrap;
+  }
+
+  .op-metric-sub {
+    font-size: 9.5px;
+    line-height: 1.35;
+  }
+
+  .op-header {
+    align-items: stretch;
+    margin-bottom: 14px;
+  }
+
+  .op-heading-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .op-subtitle {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .op-header-actions,
+  .op-tools {
+    width: 100%;
+  }
+
+  .op-header-actions .op-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .op-search {
+    flex: 1 1 auto;
+  }
+
+  .op-search input {
+    width: 100%;
+  }
+
+  .op-tabs {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .op-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .op-tab {
+    flex: 0 0 auto;
+    padding-inline: 10px;
+  }
+
+  .op-sort {
+    flex: 1 1 100%;
+  }
+
+  .op-sort select {
+    width: 100%;
+  }
+
+  .op-detail {
+    padding: 11px;
+  }
+
+  .op-detail-actions .op-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+@container (max-width: 360px) {
+  .op-metrics {
+    gap: 8px;
+  }
+
+  .op-metric {
+    gap: 7px;
+    min-height: 97px;
+    padding: 10px;
+  }
+
+  .op-metric-icon {
+    width: 29px;
+    height: 29px;
+  }
+
+  .op-metric-label {
+    font-size: 9.5px;
+  }
+
+  .op-metric-value {
+    font-size: 15px;
+  }
+
+  .op-metric-sub {
+    font-size: 8.5px;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .op-card {
+    animation: none;
+  }
+
+  .op-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .op-card:hover,
+  .op-metric:hover,
+  .op-btn:hover:not(:disabled),
+  .op-close-btn:hover {
+    transform: none;
+  }
+
+  .op-tab::after,
+  .op-risk-fill,
+  .op-health-fill,
+  .op-pnl-bar i,
+  .op-icon-btn svg {
+    transition: none;
+  }
+}

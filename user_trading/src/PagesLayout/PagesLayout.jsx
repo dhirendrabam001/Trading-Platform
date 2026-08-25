@@ -8,6 +8,7 @@ import Profile from "../pages/Profile/Profile";
 import LiveMarket from "../pages/LiveMarket/LiveMarket";
 import Watchlist from "../pages/Watchlist/Watchlist";
 import BuySell from "../pages/BuySell/BuySell";
+import OpenPosition from "../pages/OpenPosition/OpenPosition";
 
 const PagesLayout = ({ page }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -80,6 +81,7 @@ const PagesLayout = ({ page }) => {
             {page === "livemarket" && <LiveMarket />}
             {page === "watchlist" && <Watchlist />}
             {page === "buysell" && <BuySell />}
+            {page === "open-position" && <OpenPosition />}
           </div>
           <Footer />
         </div>

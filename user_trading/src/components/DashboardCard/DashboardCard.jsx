@@ -183,7 +183,7 @@ const DashboardCard = () => {
   <section className="dashboard-info">
     <div className="row g-3">
       {CARDS.map((c) => (
-        <div className="col-12 col-lg-3 col-md-6" key={c.id}>
+        <div className="col-6 col-lg-3 col-md-6" key={c.id}>
           <div className="dc-card">
 
             {/* Row 1 — icon + badge */}

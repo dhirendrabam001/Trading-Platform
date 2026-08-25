@@ -91,10 +91,10 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
           <ArrowUpCircle size={18} />
           <span>Buy & Sell</span>
         </NavLink>
-        <a href="#" className="menu-item">
+        <NavLink to="/open-position" className="menu-item">
           <ArrowLeftRight size={18} />
           <span>Open Position</span>
-        </a>
+        </NavLink>
         <a href="#" className="menu-item">
           <ArrowDownCircle size={18} />
           <span>Pending Order</span>

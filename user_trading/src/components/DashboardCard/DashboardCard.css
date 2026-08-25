@@ -139,3 +139,103 @@
   45%  { transform: translateX(220%);  }
   100% { transform: translateX(220%);  }
 }
+
+/* Four key account figures are most useful when they can be compared at a
+   glance. Keep the Bootstrap columns two-up on phones, then compact each
+   card rather than allowing a narrow viewport to turn into a one-card feed. */
+@media (max-width: 575.98px) {
+  .dashboard-info .row {
+    --bs-gutter-x: 10px;
+    --bs-gutter-y: 10px;
+  }
+
+  .dc-card {
+    min-height: 166px;
+    padding: 12px;
+    border-radius: 13px;
+  }
+
+  .dc-top {
+    margin-bottom: 9px;
+  }
+
+  .dc-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+  }
+
+  .dc-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .dc-badge {
+    padding: 3px 7px;
+    font-size: 9.5px;
+  }
+
+  .dc-title {
+    min-height: 32px;
+    margin-bottom: 4px;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .dc-value {
+    font-size: clamp(18px, 5.4vw, 23px);
+    line-height: 1.12;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+  }
+
+  .dc-foot {
+    position: relative;
+    min-height: 40px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .dc-sub {
+    position: relative;
+    z-index: 1;
+    max-width: 58%;
+    font-size: 9.5px;
+    line-height: 1.35;
+  }
+
+  /* Keep the trend visible without competing with the important number. */
+  .dc-spark {
+    position: absolute;
+    right: -5px;
+    bottom: -3px;
+    width: 54%;
+    height: 42px;
+    opacity: 0.7;
+  }
+}
+
+@media (max-width: 359.98px) {
+  .dc-card {
+    min-height: 154px;
+    padding: 10px;
+  }
+
+  .dc-badge {
+    font-size: 8.5px;
+    padding-inline: 6px;
+  }
+
+  .dc-title {
+    font-size: 10px;
+  }
+
+  .dc-value {
+    font-size: 17px;
+  }
+
+  .dc-sub {
+    max-width: 62%;
+    font-size: 8.5px;
+  }
+}
