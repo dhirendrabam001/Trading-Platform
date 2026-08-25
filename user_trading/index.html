@@ -9,6 +9,31 @@
       rel="stylesheet"
     />
     <title>user_trading</title>
+    <script>
+      /* Resolve the theme BEFORE the first paint. Doing this in React would
+         mean the browser paints the default (dark) for a frame or two and
+         then repaints light - the white-flash-on-load that makes a theme
+         toggle feel broken.
+         `data-theme-boot` suppresses the colour transitions defined in
+         index.css so the opening frame does not animate in from the wrong
+         palette; useTheme drops the attribute once mounted. */
+      (function () {
+        try {
+          var stored = localStorage.getItem("user-trading-theme");
+          var theme =
+            stored === "light" || stored === "dark"
+              ? stored
+              : window.matchMedia("(prefers-color-scheme: light)").matches
+                ? "light"
+                : "dark";
+          document.documentElement.setAttribute("data-theme", theme);
+          document.documentElement.setAttribute("data-theme-boot", "");
+        } catch (e) {
+          /* private mode / storage blocked - dark is the :root default */
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

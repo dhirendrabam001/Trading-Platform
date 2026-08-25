@@ -27,6 +27,8 @@ function App() {
 
         <Route path="/profile" element={<PagesLayout page="profile" />} />
         <Route path="/livemarket" element={<PagesLayout page="livemarket" />} />
+        <Route path="/watchlist" element={<PagesLayout page="watchlist" />} />
+        <Route path="/buysell" element={<PagesLayout page="buysell" />} />
       </Routes>
     </>
   );

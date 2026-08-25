@@ -15,6 +15,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import "./CryptoDashboard.css";
+import useChartTheme from "../../utils/chartTheme";
 
 ChartJS.register(
   CategoryScale,
@@ -76,6 +77,8 @@ const MarketTable = ({ rows, isGain }) => (
 );
 
 const CryptoDashboard = () => {
+  const chart = useChartTheme();
+
   // P&L bars — green above the mean, red below
   const pnlValues = [12, 18, 8, 10, 14, 11, 9, 6, 7, 15];
   const pnlChartData = {
@@ -83,7 +86,7 @@ const CryptoDashboard = () => {
     datasets: [
       {
         data: pnlValues,
-        backgroundColor: pnlValues.map((v) => (v > 10 ? "#00ffb2" : "#ef4444")),
+        backgroundColor: pnlValues.map((v) => (v > 10 ? chart.up : chart.down)),
         borderRadius: 3,
         borderSkipped: false,
         barPercentage: 0.55,
@@ -105,7 +108,7 @@ const CryptoDashboard = () => {
     datasets: [
       {
         data: [HEALTH_SCORE, 100 - HEALTH_SCORE],
-        backgroundColor: ["#00ffb2", "rgba(255,255,255,0.07)"],
+        backgroundColor: [chart.accent, chart.track],
         borderWidth: 0,
         circumference: 180,
         rotation: 270,

@@ -58,7 +58,7 @@
   background: linear-gradient(
     125deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.04) 50%,
+    var(--sweep-highlight) 50%,
     transparent 100%
   );
   transform: translateX(-100%);
@@ -75,7 +75,7 @@
 
 .cd-card:hover {
   transform: translateY(-5px) scale(1.012);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.42);
+  box-shadow: 0 20px 48px rgba(var(--shadow-rgb), calc(0.42 * var(--shadow-mult)));
   border-color: var(--border-medium);
 }
 
@@ -199,7 +199,7 @@
 }
 
 .cd-table tbody td {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .cd-table tbody tr:last-child td {
@@ -251,14 +251,14 @@
 }
 
 .cd-badge.is-gain {
-  background: rgba(0, 255, 178, 0.12);
-  border: 1px solid rgba(0, 255, 178, 0.2);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
   color: var(--primary);
 }
 
 .cd-badge.is-loss {
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgba(var(--down-rgb), 0.12);
+  border: 1px solid rgba(var(--down-rgb), 0.2);
   color: var(--accent-red);
 }
 

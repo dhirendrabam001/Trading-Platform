@@ -6,6 +6,8 @@ import "./PagesLayout.css";
 import Footer from "../common/Footer/Footer";
 import Profile from "../pages/Profile/Profile";
 import LiveMarket from "../pages/LiveMarket/LiveMarket";
+import Watchlist from "../pages/Watchlist/Watchlist";
+import BuySell from "../pages/BuySell/BuySell";
 
 const PagesLayout = ({ page }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -76,6 +78,8 @@ const PagesLayout = ({ page }) => {
           <div className="dashboard-main">
             {page === "profile" && <Profile />}
             {page === "livemarket" && <LiveMarket />}
+            {page === "watchlist" && <Watchlist />}
+            {page === "buysell" && <BuySell />}
           </div>
           <Footer />
         </div>

@@ -46,7 +46,7 @@
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.42);
+  background: rgba(var(--shadow-rgb), calc(0.42 * var(--shadow-mult)));
   backdrop-filter: blur(2px);
   z-index: 1500;
   animation: backdropFade 0.3s ease;

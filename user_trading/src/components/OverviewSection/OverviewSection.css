@@ -75,7 +75,7 @@
   background: linear-gradient(
     125deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.04) 50%,
+    var(--sweep-highlight) 50%,
     transparent 100%
   );
   transform: translateX(-100%);
@@ -101,7 +101,7 @@
 
 .ov-card:hover {
   transform: translateY(-5px) scale(1.012);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.42);
+  box-shadow: 0 20px 48px rgba(var(--shadow-rgb), calc(0.42 * var(--shadow-mult)));
   border-color: var(--border-medium);
 }
 
@@ -231,7 +231,7 @@
 
 .ov-table tbody td {
   color: var(--text-secondary);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .ov-table tbody tr:last-child td {
@@ -292,12 +292,12 @@
 
 .ov-badge--long,
 .ov-badge--buy {
-  background: rgba(34, 197, 94, 0.15);
+  background: var(--up-soft);
   color: var(--accent-green-bright);
 }
 
 .ov-badge--sell {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(var(--down-rgb), 0.15);
   color: var(--accent-red);
 }
 
@@ -372,7 +372,7 @@
     margin-bottom: 10px;
     border: 1px solid var(--border-light);
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--surface-1);
   }
 
   .ov-table tbody tr:last-child {
@@ -380,7 +380,7 @@
   }
 
   .ov-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--surface-1);
   }
 
   .ov-table tbody td {

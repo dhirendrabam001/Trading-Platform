@@ -10,6 +10,26 @@ import {
   Tooltip as ChartTooltip,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import useChartTheme from "../../utils/chartTheme";
+
+/* Sparkline series colours.
+   The dark set is tuned for a near-black ground. On white, mint, lilac and
+   salmon all fall below 2:1 and the sparkline reads as a smudge, so light
+   mode uses deeper variants of the same four hues. */
+const SERIES = {
+  dark: {
+    green: { stroke: "#00ffb2", rgb: "0,255,178" },
+    blue: { stroke: "#3b82f6", rgb: "59,130,246" },
+    purple: { stroke: "#a78bfa", rgb: "167,139,250" },
+    red: { stroke: "#f87171", rgb: "248,113,113" },
+  },
+  light: {
+    green: { stroke: "#00875a", rgb: "0,135,90" },
+    blue: { stroke: "#2563eb", rgb: "37,99,235" },
+    purple: { stroke: "#7c3aed", rgb: "124,58,237" },
+    red: { stroke: "#d1274b", rgb: "209,39,75" },
+  },
+};
 
 /* ── Register chart.js modules once ─────────────────────── */
 ChartJS.register(
@@ -108,8 +128,7 @@ const CARDS = [
     subColor: "green",
     icon: <Wallet size={18} />,
     iconCls: "green",
-    stroke: "#00ffb2",
-    gradRgb: "0,255,178",
+    series: "green",
     spark: SPARKS.green,
   },
   {
@@ -122,8 +141,7 @@ const CARDS = [
     subColor: "muted",
     icon: <BarChart2 size={18} />,
     iconCls: "blue",
-    stroke: "#3b82f6",
-    gradRgb: "59,130,246",
+    series: "blue",
     spark: SPARKS.blue,
   },
   {
@@ -136,8 +154,7 @@ const CARDS = [
     subColor: "muted",
     icon: <Briefcase size={18} />,
     iconCls: "purple",
-    stroke: "#a78bfa",
-    gradRgb: "167,139,250",
+    series: "purple",
     spark: SPARKS.purple,
   },
   {
@@ -150,8 +167,7 @@ const CARDS = [
     subColor: "green",
     icon: <TrendingUp size={18} />,
     iconCls: "red",
-    stroke: "#f87171",
-    gradRgb: "248,113,113",
+    series: "red",
     spark: SPARKS.red,
   },
 ];
@@ -159,7 +175,11 @@ const CARDS = [
 /* ─────────────────────────────────────────────────────────
    Component
 ───────────────────────────────────────────────────────── */
-const DashboardCard = () => (
+const DashboardCard = () => {
+  const { theme } = useChartTheme();
+  const palette = SERIES[theme] || SERIES.dark;
+
+  return (
   <section className="dashboard-info">
     <div className="row g-3">
       {CARDS.map((c) => (
@@ -183,7 +203,11 @@ const DashboardCard = () => (
               <p className={`dc-sub dc-sub--${c.subColor}`}>{c.sub}</p>
               <div className="dc-spark">
                 <Line
-                  data={makeChartData(c.spark, c.stroke, c.gradRgb)}
+                  data={makeChartData(
+                    c.spark,
+                    palette[c.series].stroke,
+                    palette[c.series].rgb,
+                  )}
                   options={CHART_OPTS}
                 />
               </div>
@@ -194,6 +218,7 @@ const DashboardCard = () => (
       ))}
     </div>
   </section>
-);
+  );
+};
 
 export default DashboardCard;

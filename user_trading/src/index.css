@@ -1,17 +1,59 @@
-/* ================= ROOT VARIABLES ================= */
+/* =====================================================================
+   DESIGN TOKENS
+
+   Two themes, one contract. Every token below exists in BOTH themes with
+   the same meaning, so component CSS never needs to know which theme is
+   active - it asks for "the subtle surface fill" and gets the right one.
+
+   The theme is set as `data-theme` on <html> (see main.jsx / useTheme).
+   :root alone is the dark theme, so the app renders correctly even if the
+   attribute never gets set.
+
+   TWO RULES WHEN ADDING COMPONENT CSS:
+
+   1. Never hardcode rgba(255,255,255,x) for a surface. Those overlays have
+      to INVERT in light mode (white-on-dark becomes ink-on-light), which a
+      literal cannot do. Use --surface-* / --border-*.
+
+   2. --primary is the TEXT-SAFE accent. #00ffb2 sits at ~1.4:1 on white,
+      so light mode swaps it for a deep green that actually passes contrast.
+      When you want the vivid mint as a FILL (bar, dot, button, glow), use
+      --primary-vivid, which stays bright in both themes.
+   ===================================================================== */
+
 :root {
   --font-primary: "Inter", sans-serif;
   --font-heading: "Space Grotesk", sans-serif;
 
-  /* BACKGROUND */
+  /* ---- Native UI (scrollbars, form controls, caret) ---- */
+  color-scheme: dark;
+
+  /* ---- Raw channels ----
+     For the many one-off rgba() values scattered through component CSS that
+     do not deserve a named token of their own. Written as bare triplets so
+     a rule can pick its own alpha:  rgba(var(--accent-rgb), 0.18)
+
+     --shadow-mult exists because a shadow cannot simply be re-tinted for
+     light mode - it has to be re-WEIGHTED. rgba(0,0,0,0.6) reads as depth
+     on near-black and as a smudge on white. Multiplying every shadow alpha
+     by this one number keeps the whole app's elevation consistent:
+       rgba(var(--shadow-rgb), calc(0.6 * var(--shadow-mult))) */
+  --accent-rgb: 0, 255, 178;
+  --down-rgb: 255, 92, 122;
+  --shadow-rgb: 0, 0, 0;
+  --shadow-mult: 1;
+  /* Corner falloff for the full-screen loader: matches whichever ground the
+     page sits on, so the vignette deepens the backdrop instead of staining it */
+  --vignette-rgb: 4, 6, 11;
+  --ink-rgb: 255, 255, 255; /* the colour overlaid onto surfaces */
+
+  /* ---- Background ---- */
   --bg-primary: #04060b;
   --bg-secondary: #0a101c;
   --bg-tertiary: #111724;
-   --accent-green: #00ffb2; /* Your primary glow green */
-  --accent-green-bright: #22c55e; /* Bright green for Solana and small UI highlights */
-  --accent-yellow: #eab308; /* BNB Yellow */
   --bg-card: rgba(255, 255, 255, 0.04);
   --bg-glass: rgba(255, 255, 255, 0.06);
+
   --dashboard-bg:
     radial-gradient(
       circle at top right,
@@ -25,36 +67,79 @@
     ),
     linear-gradient(180deg, #05070d 0%, #02040a 100%);
 
-  /* BRAND */
+  /* ---- Surfaces ----
+     The glass-fill scale. In dark mode light is added on top of a dark
+     ground; in light mode ink is added on top of a light one. Same names,
+     opposite direction. */
+  --surface-1: rgba(255, 255, 255, 0.02);
+  --surface-2: rgba(255, 255, 255, 0.035);
+  --surface-3: rgba(255, 255, 255, 0.05);
+  --surface-4: rgba(255, 255, 255, 0.07);
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --surface-inset: rgba(255, 255, 255, 0.03);
+
+  /* Gloss that sweeps across cards. On dark glass a faint white works; on
+     light glass it has to be far brighter to register at all. */
+  --sweep-highlight: rgba(255, 255, 255, 0.045);
+
+  /* ---- Brand ----
+     --primary is text-safe. --primary-vivid is the mint used for fills. */
   --primary: #00ffb2;
+  --primary-vivid: #00ffb2;
   --primary-dark: #00c98a;
   --primary-light: #66ffd1;
 
   --primary-gradient: linear-gradient(135deg, #00ffb2 0%, #00c98a 100%);
   --primary-glow: rgba(0, 255, 178, 0.5);
 
-  /* ACCENTS */
+  /* Accent tints, ordered by weight. Light mode deepens the hue as well as
+     the alpha, because a 8% mint wash over white is simply invisible. */
+  --accent-wash: rgba(0, 255, 178, 0.08);
+  --accent-soft: rgba(0, 255, 178, 0.12);
+  --accent-line: rgba(0, 255, 178, 0.28);
+  --accent-line-strong: rgba(0, 255, 178, 0.45);
+  --accent-glow: rgba(0, 255, 178, 0.3);
+
+  /* ---- Status ---- */
+  --up: #00ffb2;
+  --up-soft: rgba(0, 255, 178, 0.12);
+  --down: #ff5c7a;
+  --down-soft: rgba(255, 92, 122, 0.12);
+  --down-line: rgba(255, 92, 122, 0.3);
+
+  /* ---- Accents ---- */
   --accent-blue: #3b82f6;
   --accent-purple: #8b5cf6;
   --accent-orange: #f59e0b;
   --accent-red: #ef4444;
+  --accent-green: #00ffb2;
+  --accent-green-bright: #22c55e;
+  --accent-yellow: #eab308;
 
-  /* TEXT */
+  /* ---- Text ---- */
   --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
   --text-muted: #6b7280;
+  --text-on-accent: #04060b; /* sits on --primary-gradient */
 
-  /* BORDER */
+  /* ---- Border ---- */
   --border-light: rgba(255, 255, 255, 0.08);
   --border-medium: rgba(255, 255, 255, 0.12);
   --border-strong: rgba(36, 129, 101, 0.5);
 
-  /* EFFECTS */
+  /* ---- Effects ---- */
   --glow-green: 0 0 20px rgba(0, 255, 178, 0.6);
   --glow-soft: 0 0 40px rgba(0, 255, 178, 0.25);
   --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.6);
+  --shadow-hover: 0 22px 55px rgba(0, 0, 0, 0.5);
+  --shadow-lift: 0 20px 48px rgba(0, 0, 0, 0.42);
+  --shadow-pop: 0 6px 18px rgba(0, 0, 0, 0.45);
 
-  /* GRADIENTS */
+  --backdrop-veil: rgba(0, 0, 0, 0.42);
+  --scrollbar-track: var(--bg-secondary);
+  --scrollbar-thumb: var(--primary);
+
+  /* ---- Gradients ---- */
   --hero-gradient:
     radial-gradient(
       circle at 20% 20%,
@@ -74,9 +159,163 @@
     rgba(255, 255, 255, 0.01)
   );
 
-  /* BUTTON */
+  /* ---- Chrome ----
+     Solid (not translucent) surfaces: the sidebar rail, the sticky top bar,
+     and pop-over panels. These sit OVER page content, so they cannot be a
+     see-through glass fill the way cards are - whatever scrolls underneath
+     would show through a dropdown. */
+  --rail-bg: linear-gradient(180deg, #05070d, #02040a);
+  --bar-bg: rgba(8, 12, 20, 0.95);
+  --panel-bg: linear-gradient(180deg, #0b0f1a, #05070d);
+  --panel-bg-soft: linear-gradient(145deg, #0b0f1a, #05070d);
+
+  /* ---- Button ---- */
   --btn-primary-bg: var(--primary-gradient);
-  --btn-primary-text: #000;
+  --btn-primary-text: #04060b;
+}
+
+/* =====================================================================
+   LIGHT THEME
+
+   Not "dark mode with the colours flipped". The ground is a cool off-white
+   rather than pure #fff so white cards can still lift off it, and shadows
+   are tightened and lightened - a 40px/0.6 black shadow that reads as depth
+   on near-black reads as dirt on white.
+   ===================================================================== */
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* ---- Raw channels ----
+     The accent darkens (mint is invisible as a wash on white), the overlay
+     ink flips from white to navy, and every shadow drops to ~a fifth of its
+     dark-mode weight. */
+  --accent-rgb: 0, 152, 102;
+  --down-rgb: 209, 39, 75;
+  --shadow-rgb: 13, 27, 48;
+  --shadow-mult: 0.2;
+  --vignette-rgb: 226, 233, 242;
+  --ink-rgb: 13, 27, 48;
+
+  /* ---- Background ---- */
+  --bg-primary: #f5f7fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eceff4;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-glass: rgba(255, 255, 255, 0.75);
+
+  --dashboard-bg:
+    radial-gradient(
+      circle at top right,
+      rgba(0, 200, 140, 0.16),
+      transparent 22%
+    ),
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(94, 129, 244, 0.07),
+      transparent 38%
+    ),
+    linear-gradient(180deg, #fbfcfe 0%, #eef2f7 100%);
+
+  /* ---- Surfaces (ink on light, mirroring white on dark) ---- */
+  --surface-1: rgba(13, 27, 48, 0.022);
+  --surface-2: rgba(13, 27, 48, 0.04);
+  --surface-3: rgba(13, 27, 48, 0.058);
+  --surface-4: rgba(13, 27, 48, 0.08);
+  --surface-hover: rgba(13, 27, 48, 0.05);
+  --surface-inset: rgba(13, 27, 48, 0.035);
+
+  /* Bright enough to read as gloss against a white card */
+  --sweep-highlight: rgba(255, 255, 255, 0.75);
+
+  /* ---- Brand ----
+     --primary is a deep green here: 5.1:1 on white, so it is legible as
+     body text and as an icon colour. --primary-vivid keeps the mint for
+     fills, where contrast is carried by whatever sits on top of it. */
+  --primary: #00875a;
+  --primary-vivid: #00c281;
+  --primary-dark: #046c4a;
+  --primary-light: #34d399;
+
+  /* The CTA keeps the brand mint here rather than going deep green, and
+     carries dark text - the same relationship dark mode uses.
+     Why not white-on-deep-green: white only clears 4.5:1 once the green is
+     as dark as #00875a, so a light-to-dark green gradient fails across its
+     lighter half (#00b881 scores 2.57:1). Dark ink on mint is 6.5-8.8:1
+     across the whole sweep AND keeps the button recognisably brand. */
+  --primary-gradient: linear-gradient(135deg, #00d69a 0%, #00b881 100%);
+  --primary-glow: rgba(0, 135, 90, 0.28);
+
+  --accent-wash: rgba(0, 152, 102, 0.07);
+  --accent-soft: rgba(0, 152, 102, 0.12);
+  --accent-line: rgba(0, 152, 102, 0.26);
+  --accent-line-strong: rgba(0, 152, 102, 0.42);
+  --accent-glow: rgba(0, 152, 102, 0.22);
+
+  /* ---- Status ---- */
+  --up: #00875a;
+  --up-soft: rgba(0, 152, 102, 0.12);
+  --down: #d1274b;
+  --down-soft: rgba(209, 39, 75, 0.1);
+  --down-line: rgba(209, 39, 75, 0.26);
+
+  /* ---- Accents (darkened so they hold up on white) ---- */
+  --accent-blue: #2563eb;
+  --accent-purple: #7c3aed;
+  --accent-orange: #c2650a;
+  --accent-red: #d1274b;
+  --accent-green: #00875a;
+  --accent-green-bright: #15803d;
+  --accent-yellow: #a16207;
+
+  /* ---- Text ---- */
+  --text-primary: #0b1220;
+  --text-secondary: #46556b;
+  --text-muted: #78879b;
+  /* Dark ink, because the light-mode CTA stays bright mint (see
+     --primary-gradient above). Also used as a FILL where a knob or dot sits
+     on an accent surface - the toggle switch, the active chain dot. */
+  --text-on-accent: #04231a;
+
+  /* ---- Border ---- */
+  --border-light: rgba(13, 27, 48, 0.1);
+  --border-medium: rgba(13, 27, 48, 0.16);
+  --border-strong: rgba(0, 135, 90, 0.4);
+
+  /* ---- Effects ----
+     Short, tight, low-alpha. Depth on light surfaces comes from a crisp
+     edge plus a close shadow, not from a large dark cloud. */
+  --glow-green: 0 0 18px rgba(0, 152, 102, 0.32);
+  --glow-soft: 0 0 34px rgba(0, 152, 102, 0.16);
+  --shadow-card: 0 4px 16px rgba(13, 27, 48, 0.07);
+  --shadow-hover: 0 12px 30px rgba(13, 27, 48, 0.11);
+  --shadow-lift: 0 12px 28px rgba(13, 27, 48, 0.1);
+  --shadow-pop: 0 4px 12px rgba(13, 27, 48, 0.12);
+
+  --backdrop-veil: rgba(13, 27, 48, 0.32);
+  --scrollbar-track: rgba(13, 27, 48, 0.05);
+  --scrollbar-thumb: rgba(13, 27, 48, 0.22);
+
+  /* ---- Gradients ---- */
+  --hero-gradient:
+    radial-gradient(circle at 20% 20%, rgba(0, 152, 102, 0.12), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.09), transparent 40%),
+    #fbfcfe;
+
+  /* Cards are near-solid white here. A translucent fill over the page
+     gradient would tint every card differently depending on where it sat. */
+  --card-gradient: linear-gradient(145deg, #ffffff 0%, #fbfcfe 100%);
+
+  /* ---- Chrome ----
+     Near-white, separated from the page by a border and a soft shadow
+     rather than by being a different brightness */
+  --rail-bg: linear-gradient(180deg, #ffffff, #f6f8fc);
+  --bar-bg: rgba(255, 255, 255, 0.92);
+  --panel-bg: linear-gradient(180deg, #ffffff, #f8fafc);
+  --panel-bg-soft: linear-gradient(145deg, #ffffff, #f4f7fb);
+
+  /* ---- Button ---- */
+  --btn-primary-text: #04231a;
 }
 
 /* ================= RESET ================= */
@@ -92,11 +331,15 @@
 body {
   font-family: var(--font-primary);
   background: var(--dashboard-bg);
+  background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
 }
 
 /* ================= TYPOGRAPHY ================= */
@@ -134,18 +377,18 @@ a:hover {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
+  background: var(--scrollbar-thumb);
   border-radius: 10px;
 }
 
 /* ================= CARD ================= */
 /* Bootstrap's own `.card` sets a near-black `color` intended for light
    backgrounds. Without an explicit color here, every plain element inside a
-   card inherits that and renders almost invisibly on this dark theme. */
+   card inherits that and renders almost invisibly on the dark theme. */
 .card {
   background: var(--card-gradient);
   border: 1px solid var(--border-light);
@@ -188,6 +431,10 @@ a:hover {
   color: var(--accent-red) !important;
 }
 
+.text-success {
+  color: var(--up) !important;
+}
+
 .bg-card {
   background: var(--bg-card);
 }
@@ -195,4 +442,36 @@ a:hover {
 .glass {
   background: var(--bg-glass);
   backdrop-filter: blur(10px);
+}
+
+/* Theme swap should feel like a dissolve, not a hard cut. Scoped to the
+   properties that actually change so transforms and animations are
+   untouched. Suppressed while `data-theme-boot` is on the root (see
+   useTheme) so the first paint does not animate from the wrong colours. */
+:root:not([data-theme-boot]) .card,
+:root:not([data-theme-boot]) button,
+:root:not([data-theme-boot]) input,
+:root:not([data-theme-boot]) select,
+:root:not([data-theme-boot]) textarea,
+:root:not([data-theme-boot]) table,
+:root:not([data-theme-boot]) td,
+:root:not([data-theme-boot]) th {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .card,
+  button,
+  input,
+  select,
+  textarea,
+  table,
+  td,
+  th {
+    transition: none;
+  }
 }

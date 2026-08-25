@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./PortfolioPerformance.css";
+import useChartTheme from "../../utils/chartTheme";
 import { Info } from "lucide-react";
 import {
   Chart as ChartJS,
@@ -109,6 +110,7 @@ const marketWatchItems = [
 
 const PortfolioPerformance = () => {
   const [activeTab, setActiveTab] = useState("1M");
+  const chart = useChartTheme();
 
   const currentDataset = timeframeData[activeTab];
 
@@ -117,22 +119,22 @@ const PortfolioPerformance = () => {
     datasets: [
       {
         data: currentDataset.data,
-        borderColor: "#00ffb2",
+        borderColor: chart.accent,
         borderWidth: 2,
         tension: 0.38,
         fill: true,
         backgroundColor: (context) => {
           const ctx = context.chart.ctx;
           const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, "rgba(0, 255, 178, 0.28)");
-          gradient.addColorStop(0.6, "rgba(0, 255, 178, 0.05)");
-          gradient.addColorStop(1, "rgba(0, 255, 178, 0)");
+          gradient.addColorStop(0, `rgba(${chart.accentRgb}, 0.28)`);
+          gradient.addColorStop(0.6, `rgba(${chart.accentRgb}, 0.05)`);
+          gradient.addColorStop(1, `rgba(${chart.accentRgb}, 0)`);
           return gradient;
         },
         pointRadius: 0,
         pointHoverRadius: 5,
-        pointHoverBackgroundColor: "#00ffb2",
-        pointHoverBorderColor: "#fff",
+        pointHoverBackgroundColor: chart.accent,
+        pointHoverBorderColor: chart.tooltipBg,
         pointHoverBorderWidth: 2,
       },
     ],
@@ -144,10 +146,10 @@ const PortfolioPerformance = () => {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: "#0d131d",
-        titleColor: "#8892a4",
-        bodyColor: "#00ffb2",
-        borderColor: "rgba(255, 255, 255, 0.1)",
+        backgroundColor: chart.tooltipBg,
+        titleColor: chart.tooltipTitle,
+        bodyColor: chart.accentInk,
+        borderColor: chart.tooltipBorder,
         borderWidth: 1,
         padding: 10,
         displayColors: false,
@@ -160,18 +162,18 @@ const PortfolioPerformance = () => {
       x: {
         grid: { display: false },
         ticks: {
-          color: "#626d7d",
+          color: chart.tick,
           font: { size: 12 },
         },
       },
       y: {
         position: "left",
         grid: {
-          color: "rgba(255, 255, 255, 0.03)",
+          color: chart.gridFaint,
           drawBorder: false,
         },
         ticks: {
-          color: "#626d7d",
+          color: chart.tick,
           font: { size: 12 },
           callback: (value) => `$${value}K`,
         },

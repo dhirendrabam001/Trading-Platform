@@ -151,7 +151,7 @@ const OverviewTab = () => {
                   <CartesianGrid
                     vertical={false}
                     horizontal={true}
-                    stroke="rgba(255,255,255,.045)"
+                    stroke="var(--border-light)"
                     strokeDasharray="3 6"
                   />
 
@@ -204,7 +204,7 @@ const OverviewTab = () => {
 
                       fill: "var(--primary)",
 
-                      stroke: "#fff",
+                      stroke: "var(--text-primary)",
 
                       strokeWidth: 2,
 

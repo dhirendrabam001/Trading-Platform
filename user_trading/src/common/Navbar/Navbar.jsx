@@ -5,6 +5,7 @@ import {
   Bell,
   Zap,
   Sun,
+  Moon,
   ChevronDown,
   User,
   Settings,
@@ -17,9 +18,11 @@ import "./Navbar.css";
 import { THEME_APP_URL, USER_API_END_POINT } from "../../apis/apis";
 import { setUser } from "../../redux/authSlice";
 import { useNavigate } from "react-router-dom";
+import useTheme from "../../hooks/useTheme";
 
 const Navbar = ({ toggleSidebar }) => {
   const { user } = useSelector((store) => store.auth);
+  const [theme, toggleTheme] = useTheme();
 
   const avatar = `${user?.firstName?.charAt(0) || ""}${user?.lastName?.charAt(0) || ""}`;
 
@@ -89,9 +92,19 @@ const Navbar = ({ toggleSidebar }) => {
           <span className="nav-badge">5</span>
         </div>
 
-        <div className="nav-icon nav-icon--optional">
-          <Sun size={18} />
-        </div>
+        <button
+          type="button"
+          className="nav-icon nav-icon--theme"
+          onClick={toggleTheme}
+          aria-label={
+            theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+          }
+          title={
+            theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+          }
+        >
+          {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
 
         {/* PROFILE */}
         <div className="profile-wrapper" ref={dropdownRef}>

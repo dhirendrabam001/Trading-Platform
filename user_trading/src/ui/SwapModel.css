@@ -6,7 +6,7 @@
 .swap-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(var(--shadow-rgb), calc(0.6 * var(--shadow-mult)));
   backdrop-filter: blur(6px);
   display: flex;
   justify-content: flex-end;
@@ -23,7 +23,7 @@
 
   background: var(--card-gradient);
   border-left: 1px solid var(--border-light);
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+  box-shadow: -10px 0 40px rgba(var(--shadow-rgb), calc(0.5 * var(--shadow-mult)));
   backdrop-filter: blur(20px);
 
   display: flex;
@@ -130,7 +130,7 @@
 /* TOKEN CHOOSE DROPDOWN */
 .token-select {
   border: 1px solid var(--border-medium);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-3);
   color: var(--text-primary);
   padding: 8px 14px;
   border-radius: 8px;

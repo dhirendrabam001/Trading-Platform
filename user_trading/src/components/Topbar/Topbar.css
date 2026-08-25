@@ -73,13 +73,13 @@
 
 /* Deposit — outlined green, dark filled interior */
 .btn-deposit {
-  background: rgba(0, 255, 178, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
   color: var(--primary);
   border: 1px solid var(--border-strong);
 }
 
 .btn-deposit:hover {
-  background: rgba(0, 255, 178, 0.14);
+  background: rgba(var(--accent-rgb), 0.14);
   box-shadow: var(--glow-green);
   transform: translateY(-1px);
 }

@@ -1,5 +1,5 @@
 import "./Footer.css";
-import Logo from "/Images/trade-logo.png";
+import BrandLogo from "../BrandLogo/BrandLogo";
 
 const linkGroups = [
   {
@@ -44,7 +44,7 @@ const Footer = () => (
     <div className="ft-top">
       {/* Brand */}
       <div className="ft-brand">
-        <img src={Logo} alt="Trade logo" className="ft-logo" />
+        <BrandLogo alt="Trade logo" className="ft-logo" />
         <p className="ft-tagline">
           Institutional-grade crypto trading built for speed, clarity and
           control.

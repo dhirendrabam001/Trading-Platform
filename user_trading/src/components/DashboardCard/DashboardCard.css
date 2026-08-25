@@ -3,9 +3,9 @@
 /* ── Card ──────────────────────────────────────────────── */
 .dc-card {
   background: var(--card-gradient,
-    linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01))
+    linear-gradient(145deg, rgba(var(--ink-rgb), 0.05), rgba(var(--ink-rgb), 0.01))
   );
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-light);
   border-radius: 16px;
   padding: 18px 18px 14px;
   position: relative;
@@ -26,7 +26,7 @@
   background: linear-gradient(
     125deg,
     transparent 0%,
-    rgba(255,255,255,0.04) 50%,
+    var(--sweep-highlight) 50%,
     transparent 100%
   );
   transform: translateX(-100%);
@@ -38,8 +38,8 @@
 
 .dc-card:hover {
   transform: translateY(-5px) scale(1.012);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.42);
-  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 48px rgba(var(--shadow-rgb), calc(0.42 * var(--shadow-mult)));
+  border-color: var(--border-medium);
 }
 
 /* ── Row 1 — icon + badge ──────────────────────────────── */
@@ -73,9 +73,9 @@
   white-space: nowrap;
   letter-spacing: 0.02em;
 }
-.dc-badge--up      { background: rgba(0,255,178,0.13);   color: #00ffb2; }
-.dc-badge--down    { background: rgba(248,113,113,0.15); color: #f87171; }
-.dc-badge--neutral { background: rgba(139,92,246,0.22);  color: #c4b5fd; }
+.dc-badge--up      { background: rgba(var(--accent-rgb), 0.13);   color: var(--primary); }
+.dc-badge--down    { background: rgba(var(--down-rgb), 0.15); color: var(--down); }
+.dc-badge--neutral { background: rgba(139, 92, 246, 0.22);  color: #c4b5fd; }
 
 /* ── Row 2 — title ─────────────────────────────────────── */
 .dc-title {
@@ -89,7 +89,7 @@
 .dc-value {
   font-size: 26px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
   margin: 0;
   line-height: 1.15;
   letter-spacing: -0.3px;
@@ -114,9 +114,9 @@
   min-width: 0;
   align-self: flex-end;
 }
-.dc-sub--green { color: #00ffb2; }
+.dc-sub--green { color: var(--primary); }
 .dc-sub--muted { color: var(--text-muted, #8892a4); }
-.dc-sub--red   { color: #f87171; }
+.dc-sub--red   { color: var(--down); }
 
 /* ── Sparkline — right side, ~55% card width, 52px tall ── */
 .dc-spark {

@@ -36,7 +36,7 @@
 }
 
 .donut-segment:hover {
-  filter: drop-shadow(0 0 12px rgba(0, 255, 178, 0.45));
+  filter: drop-shadow(0 0 12px rgba(var(--accent-rgb), 0.45));
 }
 
 /* Styling for SVG text elements */

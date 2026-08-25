@@ -1,0 +1,1120 @@
+/* =====================================================================
+   WATCHLIST
+
+   Same material as the rest of the app: every colour comes from the tokens
+   in index.css, so this page themes with everything else. No literal
+   rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries. The sidebar collapses independently
+   of the window, so a viewport breakpoint would fire at the wrong moment
+   every time the rail is toggled.
+   ===================================================================== */
+
+.wl-page {
+  width: 100%;
+  container-type: inline-size;
+  /* Figures must not jitter as they update, and columns of numbers should
+     line up digit for digit */
+  font-variant-numeric: tabular-nums;
+
+  --wl-radius: 16px;
+  --wl-gap: 15px;
+  --wl-pad: clamp(14px, 1.6vw, 20px);
+}
+
+/* ============================== HEADER ============================== */
+
+.wl-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 18px;
+}
+
+.wl-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.wl-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.wl-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.wl-subtitle {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* --- Summary strip --- */
+.wl-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(14px, 2vw, 30px);
+  margin: 0;
+  padding: 11px clamp(14px, 1.8vw, 22px);
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+
+.wl-summary dt {
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.wl-summary dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.wl-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* --- Buttons --- */
+.wl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.25s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.wl-btn:hover {
+  transform: translateY(-2px);
+}
+
+.wl-btn--primary {
+  /* Violet, matching the reference. Both stops stay dark enough for white
+     text in either theme - the token'd purple only darkens in light mode. */
+  background: linear-gradient(135deg, #7c5cff, #6d3fe0);
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(124, 92, 255, 0.28);
+}
+
+.wl-btn--primary:hover {
+  box-shadow: 0 14px 30px rgba(124, 92, 255, 0.36);
+}
+
+.wl-btn--ghost {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+.wl-btn--ghost:hover {
+  border-color: var(--accent-line);
+  color: var(--text-primary);
+}
+
+/* =========================== CARD SHELL ============================ */
+
+.wl-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--wl-pad);
+  border-radius: var(--wl-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so the :hover transform
+     below is not permanently outranked by the animation. */
+  animation: wlRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes wlRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.wl-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: wlSweep 7s ease-in-out infinite;
+}
+
+@keyframes wlSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.wl-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.wl-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.wl-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.wl-card:hover::after {
+  opacity: 1;
+}
+
+.wl-table-card {
+  animation-delay: 0.04s;
+}
+.wl-overview {
+  animation-delay: 0.1s;
+}
+.wl-movers {
+  animation-delay: 0.16s;
+}
+.wl-insight {
+  animation-delay: 0.22s;
+}
+
+.wl-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== GRID =============================== */
+
+.wl-grid {
+  display: grid;
+  gap: var(--wl-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.wl-side {
+  display: grid;
+  gap: var(--wl-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Full width below the split, so the three rail cards sit in a row rather
+   than stacking into a very long scroll */
+@container (min-width: 700px) {
+  .wl-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .wl-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .wl-page, so it fires on real content width
+   regardless of sidebar state. Must come AFTER the rules above, which it
+   resets back to a single column. */
+@container (min-width: 1180px) {
+  .wl-grid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+
+  .wl-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1440px) {
+  .wl-grid {
+    grid-template-columns: minmax(0, 1fr) 330px;
+  }
+}
+
+/* ============================= TOOLBAR ============================= */
+
+.wl-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.wl-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+}
+
+.wl-tab {
+  position: relative;
+  padding: 8px 12px 10px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.wl-tab:hover {
+  color: var(--text-secondary);
+}
+
+.wl-tab.is-active {
+  color: var(--primary);
+}
+
+/* Underline drawn on a pseudo-element so switching tabs cannot shift the
+   row's height the way a real border would */
+.wl-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary-vivid);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.wl-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.wl-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.wl-select {
+  padding: 7px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.wl-select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.wl-density {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+
+.wl-density button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.wl-density button:hover {
+  color: var(--text-secondary);
+}
+
+.wl-density button.is-active {
+  background: var(--accent-soft);
+  color: var(--primary);
+}
+
+.wl-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.wl-search:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.wl-search input {
+  width: 150px;
+  max-width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.wl-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Chrome adds its own clear button which sits oddly in a custom field */
+.wl-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ============================== TABLE ============================== */
+
+.wl-table-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--wl-pad) * -1);
+  padding: 0 var(--wl-pad);
+}
+
+.wl-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.wl-table thead th {
+  padding: 12px 10px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.wl-table .wl-num {
+  text-align: right;
+}
+
+.wl-table .wl-col-rank {
+  width: 44px;
+}
+
+.wl-table .wl-col-chart,
+.wl-table .wl-col-actions {
+  text-align: center;
+}
+
+.wl-table tbody td {
+  padding: 13px 10px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Both density states are spelled out rather than letting "comfortable" fall
+   through to the base padding, so each one is greppable from the markup */
+.wl-table.is-comfortable tbody td {
+  padding: 13px 10px;
+}
+
+.wl-table.is-compact tbody td {
+  padding: 7px 10px;
+}
+
+.wl-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.wl-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.wl-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.wl-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.wl-muted {
+  color: var(--text-muted);
+}
+
+.wl-up {
+  color: var(--up);
+}
+
+/* --- Asset cell --- */
+.wl-cell-asset {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wl-coin {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  font-style: normal;
+  /* White on a saturated brand fill: correct in BOTH themes, so this one is
+     deliberately literal rather than a token */
+  color: #ffffff;
+  box-shadow: var(--shadow-pop);
+}
+
+.wl-coin--sm {
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+}
+
+.wl-asset-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.wl-asset-text b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wl-asset-text small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* --- Change pill --- */
+.wl-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.wl-change.is-up {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+.wl-change.is-down {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* --- Sparkline ---
+   Everything is driven by `color`: the stroke, the gradient stops and the
+   glow all resolve from currentColor, so the whole chart re-themes with the
+   tokens and never needs a redraw. */
+.wl-spark {
+  display: block;
+  /* Must match the viewBox in Watchlist.jsx (108 x 42). Equal numbers mean
+     no non-uniform scaling, so the 1.4px stroke stays 1.4px. */
+  width: 108px;
+  height: 42px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.wl-spark-line {
+  stroke: currentColor;
+  /* Tight halo under the line. Applied to the line only - putting it on the
+     <svg> would smear the area fill too and muddy the whole cell. */
+  filter: drop-shadow(0 0 2.5px currentColor);
+  opacity: 0.95;
+}
+
+.wl-spark.is-up {
+  color: var(--up);
+}
+
+.wl-spark.is-down {
+  color: var(--down);
+}
+
+/* A glow is a dark-mode idea: on white it reads as a printing smudge rather
+   than as light, so light mode gets a crisp line and leans on the fill. */
+:root[data-theme="light"] .wl-spark-line {
+  filter: none;
+  opacity: 1;
+  stroke-width: 1.6;
+}
+
+/* --- Row actions --- */
+.wl-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.wl-star,
+.wl-kebab {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.wl-star:hover,
+.wl-kebab:hover {
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.wl-star.is-on {
+  color: var(--accent-yellow);
+}
+
+.wl-star.is-on svg {
+  fill: currentColor;
+}
+
+.wl-star:active {
+  transform: scale(0.88);
+}
+
+/* --- Empty state --- */
+.wl-empty-row td {
+  border-bottom: none;
+}
+
+.wl-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 38px 16px;
+  color: var(--text-muted);
+}
+
+.wl-empty p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ============================ TABLE FOOT =========================== */
+
+.wl-table-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid var(--border-light);
+  font-size: 12px;
+}
+
+.wl-pager {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wl-pager button {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.wl-pager button:hover:not(:disabled) {
+  border-color: var(--accent-line);
+  color: var(--text-primary);
+}
+
+.wl-pager button.is-active {
+  border-color: transparent;
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+}
+
+.wl-pager button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wl-rows {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================= OVERVIEW ============================ */
+
+.wl-overview-body {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2cqi, 18px);
+  flex-wrap: wrap;
+}
+
+.wl-donut {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  flex-shrink: 0;
+  margin-inline: auto;
+}
+
+/* Centred label. A plain overlay rather than a Chart.js plugin: the text is
+   static, and a plugin would have to redraw it on every theme change. */
+.wl-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.wl-donut-center strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wl-donut-center span {
+  font-size: 9px;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.wl-legend {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 120px;
+  min-width: 110px;
+}
+
+.wl-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.wl-legend i {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.wl-legend b {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ============================== MOVERS ============================= */
+
+.wl-mover-list {
+  list-style: none;
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+}
+
+.wl-mover-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.wl-mover-list li:hover {
+  background: var(--surface-hover);
+}
+
+.wl-mover-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.wl-mover-text b {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.wl-mover-text small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ============================== INSIGHT ============================ */
+
+.wl-insight {
+  background:
+    radial-gradient(circle at 12% 0%, var(--accent-wash), transparent 62%),
+    var(--card-gradient);
+}
+
+.wl-insight-icon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: var(--accent-soft);
+  color: var(--primary);
+}
+
+.wl-insight p {
+  margin: 0 0 14px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.wl-report {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--accent-line);
+  background: var(--accent-wash);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  transition:
+    background 0.22s ease,
+    transform 0.22s ease;
+}
+
+.wl-report:hover {
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+}
+
+/* ============================ RESPONSIVE =========================== */
+
+/* Eight nowrap columns cannot fit a phone at a readable size, so each row
+   becomes its own block and every cell prints its own label. Nothing is
+   clipped and nothing scrolls sideways - same pattern as .ov-table and
+   .lm-table elsewhere in the app. */
+@container (max-width: 760px) {
+  .wl-table-scroll {
+    overflow-x: visible;
+  }
+
+  .wl-table,
+  .wl-table tbody,
+  .wl-table tr,
+  .wl-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .wl-table thead {
+    display: none;
+  }
+
+  .wl-table {
+    white-space: normal;
+  }
+
+  .wl-table tbody tr {
+    position: relative;
+    margin-bottom: 10px;
+    padding: 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+
+  .wl-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .wl-table tbody td,
+  .wl-table.is-compact tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .wl-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The asset is the block's heading, so it spans the row unlabelled - and
+     the rank rides along in the corner instead of taking a row of its own */
+  .wl-table tbody td.wl-cell-asset {
+    justify-content: flex-start;
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .wl-table tbody td.wl-cell-asset::before,
+  .wl-table tbody td.wl-col-rank::before {
+    content: none;
+  }
+
+  .wl-table tbody td.wl-col-rank {
+    position: absolute;
+    top: 14px;
+    right: 12px;
+    width: auto;
+    padding: 0;
+    font-size: 11px;
+  }
+
+  .wl-table tbody td.wl-col-chart {
+    justify-content: space-between;
+  }
+
+  .wl-spark {
+    margin: 0;
+  }
+
+  .wl-table tbody td.wl-col-actions {
+    padding-top: 10px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .wl-actions {
+    justify-content: flex-end;
+  }
+
+  .wl-empty-row td,
+  .wl-empty-row td::before {
+    display: block;
+    content: none;
+  }
+}
+
+@container (max-width: 560px) {
+  .wl-header,
+  .wl-header-actions {
+    width: 100%;
+  }
+
+  .wl-header-actions .wl-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .wl-summary {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .wl-tools {
+    width: 100%;
+  }
+
+  .wl-search {
+    flex: 1 1 auto;
+  }
+
+  .wl-search input {
+    width: 100%;
+  }
+
+  .wl-table-foot {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* ============================ MOTION OPT-OUT ======================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .wl-card {
+    animation: none;
+  }
+
+  .wl-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .wl-card:hover,
+  .wl-btn:hover,
+  .wl-report:hover {
+    transform: none;
+  }
+
+  .wl-tab::after {
+    transition: none;
+  }
+}

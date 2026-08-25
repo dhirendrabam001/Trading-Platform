@@ -17,18 +17,15 @@ import {
   Bell,
   Headphones,
   Settings,
-  Activity,
   Database,
   TrendingUp,
-  Store,
-  LayoutGrid,
   Shield,
   HelpCircle,
   X,
   Landmark,
 } from "lucide-react";
 import "./Sidebar.css";
-import Logo from "/Images/trade-logo.png";
+import BrandLogo from "../BrandLogo/BrandLogo";
 
 const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
   const [openMenu, setOpenMenu] = useState(null);
@@ -43,7 +40,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
     >
       {/* LOGO */}
       <div className="sidebar-header d-flex align-items-center justify-content-between">
-        <img src={Logo} alt="trade-logo" />
+        <BrandLogo alt="trade-logo" />
         <button
           className="sidebar-close-btn d-md-none"
           onClick={closeMobileSidebar}
@@ -80,20 +77,20 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
           <CandlestickChart size={18} />
           <span>Live Market</span>
         </a> */}
-        <a href="#" className="menu-item">
+        <NavLink to="/watchlist" className="menu-item">
           <Eye size={18} />
           <span>Watchlist</span>
-        </a>
+        </NavLink>
       </div>
 
       {/* TRADING */}
       <div className="sidebar-section">
         <p className="section-title">TRADING</p>
 
-        <a href="#" className="menu-item">
+        <NavLink to="/buysell" className="menu-item">
           <ArrowUpCircle size={18} />
           <span>Buy & Sell</span>
-        </a>
+        </NavLink>
         <a href="#" className="menu-item">
           <ArrowLeftRight size={18} />
           <span>Open Position</span>

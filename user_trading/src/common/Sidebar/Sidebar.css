@@ -5,7 +5,7 @@
   /* dvh tracks the visible viewport, so the user card at the bottom stays
      reachable when a mobile browser's toolbars are showing */
   height: 100dvh;
-  background: linear-gradient(180deg, #05070d, #02040a);
+  background: var(--rail-bg);
   border-right: 1px solid var(--border-light);
   padding: 15px;
   position: fixed;
@@ -110,7 +110,7 @@
   .sidebar.collapsed {
     width: min(280px, 84vw);
     transform: translateX(-100%);
-    box-shadow: 24px 0 60px rgba(0, 0, 0, 0.55);
+    box-shadow: 24px 0 60px rgba(var(--shadow-rgb), calc(0.55 * var(--shadow-mult)));
   }
 
   .sidebar.mobile-open,
@@ -130,7 +130,7 @@
     width: 34px;
     height: 34px;
     border-radius: 9px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-3);
     border: 1px solid var(--border-light);
     flex-shrink: 0;
   }
@@ -181,7 +181,7 @@
 
 /* ACTIVE */
 .menu-item.active {
-  background: rgba(0, 255, 178, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
   color: var(--primary);
   border-left: 3px solid var(--primary);
 }
@@ -244,7 +244,7 @@
   border-radius: 50px;
   min-width: 22px;
   text-align: center;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 10px rgba(var(--down-rgb), 0.6);
 }
 
 /* PRO BADGE */
@@ -271,7 +271,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: linear-gradient(145deg, #0b0f1a, #05070d);
+  background: var(--panel-bg-soft);
   padding: 12px;
   border-radius: 12px;
   border: 1px solid var(--border-light);
@@ -294,7 +294,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  color: #000;
+  color: var(--text-on-accent);
 }
 
 /* TEXT */

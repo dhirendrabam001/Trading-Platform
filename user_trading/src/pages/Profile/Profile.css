@@ -43,7 +43,7 @@
 
 .btn-export:hover {
   border-color: var(--primary);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--surface-4);
 }
 
 /* ================= MAIN LAYOUT ================= */
@@ -81,12 +81,12 @@
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-3);
   color: var(--text-primary);
 }
 
 .nav-link.active {
-  background: rgba(0, 255, 178, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
   color: var(--primary);
   border-left: 3px solid var(--primary);
   font-weight: 600;
@@ -97,7 +97,7 @@
 }
 
 .text-danger-link:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(var(--down-rgb), 0.1);
 }
 
 /* Right Content Area */
@@ -151,7 +151,7 @@
   height: 84px;
   border-radius: 50%;
   background: var(--primary);
-  color: #000;
+  color: var(--text-on-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -166,7 +166,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #111724;
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-medium);
   color: var(--text-primary);
   display: flex;
@@ -242,9 +242,9 @@
 }
 
 .pill-active {
-  background: rgba(0, 255, 178, 0.15);
+  background: rgba(var(--accent-rgb), 0.15);
   color: var(--primary);
-  border: 1px solid rgba(0, 255, 178, 0.3);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
 }
 
 /* ================= METRICS ROW ================= */
@@ -262,7 +262,7 @@
 }
 
 .metric-icon-bg {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-3);
   padding: 8px;
   border-radius: 8px;
   color: var(--primary);
@@ -288,7 +288,7 @@
 .progress-track {
   width: 100%;
   height: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--surface-4);
   border-radius: 2px;
   margin-top: 6px;
 }
@@ -341,7 +341,7 @@
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(var(--shadow-rgb), calc(0.25 * var(--shadow-mult)));
   border: 1px solid var(--border-medium);
   border-radius: 8px;
   padding: 11px 14px;
@@ -359,7 +359,7 @@
 
 .form-control:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(0, 255, 178, 0.15);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15);
 }
 
 .dropdown {
@@ -383,7 +383,7 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  background: rgba(255, 255, 255, 0.01);
+  background: var(--surface-1);
 }
 
 .upload-title {
@@ -401,7 +401,7 @@
   height: 96px;
   border-radius: 50%;
   background: var(--primary);
-  color: #000;
+  color: var(--text-on-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -421,7 +421,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #111724;
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-medium);
   color: var(--text-primary);
   display: flex;
@@ -483,7 +483,7 @@
 }
 
 .card-2fa {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(var(--shadow-rgb), calc(0.2 * var(--shadow-mult)));
   border: 1px solid var(--border-medium);
   border-radius: 12px;
   padding: 20px;
@@ -529,7 +529,7 @@
 }
 
 .btn-manage-2fa:hover {
-  background: rgba(0, 255, 178, 0.12);
+  background: rgba(var(--accent-rgb), 0.12);
 }
 
 .shield-icon-green {
@@ -626,7 +626,7 @@
 }
 
 .danger-box {
-  border-color: rgba(239, 68, 68, 0.3);
+  border-color: rgba(var(--down-rgb), 0.3);
 }
 
 .text-danger {
@@ -653,8 +653,8 @@
 }
 
 .btn-delete {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(var(--down-rgb), 0.15);
+  border: 1px solid rgba(var(--down-rgb), 0.4);
   color: var(--accent-red);
   padding: 9px 16px;
   border-radius: 8px;
@@ -665,7 +665,7 @@
 }
 
 .btn-delete:hover {
-  background: rgba(239, 68, 68, 0.25);
+  background: rgba(var(--down-rgb), 0.25);
 }
 
 /* Buttons */
@@ -715,7 +715,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: var(--surface-4);
   transition: 0.3s;
   border-radius: 18px;
 }
@@ -738,7 +738,7 @@ input:checked + .slider {
 
 input:checked + .slider:before {
   transform: translateX(18px);
-  background-color: #000;
+  background-color: var(--text-on-accent);
 }
 
 /* ================= RESPONSIVE ================= */

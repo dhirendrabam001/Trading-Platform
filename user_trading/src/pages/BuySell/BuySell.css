@@ -1,0 +1,1320 @@
+/* =====================================================================
+   BUY & SELL  -  trading terminal
+
+   Built on the tokens in index.css so it themes with the rest of the app.
+   No literal rgba(255,255,255,x) surfaces: those cannot invert for light
+   mode. Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window.
+   ===================================================================== */
+
+.bs-page {
+  width: 100%;
+  container-type: inline-size;
+  font-variant-numeric: tabular-nums;
+
+  --bs-radius: 14px;
+  --bs-gap: 12px;
+  --bs-pad: clamp(12px, 1.3vw, 16px);
+}
+
+/* ============================== TOP BAR ============================= */
+
+.bs-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: var(--bs-gap);
+}
+
+.bs-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: color 0.22s ease;
+}
+
+.bs-back:hover {
+  color: var(--primary);
+}
+
+.bs-topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.bs-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+.bs-chip.is-on {
+  color: var(--primary);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.bs-chip.is-on svg {
+  fill: currentColor;
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.bs-card {
+  position: relative;
+  padding: var(--bs-pad);
+  border-radius: var(--bs-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.35s ease;
+}
+
+.bs-card:hover {
+  border-color: var(--border-medium);
+}
+
+.bs-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.bs-card-head h2 {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== HEADER ============================== */
+
+.bs-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(14px, 2.5vw, 34px);
+  margin-bottom: var(--bs-gap);
+}
+
+.bs-symbol {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.bs-coin {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  /* Bitcoin orange is asset identity, not a surface: literal on purpose, and
+     correct in both themes */
+  background: linear-gradient(135deg, #f7931a, #ffb75e);
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 700;
+  box-shadow: var(--shadow-pop);
+}
+
+.bs-symbol h1 {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(17px, 2vw, 21px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.bs-symbol p {
+  margin: 1px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.bs-header-price {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.bs-header-price strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.2vw, 23px);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.bs-header-price span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bs-header-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(14px, 2.4vw, 34px);
+  margin: 0 0 0 auto;
+}
+
+.bs-header-stats dt {
+  margin-bottom: 3px;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.bs-header-stats dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* =============================== GRID =============================== */
+
+.bs-grid {
+  display: grid;
+  gap: var(--bs-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.bs-col-center,
+.bs-col-right {
+  display: grid;
+  gap: var(--bs-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and will not shrink below their
+   content, so a wide table or a long figure pushes the whole column out */
+.bs-col-center > *,
+.bs-col-right > * {
+  min-width: 0;
+}
+
+/* Book and trades share a row while the rail is full width */
+@container (min-width: 640px) {
+  .bs-col-right {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Ticket beside the chart */
+@container (min-width: 900px) {
+  .bs-grid {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+
+  .bs-col-right {
+    grid-column: 1 / -1;
+  }
+}
+
+/* The full three-column terminal. Measured against .bs-page so it fires on
+   real content width whatever the sidebar is doing. */
+@container (min-width: 1200px) {
+  .bs-grid {
+    grid-template-columns: 280px minmax(0, 1fr) 264px;
+  }
+
+  .bs-col-right {
+    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container (min-width: 1480px) {
+  .bs-grid {
+    grid-template-columns: 296px minmax(0, 1fr) 292px;
+  }
+}
+
+/* ============================== TICKET ============================== */
+
+.bs-ticket {
+  display: grid;
+  gap: 11px;
+  align-content: start;
+  /* A grid item defaults to min-width:auto, which refuses to shrink below its
+     content's minimum. In a fixed-width track that makes the content spill
+     past the card border rather than compress - which is exactly what the
+     balance row and the stepper fields were doing. */
+  min-width: 0;
+}
+
+.bs-ticket > * {
+  min-width: 0;
+}
+
+.bs-side-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+
+.bs-side-btn {
+  padding: 9px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.bs-side-btn:hover {
+  color: var(--text-secondary);
+}
+
+.bs-side-btn.is-buy.is-active {
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+  box-shadow: 0 6px 16px var(--accent-glow);
+}
+
+.bs-side-btn.is-sell.is-active {
+  background: linear-gradient(135deg, #ff5c7a, #d1274b);
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(var(--down-rgb), 0.32);
+}
+
+.bs-type-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  padding: 3px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+}
+
+.bs-type-tabs button {
+  /* Three equal tracks: "Stop Limit" is the widest label, so it truncates
+     rather than pushing the row wider than the card */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 7px 4px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.bs-type-tabs button:hover {
+  color: var(--text-secondary);
+}
+
+.bs-type-tabs button.is-active {
+  background: var(--surface-4);
+  color: var(--text-primary);
+}
+
+/* flex-wrap is the guard: if the label and the figure cannot share a line at
+   a given column width, the figure drops to a second line instead of
+   overflowing the card. min-width:0 lets the label shrink before that. */
+.bs-balance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 3px 8px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.bs-balance > span {
+  min-width: 0;
+}
+
+.bs-balance strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.bs-add {
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--primary);
+  cursor: pointer;
+}
+
+/* --- Fields --- */
+.bs-field label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.bs-field small {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Named .bs-input, NOT .input-group: Bootstrap owns that name and its
+   `> .form-control { flex: 1 1 auto; width: 1% }` would collapse the field. */
+.bs-input {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 3px 3px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.bs-input:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.bs-input input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 7px 0;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.bs-input input:disabled,
+.bs-input input:read-only {
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.bs-input button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 6px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.bs-input button:hover {
+  background: var(--accent-soft);
+  color: var(--primary);
+}
+
+/* --- Percentage slider ---
+   A styled range input rather than a div-and-drag reimplementation: it comes
+   with keyboard support and the correct pointer semantics for free. */
+.bs-slider input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  /* --fill is set inline from the current value */
+  background: linear-gradient(
+    to right,
+    var(--primary-vivid) 0 var(--fill, 0%),
+    var(--surface-4) var(--fill, 0%) 100%
+  );
+  outline: none;
+  cursor: pointer;
+}
+
+.bs-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-primary);
+  background: var(--primary-vivid);
+  cursor: grab;
+}
+
+.bs-slider input[type="range"]::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-primary);
+  background: var(--primary-vivid);
+  cursor: grab;
+}
+
+.bs-slider input[type="range"]:focus-visible {
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.bs-slider-marks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 7px;
+}
+
+.bs-slider-marks button {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.bs-slider-marks button:hover {
+  color: var(--primary);
+}
+
+/* --- Advanced --- */
+.bs-advanced {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.bs-check {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.bs-check.is-on {
+  border-color: transparent;
+  background: var(--primary-gradient);
+}
+
+.bs-advanced svg {
+  margin-left: auto;
+  transition: transform 0.25s ease;
+}
+
+.bs-advanced svg.is-flipped {
+  transform: rotate(180deg);
+}
+
+.bs-advanced-body {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+}
+
+.bs-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.bs-toggle-row input {
+  accent-color: var(--primary-vivid);
+}
+
+/* --- Submit --- */
+.bs-submit {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.22s ease;
+}
+
+.bs-submit.is-buy {
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+  box-shadow: 0 8px 22px var(--accent-glow);
+}
+
+.bs-submit.is-sell {
+  background: linear-gradient(135deg, #ff5c7a, #c9304c);
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(var(--down-rgb), 0.3);
+}
+
+.bs-submit:hover {
+  transform: translateY(-2px);
+}
+
+.bs-estimates {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+}
+
+.bs-estimates > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.bs-estimates dt {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.bs-estimates dd {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.bs-estimates dt {
+  flex-shrink: 0;
+}
+
+/* =============================== CHART ============================== */
+
+.bs-chart-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bs-tf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.bs-tf button {
+  padding: 5px 11px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.bs-tf button:hover {
+  color: var(--text-secondary);
+  background: var(--surface-2);
+}
+
+.bs-tf button.is-active {
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+}
+
+.bs-chart-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+
+.bs-chart-tools button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.bs-chart-tools button:hover {
+  color: var(--primary);
+  background: var(--surface-2);
+}
+
+.bs-tool-text {
+  width: auto !important;
+  padding: 0 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.bs-ohlc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 0;
+  font-size: 11px;
+}
+
+.bs-ohlc-title {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* --- Plot ---
+   The svg carries only geometry and stretches with preserveAspectRatio
+   "none"; every label is HTML positioned over it, because stretched <text>
+   would smear horizontally at wide container widths. */
+.bs-plot {
+  display: flex;
+  gap: 6px;
+}
+
+.bs-plot-canvas {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: clamp(230px, 32vh, 320px);
+  padding-bottom: 18px;
+}
+
+.bs-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.bs-gridline {
+  stroke: var(--border-light);
+  stroke-width: 1;
+}
+
+.bs-candle.is-up rect {
+  fill: var(--up);
+}
+
+.bs-candle.is-down rect {
+  fill: var(--down);
+}
+
+.bs-vol.is-up {
+  fill: var(--up);
+  opacity: 0.28;
+}
+
+.bs-vol.is-down {
+  fill: var(--down);
+  opacity: 0.28;
+}
+
+.bs-last-line {
+  stroke: var(--primary-vivid);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.7;
+}
+
+.bs-time-axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18px;
+}
+
+.bs-time-axis span {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* First and last labels would hang off the plot; pull them inside */
+.bs-time-axis span:first-child {
+  transform: none;
+}
+
+.bs-time-axis span:last-child {
+  transform: translateX(-100%);
+}
+
+.bs-price-axis {
+  position: relative;
+  flex: 0 0 auto;
+  width: 62px;
+  /* Matches .bs-plot-canvas padding-bottom so the two share a baseline */
+  margin-bottom: 18px;
+}
+
+.bs-price-axis span {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.bs-last-pill {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* =============================== ORDERS ============================= */
+
+.bs-order-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bs-order-tabs button {
+  position: relative;
+  padding: 8px 12px 10px;
+  border: none;
+  background: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.bs-order-tabs button:hover {
+  color: var(--text-secondary);
+}
+
+.bs-order-tabs button.is-active {
+  color: var(--primary);
+}
+
+/* Underline on a pseudo-element so switching tabs cannot shift row height */
+.bs-order-tabs button::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary-vivid);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.bs-order-tabs button.is-active::after {
+  transform: scaleX(1);
+}
+
+.bs-table-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--bs-pad) * -1) calc(var(--bs-pad) * -1);
+  padding: 0 var(--bs-pad);
+}
+
+.bs-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 11.5px;
+}
+
+.bs-table thead th {
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bs-table tbody td {
+  padding: 11px 8px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bs-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.bs-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.bs-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.bs-pair {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bs-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.bs-badge.is-open {
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--accent-blue);
+}
+
+.bs-badge.is-partial {
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--primary);
+}
+
+.bs-cancel {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--down);
+  cursor: pointer;
+}
+
+.bs-cancel:hover {
+  text-decoration: underline;
+}
+
+.bs-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 30px 14px;
+  color: var(--text-muted);
+}
+
+.bs-empty p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ============================= ORDER BOOK =========================== */
+
+.bs-select {
+  padding: 5px 8px;
+  border-radius: 7px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.bs-select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.bs-book-head,
+.bs-book-row,
+.bs-trade-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+}
+
+.bs-book-head {
+  padding: 0 6px 7px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* :first-of-type, NOT :first-child - each book row starts with the depth
+   bar <i>, so no <span> in a row is the first CHILD and :not(:first-child)
+   would right-align the price out of line with its heading. */
+.bs-book-head span:not(:first-of-type),
+.bs-book-row span:not(:first-of-type),
+.bs-trade-row span:not(:first-of-type) {
+  text-align: right;
+}
+
+.bs-book-side {
+  display: grid;
+  gap: 1px;
+}
+
+.bs-book-row {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+.bs-book-row:hover {
+  background: var(--surface-hover);
+}
+
+/* Depth bar behind the numbers, grown from the right the way exchange books
+   read */
+.bs-book-row i {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  border-radius: 5px;
+}
+
+.bs-book-side.is-asks .bs-book-row i {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--down-rgb), 0),
+    rgba(var(--down-rgb), 0.16)
+  );
+}
+
+.bs-book-side.is-bids .bs-book-row i {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0),
+    rgba(var(--accent-rgb), 0.16)
+  );
+}
+
+.bs-book-row span {
+  position: relative;
+  z-index: 1;
+}
+
+.bs-book-mid {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 7px 0;
+  padding: 8px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+
+.bs-book-mid strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.bs-book-mid span {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bs-book-mid small {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ============================ RECENT TRADES ========================= */
+
+.bs-trade-list {
+  display: grid;
+  gap: 1px;
+}
+
+.bs-trade-row {
+  padding: 4px 6px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: background 0.2s ease;
+}
+
+.bs-trade-row:hover {
+  background: var(--surface-hover);
+}
+
+/* ============================= ASSURANCES =========================== */
+
+.bs-assurances {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: var(--bs-gap);
+}
+
+@container (min-width: 700px) {
+  .bs-assurances {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.bs-assurance {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.bs-assurance-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--accent-soft);
+  color: var(--primary);
+}
+
+.bs-assurance b {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bs-assurance small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ============================== UTILITIES =========================== */
+
+.bs-up {
+  color: var(--up);
+}
+
+.bs-down {
+  color: var(--down);
+}
+
+.bs-muted {
+  color: var(--text-muted);
+}
+
+.bs-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 5px;
+}
+
+/* ============================= RESPONSIVE =========================== */
+
+/* Nine nowrap columns cannot fit a phone at a readable size, so each order
+   becomes its own block and every cell prints its own label. Same pattern as
+   .ov-table, .lm-table and .wl-table elsewhere in the app. */
+@container (max-width: 720px) {
+  .bs-table-scroll {
+    overflow-x: visible;
+  }
+
+  .bs-table,
+  .bs-table tbody,
+  .bs-table tr,
+  .bs-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .bs-table thead {
+    display: none;
+  }
+
+  .bs-table {
+    white-space: normal;
+  }
+
+  .bs-table tbody tr {
+    margin-bottom: 9px;
+    padding: 11px;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    background: var(--surface-1);
+  }
+
+  .bs-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .bs-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .bs-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The pair is the block's heading, so it spans the row unlabelled */
+  .bs-table tbody td.bs-pair {
+    padding: 0 0 9px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .bs-table tbody td.bs-pair::before {
+    content: none;
+  }
+}
+
+@container (max-width: 560px) {
+  .bs-header-stats {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .bs-topbar-actions .bs-chip {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+/* ============================ MOTION OPT-OUT ======================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .bs-submit:hover {
+    transform: none;
+  }
+
+  .bs-order-tabs button::after,
+  .bs-advanced svg {
+    transition: none;
+  }
+}
