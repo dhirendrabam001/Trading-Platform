@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import useSidebar from "../hooks/useSidebar";
 import Navbar from "../common/Navbar/Navbar";
 import Sidebar from "../common/Sidebar/Sidebar";
 import "./Dashboard.css";
@@ -10,56 +10,12 @@ import CryptoDashboard from "../components/CryptoDashboard/CryptoDashboard";
 import Footer from "../common/Footer/Footer";
 
 const Dashboard = () => {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    if (window.innerWidth <= 768) {
-      setMobileSidebarOpen((prev) => !prev);
-      return;
-    }
-    setSidebarCollapsed((prev) => !prev);
-  };
-
-  const closeMobileSidebar = () => {
-    setMobileSidebarOpen(false);
-  };
-
-  // Hold the page still while the drawer is open, so scrolling the menu does
-  // not run the dashboard underneath it
-  useEffect(() => {
-    if (!mobileSidebarOpen) return;
-
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [mobileSidebarOpen]);
-
-  // Escape closes the drawer
-  useEffect(() => {
-    if (!mobileSidebarOpen) return;
-
-    const onKeyDown = (e) => {
-      if (e.key === "Escape") setMobileSidebarOpen(false);
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [mobileSidebarOpen]);
-
-  // Widening past the breakpoint turns the sidebar back into a fixed rail;
-  // without this the backdrop would linger over the desktop layout
-  useEffect(() => {
-    const onResize = () => {
-      if (window.innerWidth > 768) setMobileSidebarOpen(false);
-    };
-
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+  const {
+    collapsed: sidebarCollapsed,
+    mobileOpen: mobileSidebarOpen,
+    toggleSidebar,
+    closeMobileSidebar,
+  } = useSidebar();
 
   return (
     <>

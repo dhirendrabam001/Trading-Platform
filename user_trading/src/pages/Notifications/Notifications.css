@@ -1,0 +1,873 @@
+/* =====================================================================
+   NOTIFICATIONS
+
+   Same material as the other pages: every colour comes from the tokens in
+   index.css, so this page themes with the rest of the app. No literal
+   rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.nt-page {
+  width: 100%;
+  container-type: inline-size;
+  font-variant-numeric: tabular-nums;
+
+  --nt-radius: 16px;
+  --nt-gap: 14px;
+  --nt-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.nt-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.nt-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.nt-heading-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+/* Mirrors the sidebar badge: something is waiting */
+.nt-heading-dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warn);
+  box-shadow: 0 0 0 2px var(--bg-primary);
+}
+
+.nt-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.nt-subtitle {
+  margin: 5px 0 0;
+  max-width: 58ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.nt-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* --- Buttons --- */
+.nt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    opacity 0.2s ease;
+}
+
+.nt-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+/* Nothing unread means nothing to mark - disabled rather than silently
+   doing nothing when pressed */
+.nt-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Spelled out rather than left as an invisible fallthrough, so the variant
+   is greppable from the markup */
+.nt-btn--ghost {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.nt-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--nt-pad);
+  border-radius: var(--nt-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: ntRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes ntRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.nt-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: ntSweep 7s ease-in-out infinite;
+}
+
+@keyframes ntSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.nt-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.nt-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.nt-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.nt-card:hover::after {
+  opacity: 1;
+}
+
+.nt-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.nt-metrics {
+  display: grid;
+  gap: var(--nt-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--nt-gap);
+}
+
+@container (min-width: 1040px) {
+  .nt-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.nt-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.nt-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.nt-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.nt-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.nt-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.nt-metric:hover {
+  transform: translateY(-4px);
+}
+
+.nt-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.nt-metric.is-up .nt-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.nt-metric.is-warn .nt-metric-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.nt-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.nt-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.nt-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.nt-metric.is-up .nt-metric-value {
+  color: var(--up);
+}
+
+.nt-metric.is-warn .nt-metric-value {
+  color: var(--warn);
+}
+
+.nt-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.nt-grid {
+  display: grid;
+  gap: var(--nt-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.nt-side {
+  display: grid;
+  gap: var(--nt-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a long line would push the whole column out */
+.nt-grid > *,
+.nt-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .nt-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .nt-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .nt-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1200px) {
+  .nt-grid {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+  .nt-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1480px) {
+  .nt-grid {
+    grid-template-columns: minmax(0, 1fr) 350px;
+  }
+}
+
+/* =============================== TABS =============================== */
+
+.nt-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding-bottom: 11px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.nt-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px 10px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.nt-tab:hover {
+  color: var(--text-secondary);
+}
+
+.nt-tab.is-active {
+  color: var(--primary);
+}
+
+/* Underline on a pseudo-element so switching tabs cannot shift row height */
+.nt-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary-vivid);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.nt-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.nt-tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* =============================== FEED =============================== */
+
+.nt-group + .nt-group {
+  margin-top: 16px;
+}
+
+.nt-group-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 9px;
+}
+
+.nt-group-head span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Rule fills whatever the label leaves, so the heading reads as a divider */
+.nt-group-head i {
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--border-light);
+}
+
+.nt-group-head small {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.nt-list {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.nt-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.nt-item:hover {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+}
+
+/* Unread carries a category-tinted edge and a slightly lifted surface, so it
+   is distinguishable at a glance without relying on the dot alone */
+.nt-item.is-unread {
+  background: var(--surface-2);
+  box-shadow: inset 3px 0 0 rgb(var(--cat-rgb));
+}
+
+/* --- Category icon ---
+   --cat-rgb is set inline per row, so the icon, the edge and the summary
+   legend all read from one source rather than three colour lists. An rgb
+   triplet rather than color-mix(), matching --accent-rgb elsewhere. */
+.nt-item-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: rgba(var(--cat-rgb), 0.14);
+  color: rgb(var(--cat-rgb));
+}
+
+.nt-item-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.nt-item-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.nt-item-top b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.nt-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgb(var(--cat-rgb));
+}
+
+.nt-cat {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--cat-rgb), 0.35);
+  background: rgba(var(--cat-rgb), 0.11);
+  color: rgb(var(--cat-rgb));
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.nt-time {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.nt-item-body p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* --- Row actions --- */
+.nt-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.nt-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.nt-icon-btn:hover {
+  color: var(--primary);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.nt-icon-btn.is-danger:hover {
+  color: var(--down);
+  border-color: var(--down-line);
+  background: var(--down-soft);
+}
+
+/* --- Empty state --- */
+.nt-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 46px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.nt-empty p {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ============================= DELIVERY ============================= */
+
+.nt-pref-head,
+.nt-pref-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px 44px;
+  align-items: center;
+  gap: 8px;
+}
+
+.nt-pref-head {
+  padding: 0 0 8px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.nt-pref-head span {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.nt-pref-list {
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.nt-pref-list li {
+  padding: 8px 0;
+}
+
+.nt-pref-list li + li {
+  border-top: 1px solid var(--border-light);
+}
+
+.nt-pref-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.nt-pref-body b {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.nt-pref-body small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* --- Switch ---
+   A real <button role="switch"> rather than a styled checkbox, so it keeps
+   keyboard and screen-reader semantics without a hidden input to sync */
+.nt-switch {
+  justify-self: center;
+  width: 34px;
+  height: 19px;
+  padding: 2px;
+  border: 1px solid var(--border-medium);
+  border-radius: 999px;
+  background: var(--surface-3);
+  cursor: pointer;
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.nt-switch i {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    background 0.22s ease;
+}
+
+.nt-switch.is-on {
+  border-color: transparent;
+  background: var(--primary-gradient);
+}
+
+.nt-switch.is-on i {
+  transform: translateX(15px);
+  background: var(--text-on-accent);
+}
+
+/* ============================== SUMMARY ============================= */
+
+.nt-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.nt-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.nt-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.nt-summary dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.nt-summary dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.nt-legend-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.nt-note-lead {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.nt-up {
+  color: var(--up);
+}
+
+.nt-warn {
+  color: var(--warn);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+/* ============================== FOCUS =============================== */
+
+.nt-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+@container (max-width: 620px) {
+  /* The timestamp drops onto its own line rather than squeezing the title */
+  .nt-time {
+    margin-left: 0;
+  }
+
+  .nt-item {
+    flex-wrap: wrap;
+  }
+
+  .nt-item-actions {
+    width: 100%;
+    justify-content: flex-end;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-light);
+  }
+}
+
+@container (max-width: 560px) {
+  .nt-header-actions {
+    width: 100%;
+  }
+
+  .nt-header-actions .nt-btn {
+    flex: 1 1 auto;
+  }
+
+  .nt-pref-head,
+  .nt-pref-list li {
+    grid-template-columns: minmax(0, 1fr) 38px 38px;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .nt-card {
+    animation: none;
+  }
+
+  .nt-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .nt-card:hover,
+  .nt-metric:hover,
+  .nt-btn:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .nt-tab::after,
+  .nt-switch i {
+    transition: none;
+  }
+}

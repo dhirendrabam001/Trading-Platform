@@ -51,9 +51,15 @@
 
 /* ================= CTA BUTTON ================= */
 .btn-get-started {
+  position: relative;
+  overflow: hidden;
   background: var(--btn-primary-bg);
+  background-size: 220% auto;
   color: var(--btn-primary-text);
   border: none;
+  animation:
+    nxFlow 7s linear infinite,
+    nxHalo 3.4s ease-in-out infinite;
   padding: 10px 22px;
   font-weight: 600;
   border-radius: 8px;
@@ -63,9 +69,23 @@
 }
 
 /* Hover */
+.btn-get-started::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: translateX(-150%) skewX(-18deg);
+  pointer-events: none;
+  animation: nxSheen 5.5s ease-in-out infinite;
+}
+
 .btn-get-started:hover {
+  animation: nxFlow 2.6s linear infinite;
   transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(0, 255, 178, 0.7);
+  box-shadow: 0 10px 34px rgba(0, 255, 178, 0.6);
 }
 
 /* ================= TOGGLER (MOBILE) ================= */

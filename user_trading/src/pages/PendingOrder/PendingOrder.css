@@ -1,0 +1,1225 @@
+/* =====================================================================
+   PENDING ORDERS
+
+   Same material as LiveMarket / Watchlist / BuySell / OpenPosition: every
+   colour comes from the tokens in index.css, so this page themes with the
+   rest of the app. No literal rgba(255,255,255,x) surfaces - those cannot
+   invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.po-page {
+  width: 100%;
+  container-type: inline-size;
+  /* Figures must not jitter as they update, and columns of numbers should
+     line up digit for digit */
+  font-variant-numeric: tabular-nums;
+
+  --po-radius: 16px;
+  --po-gap: 14px;
+  --po-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.po-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.po-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.po-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.po-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.po-subtitle {
+  margin: 5px 0 0;
+  max-width: 56ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.po-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* --- Buttons --- */
+.po-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.po-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+.po-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.po-btn--ghost {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+.po-btn--danger {
+  border-color: var(--down-line);
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.po-btn--danger:hover:not(:disabled) {
+  color: var(--down);
+  border-color: var(--down);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.po-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--po-pad);
+  border-radius: var(--po-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: poRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes poRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.po-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: poSweep 7s ease-in-out infinite;
+}
+
+@keyframes poSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.po-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.po-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.po-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.po-card:hover::after {
+  opacity: 1;
+}
+
+.po-card-title {
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.po-metrics {
+  display: grid;
+  gap: var(--po-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--po-gap);
+}
+
+@container (min-width: 1040px) {
+  .po-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.po-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.po-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.po-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.po-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.po-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.po-metric:hover {
+  transform: translateY(-4px);
+}
+
+.po-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.po-metric.is-up .po-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.po-metric.is-warn .po-metric-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.po-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.po-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.po-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.po-metric.is-warn .po-metric-value {
+  color: var(--warn);
+}
+
+.po-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.po-grid {
+  display: grid;
+  gap: var(--po-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.po-side {
+  display: grid;
+  gap: var(--po-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a wide table would push the whole column out */
+.po-grid > *,
+.po-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the three rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .po-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .po-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .po-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1240px) {
+  .po-grid {
+    grid-template-columns: minmax(0, 1fr) 310px;
+  }
+
+  .po-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1520px) {
+  .po-grid {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+
+/* ============================== TOOLBAR ============================= */
+
+.po-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 11px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.po-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+}
+
+.po-tab {
+  position: relative;
+  padding: 8px 12px 10px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.po-tab:hover {
+  color: var(--text-secondary);
+}
+
+.po-tab.is-active {
+  color: var(--primary);
+}
+
+/* Underline on a pseudo-element so switching tabs cannot shift row height */
+.po-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary-vivid);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.po-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.po-tab-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background: var(--warn);
+  vertical-align: middle;
+}
+
+.po-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.po-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.po-sort select {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.po-sort select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.po-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.po-search:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.po-search input {
+  width: 150px;
+  max-width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.po-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Chrome's own clear button sits oddly inside a custom field */
+.po-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* =============================== TABLE ============================== */
+
+.po-table-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--po-pad) * -1);
+  padding: 0 var(--po-pad);
+}
+
+.po-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.po-table thead th {
+  padding: 12px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.po-table .po-num {
+  text-align: right;
+}
+
+.po-table tbody td {
+  padding: 12px 9px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.po-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.po-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+/* An order about to trigger gets an amber edge - a colour cue that does not
+   depend on reading the distance column */
+.po-table tbody tr.is-near td:first-child {
+  box-shadow: inset 2px 0 0 var(--warn);
+}
+
+.po-table tbody tr.is-open {
+  background: var(--surface-2);
+}
+
+.po-table tbody tr.is-open td {
+  border-bottom-color: transparent;
+}
+
+.po-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.po-muted {
+  color: var(--text-muted);
+}
+
+.po-up {
+  color: var(--up);
+}
+
+.po-down {
+  color: var(--down);
+}
+
+.po-warn {
+  color: var(--warn);
+}
+
+/* --- Pair cell --- */
+.po-cell-pair {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.po-coin {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-style: normal;
+  /* White on a saturated brand fill: correct in BOTH themes, so this one is
+     deliberately literal rather than a token */
+  color: #ffffff;
+  box-shadow: var(--shadow-pop);
+}
+
+.po-coin--sm {
+  width: 20px;
+  height: 20px;
+  font-size: 9.5px;
+  box-shadow: none;
+}
+
+.po-pair-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.po-pair-text b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.po-pair-text small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* --- Type badge ---
+   --type-rgb is set inline per row, so the badge, the doughnut slice and
+   the legend all read from one source rather than three colour lists */
+.po-type {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 7px;
+  border: 1px solid;
+  border-color: rgba(var(--type-rgb), 0.4);
+  background: rgba(var(--type-rgb), 0.13);
+  color: rgb(var(--type-rgb));
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* --- Side pill --- */
+.po-side-cell,
+span.po-side {
+  min-width: 0;
+}
+
+span.po-side {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+span.po-side.is-buy {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+span.po-side.is-sell {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* --- Fill progress --- */
+.po-fill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 92px;
+}
+
+.po-fill-track {
+  flex: 1 1 auto;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.po-fill-bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--surface-4);
+  transition: width 0.35s ease;
+}
+
+.po-fill-bar.is-partial {
+  background: var(--primary-vivid);
+}
+
+.po-fill small {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* --- Distance to trigger --- */
+.po-distance {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.po-distance.is-near {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+/* --- Actions --- */
+.po-cell-actions {
+  text-align: right;
+}
+
+.po-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.po-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.po-icon-btn:hover {
+  color: var(--primary);
+  border-color: var(--accent-line);
+}
+
+.po-icon-btn svg {
+  transition: transform 0.25s ease;
+}
+
+.po-icon-btn svg.is-flipped {
+  transform: rotate(180deg);
+}
+
+.po-cancel-btn {
+  padding: 6px 13px;
+  border-radius: 8px;
+  border: 1px solid var(--down-line);
+  background: var(--down-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--down);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.po-cancel-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--down);
+}
+
+/* --- Expanded detail row --- */
+.po-detail-row td {
+  padding: 0 9px 13px !important;
+  background: var(--surface-2);
+}
+
+.po-detail {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 13px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  white-space: normal;
+}
+
+@container (min-width: 720px) {
+  .po-detail {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    align-items: center;
+  }
+}
+
+.po-detail-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.po-detail-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.po-detail-block b {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.po-detail-block small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.po-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.po-detail-actions .po-btn {
+  padding: 8px 13px;
+  font-size: 11.5px;
+}
+
+/* --- Empty state --- */
+.po-empty-row td {
+  border-bottom: none;
+}
+
+.po-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 42px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  white-space: normal;
+}
+
+.po-empty p {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ============================ ORDERS BY TYPE ======================== */
+
+.po-alloc {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2cqi, 18px);
+  flex-wrap: wrap;
+}
+
+.po-donut {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  flex-shrink: 0;
+  margin-inline: auto;
+}
+
+/* Centred label as a plain overlay rather than a Chart.js plugin: the text is
+   static, and a plugin would have to redraw it on every theme change */
+.po-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.po-donut-center strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.po-donut-center span {
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.po-legend {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 120px;
+  min-width: 110px;
+}
+
+.po-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.po-legend i {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.po-legend b {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* =========================== TRIGGER PROXIMITY ====================== */
+
+.po-proximity {
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+}
+
+.po-proximity li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.po-prox-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.po-prox-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.po-prox-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary-vivid);
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.po-prox-bar i.is-near {
+  background: var(--warn);
+}
+
+.po-proximity b {
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ============================ ORDER SUMMARY ========================= */
+
+.po-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.po-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.po-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.po-summary dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.po-summary dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* ============================== FOCUS =============================== */
+
+.po-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Ten nowrap columns cannot fit a phone at a readable size, so each order
+   becomes its own block and every cell prints its own label. Nothing is
+   clipped and nothing scrolls sideways - same pattern as .ov-table,
+   .lm-table, .wl-table, .bs-table and .op-table elsewhere in the app. */
+@container (max-width: 820px) {
+  .po-table-scroll {
+    overflow-x: visible;
+  }
+
+  .po-table,
+  .po-table tbody,
+  .po-table tr,
+  .po-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .po-table thead {
+    display: none;
+  }
+
+  .po-table {
+    white-space: normal;
+  }
+
+  .po-table tbody tr {
+    margin-bottom: 10px;
+    padding: 13px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+
+  .po-table tbody tr.is-near {
+    border-color: var(--warn-line);
+  }
+
+  /* The inset edge marker relies on a first cell that is no longer a table
+     cell here, so the whole card takes the cue instead */
+  .po-table tbody tr.is-near td:first-child {
+    box-shadow: none;
+  }
+
+  .po-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .po-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The pair is the block's heading, so it spans the row unlabelled */
+  .po-table tbody td.po-cell-pair {
+    justify-content: flex-start;
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .po-table tbody td.po-cell-pair::before {
+    content: none;
+  }
+
+  .po-table tbody td.po-cell-actions {
+    justify-content: flex-end;
+    padding-top: 11px;
+    margin-top: 5px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .po-table tbody td.po-cell-actions::before {
+    content: none;
+  }
+
+  .po-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* The detail row is a sibling <tr>; as a block it needs to sit flush under
+     the card it belongs to rather than floating with its own margin */
+  .po-detail-row {
+    margin-top: -10px;
+    margin-bottom: 10px;
+  }
+
+  .po-detail-row td {
+    padding: 0 !important;
+    background: none;
+  }
+
+  .po-detail-row td::before {
+    content: none;
+  }
+
+  .po-empty-row td,
+  .po-empty-row td::before {
+    display: block;
+    content: none;
+  }
+}
+
+@container (max-width: 560px) {
+  .po-header-actions,
+  .po-tools {
+    width: 100%;
+  }
+
+  .po-header-actions .po-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .po-search {
+    flex: 1 1 auto;
+  }
+
+  .po-search input {
+    width: 100%;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .po-card {
+    animation: none;
+  }
+
+  .po-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .po-card:hover,
+  .po-metric:hover,
+  .po-btn:hover:not(:disabled),
+  .po-cancel-btn:hover {
+    transform: none;
+  }
+
+  .po-tab::after,
+  .po-fill-bar,
+  .po-prox-bar i,
+  .po-icon-btn svg {
+    transition: none;
+  }
+}

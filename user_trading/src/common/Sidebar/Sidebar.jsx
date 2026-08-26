@@ -23,9 +23,11 @@ import {
   HelpCircle,
   X,
   Landmark,
+  ChevronRight,
 } from "lucide-react";
 import "./Sidebar.css";
 import BrandLogo from "../BrandLogo/BrandLogo";
+import useCurrentUser from "../../hooks/useCurrentUser";
 
 const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
   const [openMenu, setOpenMenu] = useState(null);
@@ -33,6 +35,8 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
+
+  const { email, fullName, initials } = useCurrentUser();
 
   return (
     <div
@@ -95,89 +99,90 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
           <ArrowLeftRight size={18} />
           <span>Open Position</span>
         </NavLink>
-        <a href="#" className="menu-item">
+        <NavLink to="/pending-order" className="menu-item">
           <ArrowDownCircle size={18} />
           <span>Pending Order</span>
-        </a>
-        <a href="#" className="menu-item">
+        </NavLink>
+        <NavLink to="/orders" className="menu-item">
           <History size={18} />
           <span>Orders History</span>
-        </a>
+        </NavLink>
       </div>
 
       {/* PORTFOLIO */}
       <div className="sidebar-section">
         <p className="section-title">PORTFOLIO</p>
 
-        <a href="#" className="menu-item">
+        <NavLink to="/portfolio" className="menu-item">
           <Database size={16} />
           <span>My Portfolio</span>
-        </a>
+        </NavLink>
+
         <a href="#" className="menu-item">
           <TrendingUp size={16} />
           <span>Holdings</span>
         </a>
-        <a href="#" className="menu-item">
+        <NavLink to="/profit-loss" className="menu-item">
           <BarChart3 size={16} />
           <span>Profit & Loss</span>
-        </a>
+        </NavLink>
       </div>
 
       {/* WALLET */}
       <div className="sidebar-section">
         <p className="section-title">WALLET</p>
 
-        <a href="#" className="menu-item">
+        <NavLink to="/wallet" className="menu-item">
           <Wallet size={20} />
           <span>Wallet Balance</span>
-        </a>
-        <a href="#" className="menu-item">
+        </NavLink>
+        <NavLink to="/deposit" className="menu-item">
           <ArrowDownCircle size={20} />
           <span>Deposit</span>
-        </a>
-        <a href="#" className="menu-item">
+        </NavLink>
+        <NavLink to="/withdraw" className="menu-item">
           <ArrowUpCircle size={20} />
           <span>Withdraw</span>
-        </a>
-        <a href="#" className="menu-item">
+        </NavLink>
+        <NavLink to="/transactions" className="menu-item">
           <ReceiptText size={20} />
           <span>Transactions</span>
-        </a>
+        </NavLink>
       </div>
 
       {/* REPORT */}
       <div className="sidebar-section">
         <p className="section-title">REPORTS</p>
 
-        <a href="#" className="menu-item">
+        <NavLink to="/trade-history" className="menu-item">
           <BarChart3 size={20} />
           <span>Trade History</span>
-        </a>
-        <a href="#" className="menu-item">
+        </NavLink>
+        <NavLink to="/performance" className="menu-item">
           <Briefcase size={20} />
           <span>Performance Report</span>
-        </a>
+        </NavLink>
       </div>
 
       {/* ACCOUNT */}
       <div className="sidebar-section">
         <p className="section-title">ACCOUNT</p>
 
-        <a href="#" className="menu-item">
+        <NavLink to="/profile" className="menu-item">
           <User size={20} />
           <span>Profile</span>
-        </a>
-        <a href="#" className="menu-item">
+        </NavLink>
+        <NavLink to="/kyc" className="menu-item">
           <ShieldCheck size={20} />
           <span>KYC Verification</span>
-        </a>
-        <a href="#" className="menu-item">
+        </NavLink>
+        <NavLink to="/bank-accounts" className="menu-item">
           <Landmark size={20} />
           <span>Bank Accounts</span>
-        </a>
+        </NavLink>
 
-        <a
-          href="#"
+        <NavLink
+          to="/notifications"
           className="menu-item d-flex align-items-center justify-content-between"
         >
           <div className="d-flex align-items-center gap-2">
@@ -185,20 +190,20 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
             <span>Notifications</span>
           </div>
           <span className="badge notification-badge">5</span>
-        </a>
-        <a href="#" className="menu-item">
+        </NavLink>
+        <NavLink to="/security" className="menu-item">
           <Shield size={20} />
           <span>Security</span>
-        </a>
-        <a href="#" className="menu-item">
+        </NavLink>
+        <NavLink to="/support" className="menu-item">
           <Headphones size={20} />
           <span>Support</span>
-        </a>
+        </NavLink>
 
-        <a href="#" className="menu-item">
+        <NavLink to="/help" className="menu-item">
           <HelpCircle size={20} />
           <span>Help Center</span>
-        </a>
+        </NavLink>
         <a href="#" className="menu-item">
           <Settings size={20} />
           <span>Settings</span>
@@ -207,13 +212,23 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
       <hr />
       {/* USER PROFILE */}
       <div className="sidebar-user mt-auto">
-        <div className="user-card">
-          <div className="avatar">DB</div>
-          <div className="user-info">
-            <p className="name">Dhirendra Bam</p>
-            <p className="email">dhirendra@gmail.com</p>
-          </div>
-        </div>
+        <NavLink
+          to="/profile"
+          className={({ isActive }) =>
+            isActive ? "user-card active" : "user-card"
+          }
+          title={email ? `${fullName} — ${email}` : fullName}
+        >
+          <span className="avatar">
+            {initials}
+            <i className="avatar-status" aria-hidden="true" />
+          </span>
+          <span className="user-info">
+            <span className="name">{fullName}</span>
+            <span className="email">{email}</span>
+          </span>
+          <ChevronRight size={16} className="user-chevron" aria-hidden="true" />
+        </NavLink>
       </div>
     </div>
   );

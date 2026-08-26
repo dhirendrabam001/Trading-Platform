@@ -1,0 +1,1319 @@
+/* =====================================================================
+   WITHDRAW
+
+   Same material as the other trading pages: every colour comes from the
+   tokens in index.css, so this page themes with the rest of the app. No
+   literal rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.wd-page {
+  width: 100%;
+  container-type: inline-size;
+  /* Figures must not jitter as they update, and columns of numbers should
+     line up digit for digit */
+  font-variant-numeric: tabular-nums;
+
+  --wd-radius: 16px;
+  --wd-gap: 14px;
+  --wd-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.wd-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.wd-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.wd-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.wd-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.wd-subtitle {
+  margin: 5px 0 0;
+  max-width: 62ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.wd-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* --- Buttons --- */
+.wd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.wd-btn:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+/* Spelled out rather than left as an invisible fallthrough, so the variant
+   is greppable from the markup */
+.wd-btn--ghost {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.wd-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--wd-pad);
+  border-radius: var(--wd-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: wdRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes wdRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.wd-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: wdSweep 7s ease-in-out infinite;
+}
+
+@keyframes wdSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.wd-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.wd-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.wd-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.wd-card:hover::after {
+  opacity: 1;
+}
+
+.wd-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.wd-metrics {
+  display: grid;
+  gap: var(--wd-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--wd-gap);
+}
+
+@container (min-width: 1040px) {
+  .wd-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.wd-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.wd-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.wd-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.wd-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.wd-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.wd-metric:hover {
+  transform: translateY(-4px);
+}
+
+.wd-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.wd-metric.is-up .wd-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.wd-metric.is-warn .wd-metric-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.wd-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.wd-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.wd-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(17px, 2vw, 21px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.wd-metric.is-up .wd-metric-value {
+  color: var(--up);
+}
+
+.wd-metric.is-warn .wd-metric-value {
+  color: var(--warn);
+}
+
+.wd-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.wd-grid {
+  display: grid;
+  gap: var(--wd-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.wd-col-main,
+.wd-side {
+  display: grid;
+  gap: var(--wd-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a long address would push the whole column out */
+.wd-grid > *,
+.wd-col-main > *,
+.wd-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the three rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .wd-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .wd-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .wd-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1240px) {
+  .wd-grid {
+    grid-template-columns: minmax(0, 1fr) 310px;
+  }
+
+  .wd-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1520px) {
+  .wd-grid {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+
+/* =============================== STEPS ============================== */
+
+.wd-step-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.wd-step-head > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Numbered so the three cards read as one flow rather than three unrelated
+   panels */
+.wd-step-num {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wd-step-note {
+  margin: 3px 0 0;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+/* --- Search --- */
+.wd-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.wd-search:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.wd-search input {
+  width: 140px;
+  max-width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.wd-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Chrome's own clear button sits oddly inside a custom field */
+.wd-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ============================ ASSET PICKER ========================== */
+
+.wd-asset-grid {
+  display: grid;
+  gap: 9px;
+  grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+}
+
+.wd-asset {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease;
+}
+
+.wd-asset:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-medium);
+}
+
+.wd-asset.is-active {
+  border-color: var(--accent-line-strong);
+  background: var(--accent-wash);
+}
+
+.wd-asset-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.wd-asset-text b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wd-asset-text small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.wd-no-asset {
+  margin: 0;
+  padding: 12px 0;
+  font-size: 12.5px;
+}
+
+/* ============================== NETWORK ============================= */
+
+.wd-network-list {
+  display: grid;
+  gap: 9px;
+}
+
+.wd-network {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.wd-network:hover {
+  border-color: var(--border-medium);
+}
+
+.wd-network.is-active {
+  border-color: var(--accent-line-strong);
+  background: var(--accent-wash);
+}
+
+.wd-network-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.wd-network-main b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wd-network-main small,
+.wd-network-meta small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.wd-network-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.wd-network-meta b {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* =============================== FORM =============================== */
+
+.wd-form {
+  display: grid;
+  gap: 14px;
+}
+
+.wd-field {
+  min-width: 0;
+}
+
+.wd-field-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.wd-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.wd-field-row .wd-field-label {
+  margin-bottom: 0;
+}
+
+.wd-field-row .wd-muted {
+  font-size: 11.5px;
+}
+
+/* --- Address input --- */
+.wd-input {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  outline: none;
+  font-family: var(--font-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.wd-input::placeholder {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.wd-input:focus {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.wd-input.is-invalid {
+  border-color: var(--down-line);
+  background: var(--down-soft);
+}
+
+/* --- Saved addresses --- */
+.wd-saved {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.wd-saved .wd-muted {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wd-saved-chip {
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.wd-saved-chip:hover {
+  color: var(--primary);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+/* --- Amount input --- */
+.wd-amount {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 6px 5px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.wd-amount:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.wd-amount.is-invalid {
+  border-color: var(--down-line);
+  background: var(--down-soft);
+}
+
+.wd-amount input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 7px 0;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.wd-amount input::placeholder {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.wd-amount-sym {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.wd-max {
+  flex-shrink: 0;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--accent-line);
+  background: var(--accent-wash);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.wd-max:hover {
+  background: var(--accent-soft);
+}
+
+.wd-percents {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.wd-percents button {
+  padding: 7px 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.wd-percents button:hover {
+  color: var(--primary);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+/* --- Verdict --- */
+.wd-error,
+.wd-ok {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.wd-error {
+  border: 1px solid var(--down-line);
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.wd-ok {
+  border: 1px solid var(--accent-line);
+  background: var(--accent-wash);
+  color: var(--primary);
+}
+
+/* --- Receipt --- */
+.wd-receipt {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 12px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+}
+
+.wd-receipt > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.wd-receipt dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.wd-receipt dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.wd-receipt-total {
+  margin-top: 4px;
+  padding-top: 10px !important;
+  border-top: 1px solid var(--border-light);
+}
+
+.wd-receipt-total dt {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.wd-receipt-total dd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 15px;
+  color: var(--primary);
+}
+
+.wd-receipt-total dd small {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* --- Submit --- */
+.wd-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px;
+  border: none;
+  border-radius: 11px;
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px var(--accent-glow);
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.22s ease,
+    opacity 0.2s ease;
+}
+
+.wd-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+/* Disabled until the entry validates, so an invalid transfer cannot be
+   submitted by pressing Enter or clicking through */
+.wd-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.wd-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== TABLE ============================== */
+
+.wd-table-scroll {
+  overflow-x: auto;
+  margin: 12px calc(var(--wd-pad) * -1) calc(var(--wd-pad) * -1);
+  padding: 0 var(--wd-pad) 2px;
+}
+
+.wd-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.wd-table thead th {
+  padding: 11px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.wd-table .wd-num {
+  text-align: right;
+}
+
+.wd-table tbody td {
+  padding: 11px 9px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.wd-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.wd-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.wd-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.wd-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.wd-muted {
+  color: var(--text-muted);
+}
+
+.wd-up {
+  color: var(--up);
+}
+
+.wd-warn {
+  color: var(--warn);
+}
+
+.wd-cell-asset {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.wd-cell-asset b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wd-coin {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  font-style: normal;
+  /* White on a saturated brand fill: correct in BOTH themes, so this one is
+     deliberately literal rather than a token */
+  color: #ffffff;
+  box-shadow: var(--shadow-pop);
+}
+
+.wd-coin--sm {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+  box-shadow: none;
+}
+
+/* --- Status --- */
+.wd-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.wd-status.is-completed {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+.wd-status.is-pending {
+  color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.wd-status.is-rejected {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* ============================== SUMMARY ============================= */
+
+.wd-summary-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 13px 0 12px;
+  padding: 11px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+
+.wd-summary-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.wd-summary-text b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wd-summary-text small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.wd-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.wd-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.wd-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.wd-summary dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.wd-summary dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* =============================== LIMIT ============================== */
+
+.wd-limit {
+  margin-top: 13px;
+}
+
+.wd-limit-top {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.wd-limit-top b {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wd-limit-top .wd-muted {
+  font-size: 11.5px;
+}
+
+.wd-limit-track {
+  display: block;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.wd-limit-track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary-dark), var(--primary-vivid));
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.wd-limit-note {
+  margin: 10px 0 0;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* ============================== SAFETY ============================== */
+
+.wd-checklist {
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  margin: 13px 0 0;
+  padding: 0;
+}
+
+.wd-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.wd-checklist svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--primary);
+}
+
+.wd-checklist svg.wd-warn {
+  color: var(--warn);
+}
+
+/* ============================== FOCUS =============================== */
+
+.wd-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Five nowrap columns cannot fit a phone at a readable size, so each
+   withdrawal becomes its own block and every cell prints its own label.
+   Nothing is clipped and nothing scrolls sideways - same pattern as the
+   other tables in the app. */
+@container (max-width: 700px) {
+  .wd-table-scroll {
+    overflow-x: visible;
+  }
+
+  .wd-table,
+  .wd-table tbody,
+  .wd-table tr,
+  .wd-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .wd-table thead {
+    display: none;
+  }
+
+  .wd-table {
+    white-space: normal;
+  }
+
+  .wd-table tbody tr {
+    margin-bottom: 10px;
+    padding: 13px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+
+  .wd-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .wd-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .wd-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .wd-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The asset is the block's heading, so it spans the row unlabelled */
+  .wd-table tbody td.wd-cell-asset {
+    justify-content: flex-start;
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .wd-table tbody td.wd-cell-asset::before {
+    content: none;
+  }
+}
+
+@container (max-width: 560px) {
+  .wd-header-actions {
+    width: 100%;
+  }
+
+  .wd-header-actions .wd-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .wd-search {
+    width: 100%;
+  }
+
+  .wd-search input {
+    width: 100%;
+  }
+
+  .wd-network {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+  }
+
+  .wd-network-meta {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .wd-card {
+    animation: none;
+  }
+
+  .wd-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .wd-card:hover,
+  .wd-metric:hover,
+  .wd-btn:hover,
+  .wd-asset:hover,
+  .wd-submit:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .wd-limit-track i {
+    transition: none;
+  }
+}

@@ -1,0 +1,92 @@
+.faq-list {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  margin-bottom: 12px;
+  border-radius: 15px;
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  overflow: hidden;
+  transition:
+    border-color 0.35s ease,
+    background 0.35s ease;
+}
+
+.faq-item:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.faq-item.is-open {
+  border-color: rgba(0, 255, 178, 0.32);
+  background: linear-gradient(
+    145deg,
+    rgba(0, 255, 178, 0.05),
+    rgba(255, 255, 255, 0.01)
+  );
+}
+
+.faq-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 20px 24px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.faq-q:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.faq-chev {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.35s ease;
+}
+
+.faq-item.is-open .faq-chev {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+/* Framer Motion animates this wrapper's height, so it must clip its child.
+   The padding lives on the paragraph inside — animating height on a padded
+   element leaves the padding visible at height 0. */
+.faq-a-wrap {
+  overflow: hidden;
+}
+
+.faq-a {
+  margin: 0;
+  padding: 0 24px 22px;
+  font-family: var(--font-primary);
+  font-size: 0.93rem;
+  line-height: 1.72;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 575px) {
+  .faq-q {
+    padding: 17px 18px;
+    font-size: 0.94rem;
+    gap: 14px;
+  }
+
+  .faq-a {
+    padding: 0 18px 19px;
+  }
+}

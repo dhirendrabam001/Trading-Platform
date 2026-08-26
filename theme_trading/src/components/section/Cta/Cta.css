@@ -1,0 +1,94 @@
+.cta-panel {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 74px 40px;
+  border-radius: 26px;
+  border: 1px solid rgba(0, 255, 178, 0.22);
+  background:
+    radial-gradient(circle at 15% 20%, rgba(0, 255, 178, 0.12), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.12), transparent 45%),
+    linear-gradient(145deg, rgba(11, 15, 26, 0.96), rgba(5, 7, 13, 0.96));
+  box-shadow:
+    var(--shadow-card),
+    0 0 80px rgba(0, 255, 178, 0.07);
+  text-align: center;
+}
+
+/* Slow drifting orbs behind the copy. z-index:-1 with isolation on the panel
+   keeps them from painting over the buttons. */
+.cta-orb {
+  position: absolute;
+  z-index: -1;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+}
+
+.cta-orb--a {
+  top: -140px;
+  left: -90px;
+  background: radial-gradient(circle, rgba(0, 255, 178, 0.3), transparent 70%);
+  animation: ctaDrift 15s ease-in-out infinite;
+}
+
+.cta-orb--b {
+  right: -110px;
+  bottom: -160px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.28), transparent 70%);
+  animation: ctaDrift 18s ease-in-out infinite reverse;
+}
+
+@keyframes ctaDrift {
+  50% {
+    transform: translate3d(40px, 26px, 0) scale(1.12);
+  }
+}
+
+.cta-inner {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.cta-title {
+  margin-bottom: 16px;
+}
+
+.cta-sub {
+  margin-bottom: 32px;
+}
+
+.cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.cta-fine {
+  margin: 28px 0 0;
+  font-family: var(--font-primary);
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-orb {
+    animation: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .cta-panel {
+    padding: 52px 22px;
+    border-radius: 20px;
+  }
+
+  .cta-actions .nx-btn {
+    width: 100%;
+  }
+}

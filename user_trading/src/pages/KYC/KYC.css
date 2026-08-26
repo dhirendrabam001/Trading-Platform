@@ -1,0 +1,888 @@
+/* =====================================================================
+   KYC VERIFICATION
+
+   Same material as the other pages: every colour comes from the tokens in
+   index.css, so this page themes with the rest of the app. No literal
+   rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.kyc-page {
+  width: 100%;
+  container-type: inline-size;
+  font-variant-numeric: tabular-nums;
+
+  --kyc-radius: 16px;
+  --kyc-gap: 14px;
+  --kyc-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.kyc-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.kyc-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.kyc-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.kyc-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.kyc-subtitle {
+  margin: 5px 0 0;
+  max-width: 58ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.kyc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.kyc-badge.is-done {
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+  color: var(--primary);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.kyc-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--kyc-pad);
+  border-radius: var(--kyc-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: kycRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes kycRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.kyc-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: kycSweep 7s ease-in-out infinite;
+}
+
+@keyframes kycSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.kyc-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.kyc-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.kyc-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.kyc-card:hover::after {
+  opacity: 1;
+}
+
+.kyc-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================= PROGRESS ============================= */
+
+.kyc-progress-card {
+  margin-bottom: var(--kyc-gap);
+}
+
+.kyc-progress-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kyc-progress-head .kyc-card-title {
+  margin-bottom: 4px;
+}
+
+.kyc-note-inline {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.kyc-progress-pct {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+}
+
+.kyc-progress-track {
+  display: block;
+  height: 8px;
+  margin: 13px 0 16px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.kyc-progress-track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary-dark), var(--primary-vivid));
+  transition: width 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* --- Tiers --- */
+.kyc-tiers {
+  display: grid;
+  gap: 11px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 720px) {
+  .kyc-tiers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.kyc-tier {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 13px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.kyc-tier.is-reached {
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+/* The next tier is the call to action, so it gets a visible edge without
+   claiming the "reached" green */
+.kyc-tier.is-next {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+}
+
+.kyc-tier-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.kyc-tier-top b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.kyc-tier-mark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  background: var(--surface-3);
+  color: var(--text-muted);
+}
+
+.kyc-tier.is-reached .kyc-tier-mark {
+  background: var(--accent-soft);
+  color: var(--primary);
+}
+
+.kyc-tier.is-next .kyc-tier-mark {
+  color: var(--text-secondary);
+}
+
+.kyc-tier p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.kyc-tier-limits {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding-top: 9px;
+  border-top: 1px solid var(--border-light);
+}
+
+.kyc-tier-limits > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.kyc-tier-limits dt {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.kyc-tier-limits dd {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* =============================== GRID =============================== */
+
+.kyc-grid {
+  display: grid;
+  gap: var(--kyc-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.kyc-side {
+  display: grid;
+  gap: var(--kyc-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a long line would push the whole column out */
+.kyc-grid > *,
+.kyc-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .kyc-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .kyc-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .kyc-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1200px) {
+  .kyc-grid {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+  .kyc-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1480px) {
+  .kyc-grid {
+    grid-template-columns: minmax(0, 1fr) 350px;
+  }
+}
+
+/* =============================== STEPS ============================== */
+
+.kyc-steps {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  counter-reset: kyc;
+}
+
+.kyc-step {
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  overflow: hidden;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.kyc-step.is-open {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+}
+
+/* Status colours the left edge, so the state of a step is readable without
+   parsing its badge */
+.kyc-step.is-done {
+  box-shadow: inset 3px 0 0 var(--up);
+}
+
+.kyc-step.is-review {
+  box-shadow: inset 3px 0 0 var(--accent-blue);
+}
+
+.kyc-step.is-warn {
+  box-shadow: inset 3px 0 0 var(--warn);
+}
+
+.kyc-step.is-locked {
+  opacity: 0.62;
+}
+
+.kyc-step-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.kyc-step-num {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-3);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.kyc-step.is-done .kyc-step-num {
+  border-color: transparent;
+  background: var(--accent-soft);
+  color: var(--primary);
+}
+
+.kyc-step-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.kyc-step.is-done .kyc-step-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.kyc-step.is-warn .kyc-step-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.kyc-step-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.kyc-step-body b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.kyc-step-body small {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+/* --- Status pill --- */
+.kyc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--surface-3);
+  color: var(--text-muted);
+}
+
+.kyc-status.is-done {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.kyc-status.is-review {
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--accent-blue);
+}
+
+.kyc-status.is-warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+/* --- Expanded detail --- */
+.kyc-step-detail {
+  display: grid;
+  gap: 11px;
+  padding: 0 14px 14px 14px;
+}
+
+.kyc-step-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.kyc-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 22px 16px;
+  border-radius: 11px;
+  border: 1px dashed var(--border-medium);
+  background: var(--surface-1);
+  text-align: center;
+  color: var(--text-muted);
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.kyc-drop:hover {
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.kyc-drop b {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.kyc-drop small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* --- Buttons --- */
+.kyc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  justify-self: start;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.22s ease;
+}
+
+.kyc-btn:hover {
+  transform: translateY(-2px);
+}
+
+.kyc-btn--primary {
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+  box-shadow: 0 8px 20px var(--accent-glow);
+}
+
+.kyc-btn--warn {
+  border-color: var(--warn-line);
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+/* ============================ YOUR LIMITS =========================== */
+
+.kyc-level-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 12px;
+  padding: 11px;
+  border-radius: 11px;
+  border: 1px solid var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.kyc-level-mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.kyc-level-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.kyc-level-text b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.kyc-level-text small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.kyc-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.kyc-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.kyc-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.kyc-summary dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.kyc-summary dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* ============================= NEXT LEVEL =========================== */
+
+.kyc-next {
+  background:
+    radial-gradient(circle at 12% 0%, var(--accent-wash), transparent 60%),
+    var(--card-gradient);
+}
+
+.kyc-next-copy {
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.kyc-unlock-list {
+  list-style: none;
+  display: grid;
+  gap: 7px;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.kyc-unlock-list li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 9px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+}
+
+.kyc-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.kyc-dot.is-done {
+  background: var(--up);
+}
+
+.kyc-dot.is-review {
+  background: var(--accent-blue);
+}
+
+.kyc-dot.is-warn {
+  background: var(--warn);
+}
+
+.kyc-unlock-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.kyc-unlock-body b {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.kyc-unlock-body small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* ============================== HELPERS ============================= */
+
+.kyc-checklist {
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+}
+
+.kyc-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.kyc-checklist svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--primary);
+}
+
+.kyc-note {
+  margin: 12px 0 0;
+  padding-top: 11px;
+  border-top: 1px solid var(--border-light);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.kyc-muted {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.kyc-up {
+  color: var(--up);
+}
+
+/* ============================== FOCUS =============================== */
+
+.kyc-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+@container (max-width: 620px) {
+  /* The status pill drops beneath the title rather than squeezing it to a
+     couple of characters */
+  .kyc-step-head {
+    flex-wrap: wrap;
+    row-gap: 9px;
+  }
+
+  .kyc-step-body {
+    flex-basis: calc(100% - 82px);
+  }
+
+  .kyc-status {
+    margin-left: 46px;
+  }
+}
+
+@container (max-width: 560px) {
+  .kyc-header {
+    align-items: flex-start;
+  }
+
+  .kyc-badge {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .kyc-btn {
+    justify-self: stretch;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .kyc-card {
+    animation: none;
+  }
+
+  .kyc-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .kyc-btn:hover {
+    transform: none;
+  }
+
+  .kyc-progress-track i {
+    transition: none;
+  }
+}

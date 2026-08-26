@@ -1,0 +1,1167 @@
+/* =====================================================================
+   SECURITY
+
+   Same material as the other pages: every colour comes from the tokens in
+   index.css, so this page themes with the rest of the app. No literal
+   rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.sc-page {
+  width: 100%;
+  container-type: inline-size;
+  font-variant-numeric: tabular-nums;
+
+  --sc-radius: 16px;
+  --sc-gap: 14px;
+  --sc-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.sc-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.sc-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.sc-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.sc-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.sc-subtitle {
+  margin: 5px 0 0;
+  max-width: 58ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.sc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.sc-badge.is-up {
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+  color: var(--primary);
+}
+
+.sc-badge.is-warn {
+  border-color: var(--warn-line);
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.sc-badge.is-down {
+  border-color: var(--down-line);
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.sc-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--sc-pad);
+  border-radius: var(--sc-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: scRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes scRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.sc-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: scSweep 7s ease-in-out infinite;
+}
+
+@keyframes scSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.sc-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.sc-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.sc-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.sc-card:hover::after {
+  opacity: 1;
+}
+
+.sc-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 13px;
+}
+
+.sc-card-head .sc-card-title {
+  margin-bottom: 0;
+}
+
+.sc-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.sc-metrics {
+  display: grid;
+  gap: var(--sc-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--sc-gap);
+}
+
+@container (min-width: 1040px) {
+  .sc-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.sc-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sc-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.sc-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.sc-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.sc-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.sc-metric:hover {
+  transform: translateY(-4px);
+}
+
+.sc-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.sc-metric.is-up .sc-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.sc-metric.is-warn .sc-metric-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.sc-metric.is-down .sc-metric-icon {
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.sc-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.sc-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.sc-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.sc-metric.is-up .sc-metric-value {
+  color: var(--up);
+}
+
+.sc-metric.is-warn .sc-metric-value {
+  color: var(--warn);
+}
+
+.sc-metric.is-down .sc-metric-value {
+  color: var(--down);
+}
+
+.sc-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.sc-grid {
+  display: grid;
+  gap: var(--sc-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.sc-col-main,
+.sc-side {
+  display: grid;
+  gap: var(--sc-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a wide table would push the whole column out */
+.sc-grid > *,
+.sc-col-main > *,
+.sc-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .sc-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .sc-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .sc-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1200px) {
+  .sc-grid {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+  .sc-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1480px) {
+  .sc-grid {
+    grid-template-columns: minmax(0, 1fr) 350px;
+  }
+}
+
+/* ============================= MEASURES ============================= */
+
+.sc-measures {
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+}
+
+.sc-measure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+/* An enabled protection carries a green edge; a disabled one amber, so the
+   state reads before the badge does */
+.sc-measure.is-on {
+  box-shadow: inset 3px 0 0 var(--up);
+}
+
+.sc-measure.is-off {
+  box-shadow: inset 3px 0 0 var(--warn);
+  background: var(--warn-soft);
+  border-color: var(--warn-line);
+}
+
+.sc-measure-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.sc-measure.is-on .sc-measure-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.sc-measure.is-off .sc-measure-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.sc-measure-body {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.sc-measure-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.sc-measure-top b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* The points a measure is worth, shown next to it so the score is never a
+   black box */
+.sc-weight {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.sc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.sc-status.is-on {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.sc-status.is-off {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.sc-measure-body p {
+  margin: 0 0 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.sc-measure-body small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.sc-measure-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* --- Switch ---
+   A real <button role="switch"> rather than a styled checkbox, so it keeps
+   keyboard and screen-reader semantics without a hidden input to sync */
+.sc-switch {
+  width: 36px;
+  height: 20px;
+  padding: 2px;
+  flex-shrink: 0;
+  border: 1px solid var(--border-medium);
+  border-radius: 999px;
+  background: var(--surface-3);
+  cursor: pointer;
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.sc-switch i {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    background 0.22s ease;
+}
+
+.sc-switch.is-on {
+  border-color: transparent;
+  background: var(--primary-gradient);
+}
+
+.sc-switch.is-on i {
+  transform: translateX(16px);
+  background: var(--text-on-accent);
+}
+
+/* --- Buttons --- */
+.sc-mini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.sc-mini-btn:hover:not(:disabled) {
+  color: var(--primary);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.sc-mini-btn.is-danger {
+  color: var(--down);
+  border-color: var(--down-line);
+  background: var(--down-soft);
+}
+
+.sc-mini-btn.is-danger:hover:not(:disabled) {
+  color: var(--down);
+  border-color: var(--down);
+  background: var(--down-soft);
+}
+
+.sc-mini-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    background 0.22s ease;
+}
+
+.sc-btn:hover {
+  transform: translateY(-2px);
+}
+
+.sc-btn--danger {
+  border-color: var(--down-line);
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+/* ============================== SESSIONS ============================ */
+
+.sc-table-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--sc-pad) * -1) calc(var(--sc-pad) * -1);
+  padding: 0 var(--sc-pad) 2px;
+}
+
+.sc-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.sc-table thead th {
+  padding: 11px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.sc-table tbody td {
+  padding: 11px 9px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.sc-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sc-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.sc-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.sc-table tbody tr.is-current td:first-child {
+  box-shadow: inset 2px 0 0 var(--up);
+}
+
+.sc-cell-device {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sc-device-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.sc-device-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sc-device-text b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sc-current-tag {
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--up-soft);
+  color: var(--up);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sc-loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sc-cell-action {
+  text-align: right;
+}
+
+/* ============================== ACTIVITY ============================ */
+
+.sc-activity {
+  list-style: none;
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+}
+
+.sc-event {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+}
+
+.sc-event.is-warn {
+  border-color: var(--warn-line);
+  background: var(--warn-soft);
+}
+
+.sc-event-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.sc-event.is-warn .sc-event-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.sc-event-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.sc-event-body b {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sc-event-body small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.sc-event-time {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ============================ SCORE RING ============================ */
+
+.sc-score {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+/* One conic gradient driven by --pct, so the ring needs no extra markup and
+   re-themes with the tokens */
+.sc-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--ring-color) 0 var(--pct),
+    var(--surface-4) var(--pct) 100%
+  );
+}
+
+.sc-ring.is-up {
+  --ring-color: var(--primary-vivid);
+}
+
+.sc-ring.is-warn {
+  --ring-color: var(--warn);
+}
+
+.sc-ring.is-down {
+  --ring-color: var(--down);
+}
+
+.sc-ring-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+}
+
+.sc-ring-inner strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.sc-ring-inner span {
+  font-size: 9.5px;
+  color: var(--text-muted);
+}
+
+.sc-score-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.sc-score-text b {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.sc-score-text small {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* --- Breakdown --- */
+.sc-breakdown {
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+}
+
+.sc-breakdown li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  transition: background 0.2s ease;
+}
+
+.sc-breakdown li:hover {
+  background: var(--surface-hover);
+}
+
+.sc-bd-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--surface-4);
+}
+
+.sc-breakdown li.is-on .sc-bd-dot {
+  background: var(--up);
+}
+
+.sc-breakdown li.is-off .sc-bd-dot {
+  background: var(--warn);
+}
+
+.sc-bd-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--text-secondary);
+}
+
+.sc-breakdown li b {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sc-breakdown li.is-off b {
+  color: var(--text-muted);
+}
+
+/* =========================== RECOMMENDED ============================ */
+
+.sc-reco {
+  background:
+    radial-gradient(circle at 12% 0%, var(--warn-soft), transparent 58%),
+    var(--card-gradient);
+}
+
+.sc-reco-list {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.sc-reco-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 11px;
+  border: 1px solid var(--warn-line);
+  background: var(--warn-soft);
+}
+
+.sc-reco-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.sc-reco-body b {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sc-reco-body small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.sc-reco-gain {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* ============================== HELPERS ============================= */
+
+.sc-note-lead {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.sc-note {
+  margin: 11px 0 0;
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.sc-muted {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.sc-up {
+  color: var(--up);
+}
+
+.sc-warn {
+  color: var(--warn);
+}
+
+.sc-down {
+  color: var(--down);
+}
+
+/* ============================== FOCUS =============================== */
+
+.sc-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Five nowrap columns cannot fit a phone at a readable size, so each session
+   becomes its own block and every cell prints its own label. Same pattern as
+   the other tables in the app. */
+@container (max-width: 680px) {
+  .sc-table-scroll {
+    overflow-x: visible;
+  }
+
+  .sc-table,
+  .sc-table tbody,
+  .sc-table tr,
+  .sc-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .sc-table thead {
+    display: none;
+  }
+
+  .sc-table {
+    white-space: normal;
+  }
+
+  .sc-table tbody tr {
+    margin-bottom: 9px;
+    padding: 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 11px;
+    background: var(--surface-1);
+  }
+
+  .sc-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .sc-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* The inset edge marker relies on a first cell that is no longer a table
+     cell here, so the whole card takes the cue instead */
+  .sc-table tbody tr.is-current td:first-child {
+    box-shadow: none;
+  }
+
+  .sc-table tbody tr.is-current {
+    border-color: var(--accent-line);
+  }
+
+  .sc-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .sc-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The device is the block's heading, so it spans the row unlabelled */
+  .sc-table tbody td.sc-cell-device {
+    justify-content: flex-start;
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .sc-table tbody td.sc-cell-device::before {
+    content: none;
+  }
+
+  .sc-table tbody td.sc-cell-action::before {
+    content: none;
+  }
+
+  .sc-table tbody td.sc-cell-action {
+    justify-content: flex-end;
+  }
+
+  .sc-measure-actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+    padding-top: 11px;
+    border-top: 1px solid var(--border-light);
+  }
+}
+
+@container (max-width: 560px) {
+  .sc-header {
+    align-items: flex-start;
+  }
+
+  .sc-badge {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .sc-event {
+    flex-wrap: wrap;
+  }
+
+  .sc-event-time {
+    width: 100%;
+    padding-left: 39px;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-card {
+    animation: none;
+  }
+
+  .sc-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .sc-card:hover,
+  .sc-metric:hover,
+  .sc-btn:hover {
+    transform: none;
+  }
+
+  .sc-switch i {
+    transition: none;
+  }
+}

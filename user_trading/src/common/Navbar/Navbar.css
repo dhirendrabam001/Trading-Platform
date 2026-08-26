@@ -164,6 +164,7 @@
 .avatar-lg {
   width: 45px;
   height: 45px;
+  flex-shrink: 0; /* a long email must not squash the initials */
   border-radius: 50%;
   background: var(--primary-gradient);
   display: flex;
@@ -173,14 +174,28 @@
   font-weight: 700;
 }
 
-.profile-header .name {
+/* The panel is 260px wide, leaving ~171px beside the avatar. Real addresses
+   run past that, so the text column has to be allowed to shrink — flex items
+   default to min-width: auto and would otherwise push out of the panel. */
+.profile-header-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.profile-header .name,
+.profile-header .role {
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-header .name {
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .profile-header .role {
-  margin: 0;
   font-size: 12px;
   color: var(--text-muted);
 }

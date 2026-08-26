@@ -1,0 +1,81 @@
+.how-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+}
+
+/* Connector line running behind the three steps. Drawn on the track rather
+   than between cards so it cannot fall out of alignment when the cards grow
+   to different heights. */
+.how-track::before {
+  content: "";
+  position: absolute;
+  top: 46px;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 178, 0.35),
+    rgba(139, 92, 246, 0.35),
+    transparent
+  );
+  /* purely decorative connector — must never intercept a click */
+  pointer-events: none;
+}
+
+.how-step {
+  position: relative;
+  z-index: 1;
+  padding: 30px 26px;
+  border-radius: 18px;
+  border: 1px solid var(--border-light);
+  background: linear-gradient(145deg, rgba(11, 15, 26, 0.9), rgba(5, 7, 13, 0.9));
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.45s ease;
+}
+
+.how-step:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0, 255, 178, 0.3);
+}
+
+.how-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 22px;
+  border-radius: 15px;
+  border: 1px solid rgba(0, 255, 178, 0.25);
+  background: rgba(5, 7, 13, 0.96);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  box-shadow: 0 0 26px rgba(0, 255, 178, 0.14);
+}
+
+.how-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 52px;
+}
+
+@media (max-width: 991px) {
+  .how-track {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  /* The horizontal connector is meaningless once the steps stack */
+  .how-track::before {
+    display: none;
+  }
+}

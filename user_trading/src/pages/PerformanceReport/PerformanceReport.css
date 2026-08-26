@@ -1,0 +1,971 @@
+/* =====================================================================
+   PERFORMANCE REPORT
+
+   Same material as the other trading pages: every colour comes from the
+   tokens in index.css, so this page themes with the rest of the app. No
+   literal rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.pr-page {
+  width: 100%;
+  container-type: inline-size;
+  /* Figures must not jitter as they update, and columns of numbers should
+     line up digit for digit */
+  font-variant-numeric: tabular-nums;
+
+  --pr-radius: 16px;
+  --pr-gap: 14px;
+  --pr-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.pr-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.pr-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.pr-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.pr-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.pr-subtitle {
+  margin: 5px 0 0;
+  max-width: 60ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pr-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+/* --- Period switch --- */
+.pr-period {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+
+.pr-period button {
+  padding: 6px 13px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.22s ease,
+    background 0.22s ease;
+}
+
+.pr-period button:hover {
+  color: var(--text-secondary);
+}
+
+.pr-period button.is-active {
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+}
+
+/* --- Buttons --- */
+.pr-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.pr-btn:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+/* Spelled out rather than left as an invisible fallthrough, so the variant
+   is greppable from the markup */
+.pr-btn--ghost {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.pr-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--pr-pad);
+  border-radius: var(--pr-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: prRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes prRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.pr-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: prSweep 7s ease-in-out infinite;
+}
+
+@keyframes prSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.pr-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.pr-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pr-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.pr-card:hover::after {
+  opacity: 1;
+}
+
+.pr-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.pr-metrics {
+  display: grid;
+  gap: var(--pr-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--pr-gap);
+}
+
+@container (min-width: 1040px) {
+  .pr-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.pr-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pr-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.pr-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.pr-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.pr-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.pr-metric:hover {
+  transform: translateY(-4px);
+}
+
+.pr-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.pr-metric.is-up .pr-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.pr-metric.is-down .pr-metric-icon {
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.pr-metric.is-warn .pr-metric-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.pr-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.pr-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.pr-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.pr-metric.is-up .pr-metric-value {
+  color: var(--up);
+}
+
+.pr-metric.is-down .pr-metric-value {
+  color: var(--down);
+}
+
+.pr-metric.is-warn .pr-metric-value {
+  color: var(--warn);
+}
+
+.pr-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.pr-grid {
+  display: grid;
+  gap: var(--pr-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.pr-col-main,
+.pr-side {
+  display: grid;
+  gap: var(--pr-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a wide table would push the whole column out */
+.pr-grid > *,
+.pr-col-main > *,
+.pr-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the three rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .pr-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .pr-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .pr-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1240px) {
+  .pr-grid {
+    grid-template-columns: minmax(0, 1fr) 310px;
+  }
+
+  .pr-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1520px) {
+  .pr-grid {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+
+/* =============================== CHARTS ============================= */
+
+.pr-chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pr-chart-head .pr-card-title {
+  margin-bottom: 6px;
+}
+
+.pr-chart-figure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.pr-chart-figure strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(22px, 2.8vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.pr-step-note {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.pr-delta {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pr-delta.is-up {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+.pr-delta.is-down {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* --- Series key ---
+   A hand-drawn key rather than Chart.js's legend, so the dashed benchmark
+   line reads the same in the key as it does on the plot */
+.pr-series-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pr-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.pr-key-line {
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.pr-key-line.is-portfolio {
+  background: var(--primary-vivid);
+}
+
+.pr-key-line.is-benchmark {
+  /* Dashes drawn with a repeating gradient, matching borderDash on the plot */
+  background: repeating-linear-gradient(
+    90deg,
+    var(--text-muted) 0 5px,
+    transparent 5px 9px
+  );
+}
+
+.pr-chart-body {
+  position: relative;
+  height: clamp(220px, 30vh, 300px);
+}
+
+.pr-chart-body.is-short {
+  height: clamp(170px, 22vh, 220px);
+}
+
+/* --- Portfolio vs benchmark strip --- */
+.pr-versus {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid var(--border-light);
+}
+
+.pr-versus > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.pr-versus span {
+  font-size: 11px;
+}
+
+.pr-versus b {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pr-versus-alpha {
+  padding-left: 12px;
+  border-left: 1px solid var(--border-light);
+}
+
+/* --- Month chips --- */
+.pr-month-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid var(--border-light);
+}
+
+.pr-month {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 9px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+}
+
+.pr-month span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pr-month b {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pr-month.is-up {
+  border-color: var(--accent-line);
+  background: var(--up-soft);
+}
+
+.pr-month.is-up b {
+  color: var(--up);
+}
+
+.pr-month.is-down {
+  border-color: var(--down-line);
+  background: var(--down-soft);
+}
+
+.pr-month.is-down b {
+  color: var(--down);
+}
+
+/* =============================== TABLE ============================== */
+
+.pr-table-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--pr-pad) * -1) calc(var(--pr-pad) * -1);
+  padding: 0 var(--pr-pad) 2px;
+}
+
+.pr-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.pr-table thead th {
+  padding: 11px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pr-table .pr-num {
+  text-align: right;
+}
+
+.pr-table tbody td {
+  padding: 11px 9px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pr-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pr-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.pr-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.pr-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.pr-muted {
+  color: var(--text-muted);
+}
+
+.pr-up {
+  color: var(--up);
+}
+
+.pr-down {
+  color: var(--down);
+}
+
+.pr-warn {
+  color: var(--warn);
+}
+
+/* ============================= DRAWDOWN ============================= */
+
+.pr-dd-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 13px;
+}
+
+.pr-dd-figure strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pr-dd-figure span {
+  font-size: 11px;
+}
+
+/* --- Underwater plot ---
+   Bars hang from the TOP: the account is measured downward from its running
+   high, so an empty slot means a new high rather than "no data". */
+.pr-underwater {
+  display: flex;
+  align-items: flex-start;
+  gap: 3px;
+  height: 62px;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+}
+
+.pr-uw-slot {
+  display: block;
+  flex: 1 1 auto;
+  height: 100%;
+  min-width: 0;
+}
+
+.pr-uw-slot i {
+  display: block;
+  width: 100%;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(180deg, var(--down), rgba(var(--down-rgb), 0.35));
+  transition: height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ========================== RISK / SUMMARY ========================== */
+
+.pr-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.pr-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.pr-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.pr-summary dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pr-summary dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* ============================ HIGHLIGHTS ============================ */
+
+.pr-highlights {
+  display: grid;
+  gap: 9px;
+}
+
+.pr-highlight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+}
+
+.pr-highlight.is-up {
+  border-color: var(--accent-line);
+  background: var(--up-soft);
+}
+
+.pr-highlight.is-down {
+  border-color: var(--down-line);
+  background: var(--down-soft);
+}
+
+.pr-highlight-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.pr-highlight.is-up .pr-highlight-icon {
+  color: var(--up);
+}
+
+.pr-highlight.is-down .pr-highlight-icon {
+  color: var(--down);
+}
+
+.pr-highlight-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.pr-highlight-body b {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pr-highlight-body small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.pr-highlight > b {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pr-note {
+  margin: 12px 0 0;
+  padding-top: 11px;
+  border-top: 1px solid var(--border-light);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* ============================== FOCUS =============================== */
+
+.pr-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Four columns of comparison figures cannot fit a phone at a readable size,
+   so each metric becomes its own block and every cell prints its own label.
+   Same pattern as the other tables in the app. */
+@container (max-width: 640px) {
+  .pr-table-scroll {
+    overflow-x: visible;
+  }
+
+  .pr-table,
+  .pr-table tbody,
+  .pr-table tr,
+  .pr-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .pr-table thead {
+    display: none;
+  }
+
+  .pr-table {
+    white-space: normal;
+  }
+
+  .pr-table tbody tr {
+    margin-bottom: 9px;
+    padding: 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 11px;
+    background: var(--surface-1);
+  }
+
+  .pr-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .pr-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .pr-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .pr-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The metric name is the block's heading, so it spans the row unlabelled */
+  .pr-table tbody td:first-child {
+    justify-content: flex-start;
+    padding: 0 0 9px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .pr-table tbody td:first-child::before {
+    content: none;
+  }
+
+  .pr-versus {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pr-versus-alpha {
+    padding-left: 0;
+    padding-top: 10px;
+    border-left: none;
+    border-top: 1px solid var(--border-light);
+  }
+}
+
+@container (max-width: 560px) {
+  .pr-header-actions {
+    width: 100%;
+  }
+
+  .pr-period {
+    flex: 1 1 auto;
+    justify-content: space-between;
+  }
+
+  .pr-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .pr-card {
+    animation: none;
+  }
+
+  .pr-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .pr-card:hover,
+  .pr-metric:hover,
+  .pr-btn:hover {
+    transform: none;
+  }
+
+  .pr-uw-slot i {
+    transition: none;
+  }
+}

@@ -1,0 +1,1205 @@
+/* =====================================================================
+   DEPOSIT
+
+   Same material as the other trading pages: every colour comes from the
+   tokens in index.css, so this page themes with the rest of the app. No
+   literal rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.dp-page {
+  width: 100%;
+  container-type: inline-size;
+  /* Figures must not jitter as they update, and columns of numbers should
+     line up digit for digit */
+  font-variant-numeric: tabular-nums;
+
+  --dp-radius: 16px;
+  --dp-gap: 14px;
+  --dp-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.dp-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.dp-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.dp-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.dp-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.dp-subtitle {
+  margin: 5px 0 0;
+  max-width: 62ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.dp-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* --- Buttons --- */
+.dp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.dp-btn:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+/* Spelled out rather than left as an invisible fallthrough, so the variant
+   is greppable from the markup */
+.dp-btn--ghost {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.dp-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--dp-pad);
+  border-radius: var(--dp-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: dpRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes dpRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.dp-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: dpSweep 7s ease-in-out infinite;
+}
+
+@keyframes dpSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.dp-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.dp-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dp-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.dp-card:hover::after {
+  opacity: 1;
+}
+
+.dp-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.dp-metrics {
+  display: grid;
+  gap: var(--dp-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--dp-gap);
+}
+
+@container (min-width: 1040px) {
+  .dp-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.dp-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dp-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.dp-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.dp-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.dp-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.dp-metric:hover {
+  transform: translateY(-4px);
+}
+
+.dp-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.dp-metric.is-up .dp-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.dp-metric.is-warn .dp-metric-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.dp-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.dp-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.dp-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.dp-metric.is-up .dp-metric-value {
+  color: var(--up);
+}
+
+.dp-metric.is-warn .dp-metric-value {
+  color: var(--warn);
+}
+
+.dp-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.dp-grid {
+  display: grid;
+  gap: var(--dp-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.dp-col-main,
+.dp-side {
+  display: grid;
+  gap: var(--dp-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a wide table would push the whole column out */
+.dp-grid > *,
+.dp-col-main > *,
+.dp-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the three rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .dp-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .dp-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .dp-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1240px) {
+  .dp-grid {
+    grid-template-columns: minmax(0, 1fr) 310px;
+  }
+
+  .dp-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1520px) {
+  .dp-grid {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+
+/* =============================== STEPS ============================== */
+
+.dp-step-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.dp-step-head > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Numbered so the three cards read as one flow rather than three unrelated
+   panels */
+.dp-step-num {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dp-step-note {
+  margin: 3px 0 0;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+/* --- Search --- */
+.dp-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.dp-search:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.dp-search input {
+  width: 140px;
+  max-width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.dp-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Chrome's own clear button sits oddly inside a custom field */
+.dp-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ============================ ASSET PICKER ========================== */
+
+.dp-asset-grid {
+  display: grid;
+  gap: 9px;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+}
+
+.dp-asset {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease;
+}
+
+.dp-asset:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-medium);
+}
+
+.dp-asset.is-active {
+  border-color: var(--accent-line-strong);
+  background: var(--accent-wash);
+}
+
+.dp-asset-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.dp-asset-text b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dp-asset-text small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.dp-no-asset {
+  margin: 0;
+  padding: 12px 0;
+  font-size: 12.5px;
+}
+
+/* ============================== NETWORK ============================= */
+
+.dp-network-list {
+  display: grid;
+  gap: 9px;
+}
+
+.dp-network {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.dp-network:hover {
+  border-color: var(--border-medium);
+}
+
+.dp-network.is-active {
+  border-color: var(--accent-line-strong);
+  background: var(--accent-wash);
+}
+
+.dp-network-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dp-network-main b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dp-network-main small,
+.dp-network-meta small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.dp-network-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.dp-network-meta b {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ============================== ADDRESS ============================= */
+
+.dp-address-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(14px, 2.5cqi, 22px);
+  align-items: flex-start;
+}
+
+/* --- QR ---
+   The pattern is a PLACEHOLDER drawn from the address string; it does not
+   encode anything (see the comment in Deposit.jsx). Styled as a plain white
+   tile in both themes, because a QR reader expects dark-on-light and
+   inverting it in dark mode would make a real code unscannable. */
+.dp-qr {
+  flex-shrink: 0;
+  width: 148px;
+  height: 148px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: #ffffff;
+  box-shadow: var(--shadow-pop);
+}
+
+.dp-qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  shape-rendering: crispEdges;
+}
+
+.dp-qr rect {
+  fill: #0b1220;
+}
+
+.dp-address-fields {
+  display: grid;
+  gap: 12px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.dp-field {
+  min-width: 0;
+}
+
+.dp-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.dp-address {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px dashed var(--border-medium);
+  background: var(--surface-2);
+}
+
+.dp-address.is-tag {
+  border-color: var(--warn-line);
+  background: var(--warn-soft);
+}
+
+.dp-address code {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  /* Addresses are long and have no spaces; break them rather than letting
+     them push the card wider than its column */
+  overflow-wrap: anywhere;
+}
+
+.dp-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 6px 11px;
+  border-radius: 7px;
+  border: 1px solid var(--accent-line);
+  background: var(--accent-wash);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dp-copy:hover {
+  background: var(--accent-soft);
+}
+
+/* --- Facts --- */
+.dp-facts {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 560px) {
+  .dp-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.dp-facts > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.dp-facts > div:hover {
+  background: var(--surface-hover);
+}
+
+.dp-facts dt {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.dp-facts dd {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* --- Warning --- */
+.dp-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  border: 1px solid var(--down-line);
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.dp-warning svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.dp-warning p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--down);
+}
+
+.dp-warning b {
+  font-weight: 700;
+}
+
+/* =============================== TABLE ============================== */
+
+.dp-table-scroll {
+  overflow-x: auto;
+  margin: 12px calc(var(--dp-pad) * -1) calc(var(--dp-pad) * -1);
+  padding: 0 var(--dp-pad) 2px;
+}
+
+.dp-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.dp-table thead th {
+  padding: 11px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.dp-table .dp-num {
+  text-align: right;
+}
+
+.dp-table tbody td {
+  padding: 11px 9px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.dp-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.dp-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.dp-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.dp-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.dp-muted {
+  color: var(--text-muted);
+}
+
+.dp-warn {
+  color: var(--warn);
+}
+
+.dp-cell-asset {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.dp-cell-asset b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dp-coin {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  font-style: normal;
+  /* White on a saturated brand fill: correct in BOTH themes, so this one is
+     deliberately literal rather than a token */
+  color: #ffffff;
+  box-shadow: var(--shadow-pop);
+}
+
+.dp-coin--sm {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+  box-shadow: none;
+}
+
+/* --- Confirmations --- */
+.dp-conf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 92px;
+}
+
+.dp-conf-track {
+  flex: 1 1 auto;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.dp-conf-track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary-vivid);
+  transition: width 0.35s ease;
+}
+
+.dp-conf small {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* --- Status --- */
+.dp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dp-status.is-completed {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+.dp-status.is-pending {
+  color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.dp-status.is-failed {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* =========================== DEPOSIT SUMMARY ======================== */
+
+.dp-summary-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 13px 0 12px;
+  padding: 11px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+
+.dp-summary-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.dp-summary-text b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dp-summary-text small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.dp-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.dp-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.dp-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.dp-summary dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.dp-summary dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* ============================ FIAT DEPOSIT ========================== */
+
+.dp-fiat-list {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 13px 0 0;
+  padding: 0;
+}
+
+.dp-fiat-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.dp-fiat-list li:hover {
+  border-color: var(--accent-line);
+  background: var(--surface-2);
+}
+
+.dp-fiat-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.dp-fiat-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.dp-fiat-body b {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dp-fiat-body small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.dp-fiat-fee {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ============================== SAFETY ============================== */
+
+.dp-checklist {
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  margin: 13px 0 0;
+  padding: 0;
+}
+
+.dp-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.dp-checklist svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--primary);
+}
+
+/* ============================== FOCUS =============================== */
+
+.dp-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Six nowrap columns cannot fit a phone at a readable size, so each deposit
+   becomes its own block and every cell prints its own label. Nothing is
+   clipped and nothing scrolls sideways - same pattern as the other tables in
+   the app. */
+@container (max-width: 760px) {
+  .dp-table-scroll {
+    overflow-x: visible;
+  }
+
+  .dp-table,
+  .dp-table tbody,
+  .dp-table tr,
+  .dp-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .dp-table thead {
+    display: none;
+  }
+
+  .dp-table {
+    white-space: normal;
+  }
+
+  .dp-table tbody tr {
+    margin-bottom: 10px;
+    padding: 13px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+
+  .dp-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .dp-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .dp-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .dp-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The asset is the block's heading, so it spans the row unlabelled */
+  .dp-table tbody td.dp-cell-asset {
+    justify-content: flex-start;
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .dp-table tbody td.dp-cell-asset::before {
+    content: none;
+  }
+}
+
+@container (max-width: 560px) {
+  .dp-header-actions {
+    width: 100%;
+  }
+
+  .dp-header-actions .dp-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .dp-search {
+    width: 100%;
+  }
+
+  .dp-search input {
+    width: 100%;
+  }
+
+  .dp-qr {
+    margin-inline: auto;
+  }
+
+  .dp-network {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+  }
+
+  .dp-network-meta {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .dp-card {
+    animation: none;
+  }
+
+  .dp-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .dp-card:hover,
+  .dp-metric:hover,
+  .dp-btn:hover,
+  .dp-asset:hover {
+    transform: none;
+  }
+
+  .dp-conf-track i {
+    transition: none;
+  }
+}

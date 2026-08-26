@@ -8,26 +8,32 @@ import {
   Moon,
   ChevronDown,
   User,
-  Settings,
+  Headphones,
   HelpCircle,
   LogOut,
 } from "lucide-react";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import "./Navbar.css";
 import { THEME_APP_URL, USER_API_END_POINT } from "../../apis/apis";
 import { setUser } from "../../redux/authSlice";
 import { useNavigate } from "react-router-dom";
 import useTheme from "../../hooks/useTheme";
+import useCurrentUser from "../../hooks/useCurrentUser";
 
 const Navbar = ({ toggleSidebar }) => {
-  const { user } = useSelector((store) => store.auth);
+  const { fullName, email, initials } = useCurrentUser();
   const [theme, toggleTheme] = useTheme();
-
-  const avatar = `${user?.firstName?.charAt(0) || ""}${user?.lastName?.charAt(0) || ""}`;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Close the menu before routing. Only an outside mousedown cleared it, so
+  // picking an item left the dropdown hanging open over the new page.
+  const goTo = (path) => {
+    setOpenProfile(false);
+    navigate(path);
+  };
 
   const logoutHandler = async () => {
     try {
@@ -112,7 +118,7 @@ const Navbar = ({ toggleSidebar }) => {
             className="profile d-flex align-items-center gap-2"
             onClick={() => setOpenProfile(!openProfile)}
           >
-            <div className="avatar-sm">{avatar}</div>
+            <div className="avatar-sm">{initials}</div>
             <ChevronDown size={16} />
           </div>
 
@@ -121,29 +127,31 @@ const Navbar = ({ toggleSidebar }) => {
             <div className="profile-dropdown">
               {/* USER INFO */}
               <div className="profile-header">
-                <div className="avatar-lg">DB</div>
-                <div>
-                  <p className="name">Dhirendra Bam</p>
-                  <p className="role">Pro Trader</p>
+                <div className="avatar-lg">{initials}</div>
+                {/* The model has no "Pro Trader" tier - role is only
+                    user|admin - so the second line shows the account it
+                    actually belongs to. */}
+                <div className="profile-header-text">
+                  <p className="name">{fullName}</p>
+                  <p className="role" title={email}>
+                    {email}
+                  </p>
                 </div>
               </div>
 
               <div className="divider"></div>
 
               {/* MENU */}
-              <div
-                className="dropdown-item"
-                onClick={() => navigate("/profile")}
-              >
+              <div className="dropdown-item" onClick={() => goTo("/profile")}>
                 <User size={16} /> <span>My Profile</span>
               </div>
 
-              <div className="dropdown-item">
-                <Settings size={16} /> <span>Settings</span>
+              <div className="dropdown-item" onClick={() => goTo("/support")}>
+                <Headphones size={16} /> <span>Support</span>
               </div>
 
-              <div className="dropdown-item">
-                <HelpCircle size={16} /> <span>Help & Support</span>
+              <div className="dropdown-item" onClick={() => goTo("/help")}>
+                <HelpCircle size={16} /> <span>Help Center</span>
               </div>
 
               <div className="divider"></div>

@@ -1,0 +1,19 @@
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 1000; /* one above the sticky navbar */
+  background: linear-gradient(
+    90deg,
+    var(--primary) 0%,
+    var(--accent-blue) 55%,
+    var(--accent-purple) 100%
+  );
+  /* scaleX runs 0 -> 1, so the bar has to grow from the left edge rather
+     than from its centre. */
+  transform-origin: 0 50%;
+  box-shadow: 0 0 12px rgba(0, 255, 178, 0.45);
+  pointer-events: none;
+}

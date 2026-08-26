@@ -1,0 +1,158 @@
+/* ---------- GRID ----------
+   These were previously one slab: solid near-black cells separated by a 1px
+   gap. Against the #05070d page background the fills were almost the same
+   colour, so the block read as a flat dark table rather than as cards, and
+   it did not match any other section. They are real .nx-card surfaces now —
+   the same translucent gradient, hairline and hover the rest of the page
+   uses — separated by a real gap. */
+.security-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.nx-card.security-item {
+  padding: 24px 22px;
+  border-radius: 16px;
+}
+
+/* ---------- CHECK MARK ---------- */
+.security-item-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 15px;
+  border-radius: 9px;
+  border: 1px solid rgba(0, 255, 178, 0.24);
+  background: rgba(0, 255, 178, 0.09);
+  color: var(--primary);
+}
+
+.security-item-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-primary);
+  margin-bottom: 9px;
+}
+
+.security-item-text {
+  margin: 0;
+  font-family: var(--font-primary);
+  font-size: 0.87rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ---------- SEAL ----------
+   Sits above the grid as the section's one accented surface, so it reads as
+   the headline claim rather than competing with the six cards. */
+.security-seal {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-top: 34px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 255, 178, 0.22);
+  background: linear-gradient(
+    145deg,
+    rgba(0, 255, 178, 0.09),
+    rgba(255, 255, 255, 0.015)
+  );
+  backdrop-filter: blur(14px);
+}
+
+.security-seal-ring {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 255, 178, 0.28);
+  background: rgba(5, 7, 13, 0.6);
+  color: var(--primary);
+}
+
+.security-seal-title {
+  margin: 0 0 4px;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.security-seal-text {
+  margin: 0;
+  font-family: var(--font-primary);
+  font-size: 0.83rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* ---------- TWO-UP ON MOBILE ----------
+   The grid stays at two columns all the way down. At 390px each card is
+   ~175px wide, so padding and type step down together — otherwise
+   "Withdrawal allowlists" wraps to three lines and the cards lose shape. */
+@media (max-width: 767px) {
+  .security-grid {
+    gap: 12px;
+  }
+
+  .nx-card.security-item {
+    padding: 16px 14px;
+    border-radius: 14px;
+  }
+
+  .security-item-mark {
+    width: 26px;
+    height: 26px;
+    margin-bottom: 11px;
+    border-radius: 8px;
+  }
+
+  .security-item-mark svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .security-item-title {
+    font-size: 0.9rem;
+    margin-bottom: 7px;
+  }
+
+  .security-item-text {
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+
+  .security-seal {
+    margin-top: 26px;
+    padding: 17px 16px;
+    gap: 13px;
+  }
+
+  .security-seal-ring {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 400px) {
+  .nx-card.security-item {
+    padding: 14px 12px;
+  }
+
+  .security-item-title {
+    font-size: 0.85rem;
+  }
+
+  .security-item-text {
+    font-size: 0.74rem;
+  }
+}

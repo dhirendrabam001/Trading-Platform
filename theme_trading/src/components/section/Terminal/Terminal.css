@@ -1,0 +1,630 @@
+/* =====================================================================
+   TRADING TERMINAL
+   Three panes under one window chrome, with a status strip closing it off.
+   The density is the point — a terminal that shows only a chart reads as an
+   empty box, which is what the previous version looked like.
+   ===================================================================== */
+.tm-shell {
+  border-radius: 20px;
+  border: 1px solid var(--border-medium);
+  background: linear-gradient(
+    160deg,
+    rgba(14, 19, 32, 0.97),
+    rgba(6, 9, 16, 0.97)
+  );
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.55),
+    0 0 90px rgba(0, 255, 178, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+/* ---------- TOP BAR ---------- */
+.tm-bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 52px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.tm-dots {
+  display: inline-flex;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.tm-dots i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.tm-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tm-pair-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 255, 178, 0.12);
+  border: 1px solid rgba(0, 255, 178, 0.28);
+  font-size: 0.72rem;
+  color: var(--primary);
+}
+
+/* ---------- TIMEFRAME TABS ---------- */
+.tm-tfs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-light);
+}
+
+.tm-tf {
+  padding: 5px 11px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.tm-tf:hover {
+  color: var(--text-primary);
+}
+
+.tm-tf.is-active {
+  background: rgba(0, 255, 178, 0.14);
+  color: var(--primary);
+}
+
+.tm-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: var(--font-primary);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.tm-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+  animation: tmPulse 2s ease-in-out infinite;
+}
+
+@keyframes tmPulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* ---------- LAYOUT ---------- */
+.tm-body {
+  display: grid;
+  grid-template-columns: 178px minmax(0, 1fr) 258px;
+}
+
+.tm-panel-title {
+  margin: 0 0 10px;
+  font-family: var(--font-primary);
+  font-size: 0.68rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ---------- WATCHLIST ---------- */
+.tm-watch {
+  padding: 15px 13px;
+  border-right: 1px solid var(--border-light);
+  min-width: 0;
+}
+
+.tm-watch-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.tm-watch-row:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+/* The selected symbol is the one the chart is showing */
+.tm-watch-row.is-active {
+  border-color: rgba(0, 255, 178, 0.28);
+  background: rgba(0, 255, 178, 0.07);
+}
+
+.tm-watch-sym {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tm-watch-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-primary);
+  font-size: 0.74rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tm-watch-price {
+  color: var(--text-secondary);
+}
+
+.tm-pos {
+  color: var(--primary);
+}
+
+.tm-neg {
+  color: var(--accent-red);
+}
+
+/* ---------- CHART ---------- */
+.tm-chart {
+  padding: 15px 16px 8px;
+  min-width: 0;
+}
+
+.tm-quote {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-bottom: 10px;
+}
+
+.tm-last {
+  font-family: var(--font-heading);
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tm-delta {
+  font-family: var(--font-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The OHLC readout is what makes it read as a terminal rather than a
+   marketing chart. It is the first thing dropped when space runs out. */
+.tm-ohlc {
+  margin-left: auto;
+  font-family: var(--font-primary);
+  font-size: 0.73rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tm-ohlc b {
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* No preserveAspectRatio override — the drawing keeps its proportions and
+   scales with the column, so candles are never stretched. */
+.tm-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tm-axis {
+  fill: var(--text-muted);
+  font-family: var(--font-primary);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tm-axis-last {
+  fill: #04231a;
+  font-family: var(--font-primary);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- BOOK + TICKET ---------- */
+.tm-side {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-light);
+  min-width: 0;
+}
+
+.tm-book {
+  padding: 15px 15px 13px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* The depth bar is the row's first child and absolutely positioned, so the
+   price and size sit above it rather than beside it. */
+.tm-book-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 23px;
+  padding: 0 8px;
+  font-family: var(--font-primary);
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tm-book-row i {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  right: 0;
+  border-radius: 4px;
+}
+
+.tm-book-row.is-ask i {
+  background: rgba(239, 68, 68, 0.16);
+}
+
+.tm-book-row.is-bid i {
+  background: rgba(0, 255, 178, 0.14);
+}
+
+.tm-book-price,
+.tm-book-size {
+  position: relative;
+  z-index: 1;
+}
+
+.tm-book-row.is-ask .tm-book-price {
+  color: var(--accent-red);
+}
+
+.tm-book-row.is-bid .tm-book-price {
+  color: var(--primary);
+}
+
+.tm-book-size {
+  color: var(--text-muted);
+}
+
+.tm-spread {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 6px 0;
+  padding: 7px 8px;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tm-spread-label {
+  font-family: var(--font-primary);
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.tm-ticket {
+  padding: 14px 15px 16px;
+}
+
+.tm-sides {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-bottom: 13px;
+}
+
+.tm-side-btn {
+  padding: 9px 0;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  font-family: var(--font-primary);
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.tm-side-btn.is-buy.is-active {
+  border-color: rgba(0, 255, 178, 0.45);
+  background: rgba(0, 255, 178, 0.12);
+  color: var(--primary);
+}
+
+.tm-side-btn.is-sell.is-active {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--accent-red);
+}
+
+.tm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-family: var(--font-primary);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tm-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: rgba(0, 0, 0, 0.35);
+  font-size: 0.86rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tm-input em {
+  font-style: normal;
+  color: var(--text-muted);
+}
+
+.tm-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 13px 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+  font-family: var(--font-primary);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.tm-total strong {
+  font-family: var(--font-heading);
+  font-size: 0.98rem;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tm-submit {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  padding: 11px 0;
+  border-radius: 10px;
+  text-align: center;
+  font-family: var(--font-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.3s ease;
+}
+
+.tm-submit.is-buy {
+  background: var(--primary-gradient);
+  background-size: 220% auto;
+  color: var(--btn-primary-text);
+  animation: nxFlow 7s linear infinite;
+}
+
+.tm-submit.is-sell {
+  background: linear-gradient(135deg, #ff6b6b, #ef4444);
+  color: #fff;
+}
+
+.tm-submit::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: translateX(-150%) skewX(-18deg);
+  pointer-events: none;
+  animation: nxSheen 5s ease-in-out infinite;
+}
+
+.tm-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- STATUS STRIP ---------- */
+.tm-status {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  height: 44px;
+  padding: 0 18px;
+  border-top: 1px solid var(--border-light);
+  background: rgba(0, 0, 0, 0.28);
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tm-status::-webkit-scrollbar {
+  display: none;
+}
+
+.tm-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.tm-stat b {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.tm-stat em {
+  font-style: normal;
+  font-weight: 600;
+}
+
+.tm-stat--end {
+  margin-left: auto;
+}
+
+.tm-note {
+  margin: 18px 0 0;
+  text-align: center;
+  font-family: var(--font-primary);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ---------- RESPONSIVE ----------
+   Panes are dropped in order of what a preview needs least: the watchlist
+   first, then the book/ticket move below the chart. */
+@media (max-width: 1199px) {
+  .tm-body {
+    grid-template-columns: minmax(0, 1fr) 250px;
+  }
+
+  .tm-watch {
+    display: none;
+  }
+}
+
+@media (max-width: 991px) {
+  .tm-body {
+    grid-template-columns: 1fr;
+  }
+
+  .tm-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-left: none;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .tm-book {
+    border-bottom: none;
+    border-right: 1px solid var(--border-light);
+  }
+
+  .tm-ohlc {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .tm-bar {
+    gap: 12px;
+    padding: 0 13px;
+  }
+
+  /* Five timeframe buttons plus the pair name will not fit a phone bar */
+  .tm-dots {
+    display: none;
+  }
+
+  .tm-tfs {
+    margin-left: auto;
+  }
+
+  .tm-tf {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+
+  .tm-live {
+    display: none;
+  }
+}
+
+@media (max-width: 575px) {
+  .tm-side {
+    grid-template-columns: 1fr;
+  }
+
+  .tm-book {
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .tm-chart {
+    padding: 13px 11px 6px;
+  }
+
+  .tm-last {
+    font-size: 1.25rem;
+  }
+
+  .tm-status {
+    gap: 18px;
+    padding: 0 13px;
+  }
+
+  .tm-stat--end {
+    margin-left: 0;
+  }
+}

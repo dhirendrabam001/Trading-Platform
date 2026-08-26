@@ -1,5 +1,9 @@
 /* ================= SIDEBAR ================= */
 .sidebar {
+  /* A flex column is what makes `mt-auto` on the user card actually pin it to
+     the bottom of the rail — as a block container the class did nothing. */
+  display: flex;
+  flex-direction: column;
   width: 260px;
   height: 100vh;
   /* dvh tracks the visible viewport, so the user card at the bottom stays
@@ -69,6 +73,7 @@
   .sidebar.collapsed .menu-item .badge,
   .sidebar.collapsed .pro-badge,
   .sidebar.collapsed .user-info,
+  .sidebar.collapsed .user-chevron,
   .sidebar.collapsed .submenu,
   .sidebar.collapsed hr {
     display: none;
@@ -83,15 +88,25 @@
     display: none;
   }
 
+  /* In the 88px strip the avatar carries the card on its own, so the shell,
+     its hairline and its sweep are all dropped. */
   .sidebar.collapsed .user-card {
     justify-content: center;
     padding: 4px;
     border: none;
     background: none !important;
+    box-shadow: none;
+  }
+
+  .sidebar.collapsed .user-card::before,
+  .sidebar.collapsed .user-card::after {
+    display: none;
   }
 
   .sidebar.collapsed .user-card:hover {
     background: none !important;
+    transform: none;
+    box-shadow: none;
   }
 
   .sidebar.collapsed .sidebar-user {
@@ -143,6 +158,24 @@
   .menu-item {
     padding: 12px;
     font-size: 14.5px;
+  }
+
+  /* The drawer is up to 20px wider than the rail, so the card can breathe */
+  .user-card {
+    padding: 12px;
+  }
+
+  .avatar {
+    width: 42px;
+    height: 42px;
+  }
+
+  .user-info .name {
+    font-size: 14px;
+  }
+
+  .user-info .email {
+    font-size: 12px;
   }
 }
 
@@ -266,47 +299,193 @@
   gap: 10px;
 }
 
-/* CARD */
-.user-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--panel-bg-soft);
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border-light);
-  transition: 0.3s;
+/* ================= USER CARD =================
+   The rail leaves 204px inside this card; the avatar and its gap take 51 of
+   that, so the label column gets ~153px. A 27-character email needs ~162px,
+   which is why it used to burst out of the card. `min-width: 0` lets the flex
+   child shrink below its max-content width, and the ellipsis absorbs the
+   remainder — the full address stays available via the link's title. */
+.sidebar-user {
+  padding-top: 4px;
 }
 
-/* HOVER EFFECT */
+.user-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+/* Top hairline — the same shell the page cards use */
+.user-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.75;
+}
+
+/* Gloss sweep. Fired on hover rather than looping, so the rail is not
+   repainting itself while the user is reading a chart. */
+.user-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    var(--sweep-highlight) 50%,
+    transparent 80%
+  );
+  transform: translateX(-120%);
+}
+
 .user-card:hover {
-  box-shadow: var(--glow-soft);
   transform: translateY(-2px);
+  border-color: rgba(var(--accent-rgb), 0.35);
+  box-shadow:
+    var(--shadow-card),
+    var(--glow-soft);
+}
+
+.user-card:hover::before {
+  animation: userSweep 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes userSweep {
+  to {
+    transform: translateX(120%);
+  }
+}
+
+.user-card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.user-card.active {
+  border-color: rgba(var(--accent-rgb), 0.45);
+  box-shadow:
+    var(--shadow-card),
+    inset 0 0 0 1px rgba(var(--accent-rgb), 0.12);
 }
 
 /* AVATAR */
 .avatar {
-  width: 42px;
-  height: 42px;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0; /* a long email must never squash the initials */
   border-radius: 50%;
   background: var(--primary-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 14px;
   font-weight: 700;
+  letter-spacing: 0.3px;
   color: var(--text-on-accent);
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb), 0.28),
+    0 6px 16px rgba(var(--accent-rgb), calc(0.3 * var(--shadow-mult)));
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.user-card:hover .avatar {
+  transform: scale(1.05);
+}
+
+/* Presence dot. Its ring is painted in the rail colour so the dot reads as
+   punched out of the avatar rather than floating on top of it. */
+.avatar-status {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  border: 2px solid var(--rail-bg);
 }
 
 /* TEXT */
-.user-info .name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0; /* the fix — flex items default to min-width: auto */
+}
+
+.user-info .name,
+.user-info .email {
+  display: block;
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-info .name {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-primary);
 }
 
 .user-info .email {
-  font-size: 12px;
+  font-size: 11.5px;
+  line-height: 1.3;
   color: var(--text-muted);
-  margin: 0;
+}
+
+.user-chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  opacity: 0.55;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0.35s ease,
+    color 0.35s ease;
+}
+
+.user-card:hover .user-chevron {
+  color: var(--primary);
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user-card,
+  .user-card:hover,
+  .avatar,
+  .user-card:hover .avatar,
+  .user-chevron,
+  .user-card:hover .user-chevron {
+    transform: none;
+    transition: none;
+  }
+
+  .user-card:hover::before {
+    animation: none;
+  }
 }

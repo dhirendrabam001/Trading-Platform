@@ -1,0 +1,1093 @@
+/* =====================================================================
+   TRADE HISTORY
+
+   Same material as the other trading pages: every colour comes from the
+   tokens in index.css, so this page themes with the rest of the app. No
+   literal rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.th-page {
+  width: 100%;
+  container-type: inline-size;
+  /* Figures must not jitter as they update, and columns of numbers should
+     line up digit for digit */
+  font-variant-numeric: tabular-nums;
+
+  --th-radius: 16px;
+  --th-gap: 14px;
+  --th-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.th-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.th-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.th-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.th-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.th-subtitle {
+  margin: 5px 0 0;
+  max-width: 62ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.th-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* --- Buttons --- */
+.th-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.th-btn:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+/* Spelled out rather than left as an invisible fallthrough, so the variant
+   is greppable from the markup */
+.th-btn--ghost {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.th-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--th-pad);
+  border-radius: var(--th-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: thRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes thRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.th-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: thSweep 7s ease-in-out infinite;
+}
+
+@keyframes thSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.th-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.th-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.th-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.th-card:hover::after {
+  opacity: 1;
+}
+
+.th-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.th-metrics {
+  display: grid;
+  gap: var(--th-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--th-gap);
+}
+
+@container (min-width: 1040px) {
+  .th-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.th-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.th-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.th-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.th-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.th-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.th-metric:hover {
+  transform: translateY(-4px);
+}
+
+.th-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.th-metric.is-up .th-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.th-metric.is-warn .th-metric-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.th-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.th-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.th-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.th-metric.is-up .th-metric-value {
+  color: var(--up);
+}
+
+.th-metric.is-warn .th-metric-value {
+  color: var(--warn);
+}
+
+.th-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.th-grid {
+  display: grid;
+  gap: var(--th-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.th-side {
+  display: grid;
+  gap: var(--th-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a wide table would push the whole column out */
+.th-grid > *,
+.th-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the three rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .th-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .th-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .th-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1280px) {
+  .th-grid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+
+  .th-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1560px) {
+  .th-grid {
+    grid-template-columns: minmax(0, 1fr) 330px;
+  }
+}
+
+/* ============================== TOOLBAR ============================= */
+
+.th-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 11px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.th-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+}
+
+.th-tab {
+  position: relative;
+  padding: 8px 12px 10px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.th-tab:hover {
+  color: var(--text-secondary);
+}
+
+.th-tab.is-active {
+  color: var(--primary);
+}
+
+/* Underline on a pseudo-element so switching tabs cannot shift row height */
+.th-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary-vivid);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.th-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.th-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.th-sort select,
+.th-rows select {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.th-sort select option,
+.th-rows select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.th-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.th-search:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.th-search input {
+  width: 170px;
+  max-width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.th-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Chrome's own clear button sits oddly inside a custom field */
+.th-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* =============================== TABLE ============================== */
+
+.th-table-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--th-pad) * -1);
+  padding: 0 var(--th-pad);
+}
+
+.th-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.th-table thead th {
+  padding: 12px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.th-table .th-num {
+  text-align: right;
+}
+
+.th-table tbody td {
+  padding: 11px 9px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.th-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.th-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.th-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.th-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.th-muted {
+  color: var(--text-muted);
+}
+
+.th-up {
+  color: var(--up);
+}
+
+.th-warn {
+  color: var(--warn);
+}
+
+/* --- Date cell --- */
+.th-cell-date b {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.th-cell-date small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* --- Pair cell --- */
+.th-cell-pair {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.th-cell-pair b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.th-coin {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  font-style: normal;
+  /* White on a saturated brand fill: correct in BOTH themes, so this one is
+     deliberately literal rather than a token */
+  color: #ffffff;
+  box-shadow: var(--shadow-pop);
+}
+
+.th-coin--sm {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+  box-shadow: none;
+}
+
+/* --- Side pill --- */
+.th-side-cell,
+span.th-side {
+  min-width: 0;
+}
+
+span.th-side {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+span.th-side.is-buy {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+span.th-side.is-sell {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* --- Role badge ---
+   --role-rgb is set inline per row, so the badge, the doughnut slice and the
+   legend all read from one source rather than three colour lists. An rgb
+   triplet rather than color-mix(), matching --accent-rgb / --down-rgb. */
+.th-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 7px;
+  border: 1px solid rgba(var(--role-rgb), 0.4);
+  background: rgba(var(--role-rgb), 0.13);
+  color: rgb(var(--role-rgb));
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* --- Fee --- */
+.th-fee {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.3;
+}
+
+.th-fee b {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.th-fee small {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* --- Empty state --- */
+.th-empty-row td {
+  border-bottom: none;
+}
+
+.th-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 42px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  white-space: normal;
+}
+
+.th-empty p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ============================ TABLE FOOT ============================ */
+
+.th-table-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid var(--border-light);
+  font-size: 12px;
+}
+
+.th-pager {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.th-pager button {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.th-pager button:hover:not(:disabled) {
+  border-color: var(--accent-line);
+  color: var(--text-primary);
+}
+
+.th-pager button.is-active {
+  border-color: transparent;
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+}
+
+.th-pager button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.th-rows {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* =========================== MAKER VS TAKER ========================= */
+
+.th-alloc {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2cqi, 18px);
+  flex-wrap: wrap;
+}
+
+.th-donut {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  flex-shrink: 0;
+  margin-inline: auto;
+}
+
+/* Centred label as a plain overlay rather than a Chart.js plugin: the text is
+   static, and a plugin would have to redraw it on every theme change */
+.th-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.th-donut-center strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.th-donut-center span {
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.th-legend {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 110px;
+  min-width: 100px;
+}
+
+.th-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.th-legend i {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.th-legend b {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.th-note {
+  margin: 12px 0 0;
+  padding-top: 11px;
+  border-top: 1px solid var(--border-light);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* =========================== VOLUME BY PAIR ========================= */
+
+.th-top-list {
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+}
+
+.th-top-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.th-top-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.th-top-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.th-top-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary-vivid);
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.th-top-list b {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* =========================== EXECUTION STATS ======================== */
+
+.th-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.th-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.th-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.th-summary dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.th-summary dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* ============================== FOCUS =============================== */
+
+.th-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Nine nowrap columns cannot fit a phone at a readable size, so each fill
+   becomes its own block and every cell prints its own label. Nothing is
+   clipped and nothing scrolls sideways - same pattern as the other tables in
+   the app. */
+@container (max-width: 820px) {
+  .th-table-scroll {
+    overflow-x: visible;
+  }
+
+  .th-table,
+  .th-table tbody,
+  .th-table tr,
+  .th-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .th-table thead {
+    display: none;
+  }
+
+  .th-table {
+    white-space: normal;
+  }
+
+  .th-table tbody tr {
+    position: relative;
+    margin-bottom: 10px;
+    padding: 13px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+
+  .th-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .th-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .th-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .th-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The pair is the block's heading, so it spans the row unlabelled - and the
+     execution time rides in the corner instead of taking a row of its own */
+  .th-table tbody td.th-cell-pair {
+    justify-content: flex-start;
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .th-table tbody td.th-cell-pair::before,
+  .th-table tbody td.th-cell-date::before {
+    content: none;
+  }
+
+  .th-table tbody td.th-cell-date {
+    position: absolute;
+    top: 13px;
+    right: 13px;
+    width: auto;
+    padding: 0;
+    display: block;
+    text-align: right;
+  }
+
+  .th-fee {
+    align-items: flex-end;
+  }
+
+  .th-empty-row td,
+  .th-empty-row td::before {
+    display: block;
+    content: none;
+  }
+
+  .th-table-foot {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@container (max-width: 560px) {
+  .th-header-actions,
+  .th-tools {
+    width: 100%;
+  }
+
+  .th-header-actions .th-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .th-search {
+    flex: 1 1 auto;
+  }
+
+  .th-search input {
+    width: 100%;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .th-card {
+    animation: none;
+  }
+
+  .th-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .th-card:hover,
+  .th-metric:hover,
+  .th-btn:hover {
+    transform: none;
+  }
+
+  .th-tab::after,
+  .th-top-bar i {
+    transition: none;
+  }
+}

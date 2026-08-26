@@ -1,0 +1,1240 @@
+/* =====================================================================
+   TRANSACTIONS
+
+   Same material as the other trading pages: every colour comes from the
+   tokens in index.css, so this page themes with the rest of the app. No
+   literal rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.tx-page {
+  width: 100%;
+  container-type: inline-size;
+  /* Figures must not jitter as they update, and columns of numbers should
+     line up digit for digit */
+  font-variant-numeric: tabular-nums;
+
+  --tx-radius: 16px;
+  --tx-gap: 14px;
+  --tx-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.tx-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.tx-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.tx-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.tx-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.tx-subtitle {
+  margin: 5px 0 0;
+  max-width: 60ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.tx-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* --- Buttons --- */
+.tx-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.tx-btn:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+/* Spelled out rather than left as an invisible fallthrough, so the variant
+   is greppable from the markup */
+.tx-btn--ghost {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.tx-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--tx-pad);
+  border-radius: var(--tx-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: txRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes txRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.tx-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: txSweep 7s ease-in-out infinite;
+}
+
+@keyframes txSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.tx-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.tx-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.tx-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.tx-card:hover::after {
+  opacity: 1;
+}
+
+.tx-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.tx-metrics {
+  display: grid;
+  gap: var(--tx-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--tx-gap);
+}
+
+@container (min-width: 1040px) {
+  .tx-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.tx-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tx-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.tx-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.tx-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.tx-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.tx-metric:hover {
+  transform: translateY(-4px);
+}
+
+.tx-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.tx-metric.is-up .tx-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.tx-metric.is-down .tx-metric-icon {
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.tx-metric.is-warn .tx-metric-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.tx-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.tx-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.tx-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.tx-metric.is-up .tx-metric-value {
+  color: var(--up);
+}
+
+.tx-metric.is-down .tx-metric-value {
+  color: var(--down);
+}
+
+.tx-metric.is-warn .tx-metric-value {
+  color: var(--warn);
+}
+
+.tx-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.tx-grid {
+  display: grid;
+  gap: var(--tx-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.tx-side {
+  display: grid;
+  gap: var(--tx-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a wide table would push the whole column out */
+.tx-grid > *,
+.tx-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the three rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .tx-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .tx-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .tx-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1280px) {
+  .tx-grid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+
+  .tx-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1560px) {
+  .tx-grid {
+    grid-template-columns: minmax(0, 1fr) 330px;
+  }
+}
+
+/* ============================== TOOLBAR ============================= */
+
+.tx-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 11px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tx-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tx-tab {
+  position: relative;
+  padding: 8px 12px 10px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.tx-tab:hover {
+  color: var(--text-secondary);
+}
+
+.tx-tab.is-active {
+  color: var(--primary);
+}
+
+/* Underline on a pseudo-element so switching tabs cannot shift row height */
+.tx-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary-vivid);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.tx-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.tx-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.tx-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.tx-sort select,
+.tx-rows select {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.tx-sort select option,
+.tx-rows select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.tx-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.tx-search:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.tx-search input {
+  width: 170px;
+  max-width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.tx-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Chrome's own clear button sits oddly inside a custom field */
+.tx-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* =============================== TABLE ============================== */
+
+.tx-table-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--tx-pad) * -1);
+  padding: 0 var(--tx-pad);
+}
+
+.tx-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.tx-table thead th {
+  padding: 12px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tx-table .tx-num {
+  text-align: right;
+}
+
+.tx-table tbody td {
+  padding: 11px 9px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tx-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.tx-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.tx-table tbody tr.is-open {
+  background: var(--surface-2);
+}
+
+.tx-table tbody tr.is-open td {
+  border-bottom-color: transparent;
+}
+
+.tx-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.tx-muted {
+  color: var(--text-muted);
+}
+
+.tx-up {
+  color: var(--up);
+}
+
+.tx-down {
+  color: var(--down);
+}
+
+.tx-warn {
+  color: var(--warn);
+}
+
+/* --- Date cell --- */
+.tx-cell-date b {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tx-cell-date small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* --- Type badge ---
+   --type-rgb is set inline per row, so the badge, the doughnut slice and the
+   legend all read from one source rather than three colour lists. An rgb
+   triplet rather than color-mix(), matching --accent-rgb / --down-rgb. */
+.tx-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 7px;
+  border: 1px solid rgba(var(--type-rgb), 0.4);
+  background: rgba(var(--type-rgb), 0.13);
+  color: rgb(var(--type-rgb));
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* --- Asset cell --- */
+.tx-cell-asset {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.tx-cell-asset b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tx-coin {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  font-style: normal;
+  /* White on a saturated brand fill: correct in BOTH themes, so this one is
+     deliberately literal rather than a token */
+  color: #ffffff;
+  box-shadow: var(--shadow-pop);
+}
+
+.tx-coin--sm {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+  box-shadow: none;
+}
+
+/* --- Status --- */
+.tx-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tx-status.is-completed {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+.tx-status.is-pending {
+  color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.tx-status.is-rejected {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* --- Details toggle --- */
+.tx-cell-actions {
+  text-align: right;
+}
+
+.tx-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tx-icon-btn:hover {
+  color: var(--primary);
+  border-color: var(--accent-line);
+}
+
+.tx-icon-btn svg {
+  transition: transform 0.25s ease;
+}
+
+.tx-icon-btn svg.is-flipped {
+  transform: rotate(180deg);
+}
+
+/* --- Expanded detail row --- */
+.tx-detail-row td {
+  padding: 0 9px 13px !important;
+  background: var(--surface-2);
+}
+
+.tx-detail {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 13px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  white-space: normal;
+}
+
+@container (min-width: 720px) {
+  .tx-detail {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.tx-detail-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.tx-detail-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tx-detail-block b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.tx-detail-block small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.tx-copyable {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.tx-copyable button,
+.tx-copyable a {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tx-copyable button:hover,
+.tx-copyable a:hover {
+  color: var(--primary);
+  border-color: var(--accent-line);
+}
+
+/* --- Empty state --- */
+.tx-empty-row td {
+  border-bottom: none;
+}
+
+.tx-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 42px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  white-space: normal;
+}
+
+.tx-empty p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ============================ TABLE FOOT ============================ */
+
+.tx-table-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid var(--border-light);
+  font-size: 12px;
+}
+
+.tx-pager {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tx-pager button {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tx-pager button:hover:not(:disabled) {
+  border-color: var(--accent-line);
+  color: var(--text-primary);
+}
+
+.tx-pager button.is-active {
+  border-color: transparent;
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+}
+
+.tx-pager button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tx-rows {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================ VALUE BY TYPE ========================= */
+
+.tx-alloc {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2cqi, 18px);
+  flex-wrap: wrap;
+}
+
+.tx-donut {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  flex-shrink: 0;
+  margin-inline: auto;
+}
+
+/* Centred label as a plain overlay rather than a Chart.js plugin: the text is
+   static, and a plugin would have to redraw it on every theme change */
+.tx-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.tx-donut-center strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tx-donut-center span {
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tx-legend {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 118px;
+  min-width: 106px;
+}
+
+.tx-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.tx-legend i {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.tx-legend b {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ============================= MONEY FLOW =========================== */
+
+.tx-flow {
+  display: grid;
+  gap: 7px;
+}
+
+.tx-flow-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.tx-flow-row .tx-muted {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tx-flow-row b {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tx-flow-track {
+  display: block;
+  height: 7px;
+  margin-bottom: 5px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.tx-flow-track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.tx-flow-track i.is-in {
+  background: linear-gradient(90deg, var(--primary-dark), var(--primary-vivid));
+}
+
+.tx-flow-track i.is-out {
+  background: var(--down);
+}
+
+.tx-flow-net {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 11px;
+  border-top: 1px solid var(--border-light);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.tx-flow-net b {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* =========================== LEDGER SUMMARY ========================= */
+
+.tx-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.tx-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.tx-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.tx-summary dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tx-summary dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.tx-note {
+  margin: 11px 0 0;
+  padding-top: 11px;
+  border-top: 1px solid var(--border-light);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* ============================== FOCUS =============================== */
+
+.tx-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Eight nowrap columns cannot fit a phone at a readable size, so each entry
+   becomes its own block and every cell prints its own label. Nothing is
+   clipped and nothing scrolls sideways - same pattern as the other tables in
+   the app. */
+@container (max-width: 800px) {
+  .tx-table-scroll {
+    overflow-x: visible;
+  }
+
+  .tx-table,
+  .tx-table tbody,
+  .tx-table tr,
+  .tx-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .tx-table thead {
+    display: none;
+  }
+
+  .tx-table {
+    white-space: normal;
+  }
+
+  .tx-table tbody tr {
+    position: relative;
+    margin-bottom: 10px;
+    padding: 13px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+
+  .tx-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .tx-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The asset is the block's heading, so it spans the row unlabelled - and
+     the date rides in the corner instead of taking a row of its own */
+  .tx-table tbody td.tx-cell-asset {
+    justify-content: flex-start;
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .tx-table tbody td.tx-cell-asset::before,
+  .tx-table tbody td.tx-cell-date::before {
+    content: none;
+  }
+
+  .tx-table tbody td.tx-cell-date {
+    position: absolute;
+    top: 13px;
+    right: 13px;
+    width: auto;
+    padding: 0;
+    display: block;
+    text-align: right;
+  }
+
+  .tx-table tbody td.tx-cell-actions {
+    justify-content: flex-end;
+    padding-top: 11px;
+    margin-top: 5px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .tx-table tbody td.tx-cell-actions::before {
+    content: none;
+  }
+
+  /* The detail row is a sibling <tr>; as a block it needs to sit flush under
+     the card it belongs to rather than floating with its own margin */
+  .tx-detail-row {
+    margin-top: -10px;
+    margin-bottom: 10px;
+  }
+
+  .tx-detail-row td {
+    padding: 0 !important;
+    background: none;
+  }
+
+  .tx-detail-row td::before {
+    content: none;
+  }
+
+  .tx-empty-row td,
+  .tx-empty-row td::before {
+    display: block;
+    content: none;
+  }
+
+  .tx-table-foot {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@container (max-width: 560px) {
+  .tx-header-actions,
+  .tx-tools {
+    width: 100%;
+  }
+
+  .tx-header-actions .tx-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .tx-search {
+    flex: 1 1 auto;
+  }
+
+  .tx-search input {
+    width: 100%;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .tx-card {
+    animation: none;
+  }
+
+  .tx-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .tx-card:hover,
+  .tx-metric:hover,
+  .tx-btn:hover {
+    transform: none;
+  }
+
+  .tx-tab::after,
+  .tx-flow-track i,
+  .tx-icon-btn svg {
+    transition: none;
+  }
+}

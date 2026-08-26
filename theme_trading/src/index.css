@@ -126,3 +126,89 @@ a:hover {
     max-width: 1320px;
   }
 }
+
+/* =====================================================================
+   PREMIUM BUTTON MOTION
+   Shared keyframes for every call to action on the landing page. They are
+   defined here, once, and applied at each button's own rule so nothing has
+   to fight the cascade between stylesheets.
+
+   Deliberately split across three properties that never collide:
+     nxFlow  -> background-position   (the gradient drifts)
+     nxHalo  -> box-shadow            (the glow breathes)
+     nxSheen -> transform on ::before (the highlight sweeps)
+   Hover then owns transform + box-shadow on the element itself, so a hover
+   state can never be overwritten mid-animation.
+   ===================================================================== */
+
+/* Slow drift across an oversized gradient. Needs background-size: 220% */
+@keyframes nxFlow {
+  to {
+    background-position: 220% 50%;
+  }
+}
+
+/* The glow breathes rather than sitting static */
+@keyframes nxHalo {
+  0%,
+  100% {
+    box-shadow: 0 6px 20px rgba(0, 255, 178, 0.22);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(0, 255, 178, 0.45);
+  }
+}
+
+/* Sweeps across, then holds off-screen for the rest of the cycle — a
+   continuous sweep with no pause reads as a loading bar, not a highlight. */
+@keyframes nxSheen {
+  0% {
+    transform: translateX(-150%) skewX(-18deg);
+  }
+  55%,
+  100% {
+    transform: translateX(150%) skewX(-18deg);
+  }
+}
+
+/* Secondary/ghost buttons: the outline glints instead of the fill */
+@keyframes nxEdge {
+  0%,
+  100% {
+    border-color: var(--border-light);
+  }
+  50% {
+    border-color: rgba(0, 255, 178, 0.32);
+  }
+}
+
+/* Shared sheen overlay. Buttons opt in by setting position/overflow and
+   giving their ::before this background. */
+@keyframes nxArrow {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-nexa-primary,
+  .btn-nexa-ghost,
+  .nx-btn,
+  .btn-get-started,
+  .markets-trade,
+  .tm-submit,
+  .tst-arrow,
+  .btn-nexa-primary::before,
+  .btn-nexa-ghost::before,
+  .nx-btn::before,
+  .btn-get-started::before,
+  .markets-trade::before,
+  .tm-submit::before,
+  .tst-arrow::before {
+    animation: none !important;
+  }
+}

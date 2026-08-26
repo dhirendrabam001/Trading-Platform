@@ -1,0 +1,1116 @@
+/* =====================================================================
+   MY PORTFOLIO
+
+   Same material as the other trading pages: every colour comes from the
+   tokens in index.css, so this page themes with the rest of the app. No
+   literal rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.pf-page {
+  width: 100%;
+  container-type: inline-size;
+  /* Figures must not jitter as they update, and columns of numbers should
+     line up digit for digit */
+  font-variant-numeric: tabular-nums;
+
+  --pf-radius: 16px;
+  --pf-gap: 14px;
+  --pf-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.pf-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.pf-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.pf-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.pf-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.pf-subtitle {
+  margin: 5px 0 0;
+  max-width: 56ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pf-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* --- Buttons --- */
+.pf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.pf-btn:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+/* Spelled out rather than left as an invisible fallthrough, so the variant
+   is greppable from the markup */
+.pf-btn--ghost {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.pf-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--pf-pad);
+  border-radius: var(--pf-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: pfRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes pfRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.pf-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: pfSweep 7s ease-in-out infinite;
+}
+
+@keyframes pfSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.pf-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.pf-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pf-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.pf-card:hover::after {
+  opacity: 1;
+}
+
+.pf-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.pf-metrics {
+  display: grid;
+  gap: var(--pf-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--pf-gap);
+}
+
+@container (min-width: 1040px) {
+  .pf-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.pf-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pf-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.pf-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.pf-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.pf-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.pf-metric:hover {
+  transform: translateY(-4px);
+}
+
+.pf-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.pf-metric.is-up .pf-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.pf-metric.is-down .pf-metric-icon {
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.pf-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.pf-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.pf-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.pf-metric.is-up .pf-metric-value {
+  color: var(--up);
+}
+
+.pf-metric.is-down .pf-metric-value {
+  color: var(--down);
+}
+
+.pf-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.pf-grid {
+  display: grid;
+  gap: var(--pf-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.pf-col-main,
+.pf-side {
+  display: grid;
+  gap: var(--pf-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a wide table would push the whole column out */
+.pf-grid > *,
+.pf-col-main > *,
+.pf-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the three rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .pf-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .pf-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .pf-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1240px) {
+  .pf-grid {
+    grid-template-columns: minmax(0, 1fr) 310px;
+  }
+
+  .pf-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1520px) {
+  .pf-grid {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+
+/* ============================ EQUITY CURVE ========================== */
+
+.pf-chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pf-chart-title {
+  min-width: 0;
+}
+
+.pf-chart-title .pf-card-title {
+  margin-bottom: 6px;
+}
+
+.pf-chart-figure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.pf-chart-figure strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(22px, 2.8vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.pf-chart-figure .pf-muted {
+  font-size: 11.5px;
+}
+
+.pf-range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+
+.pf-range button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.22s ease,
+    background 0.22s ease;
+}
+
+.pf-range button:hover {
+  color: var(--text-secondary);
+}
+
+.pf-range button.is-active {
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+}
+
+.pf-chart-body {
+  position: relative;
+  height: clamp(220px, 30vh, 300px);
+}
+
+/* ============================== TOOLBAR ============================= */
+
+.pf-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 11px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pf-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pf-tab {
+  position: relative;
+  padding: 8px 12px 10px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.pf-tab:hover {
+  color: var(--text-secondary);
+}
+
+.pf-tab.is-active {
+  color: var(--primary);
+}
+
+/* Underline on a pseudo-element so switching tabs cannot shift row height */
+.pf-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary-vivid);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.pf-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.pf-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pf-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.pf-sort select {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.pf-sort select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.pf-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.pf-search:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.pf-search input {
+  width: 140px;
+  max-width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.pf-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Chrome's own clear button sits oddly inside a custom field */
+.pf-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* =============================== TABLE ============================== */
+
+.pf-table-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--pf-pad) * -1) calc(var(--pf-pad) * -1);
+  padding: 0 var(--pf-pad) 2px;
+}
+
+.pf-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.pf-table thead th {
+  padding: 12px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pf-table .pf-num {
+  text-align: right;
+}
+
+.pf-table tbody td {
+  padding: 12px 9px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pf-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pf-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.pf-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.pf-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.pf-muted {
+  color: var(--text-muted);
+}
+
+.pf-up {
+  color: var(--up);
+}
+
+.pf-down {
+  color: var(--down);
+}
+
+/* --- Asset cell --- */
+.pf-cell-asset {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pf-coin {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  font-style: normal;
+  /* White on a saturated brand fill: correct in BOTH themes, so this one is
+     deliberately literal rather than a token */
+  color: #ffffff;
+  box-shadow: var(--shadow-pop);
+}
+
+.pf-coin--sm {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+  box-shadow: none;
+}
+
+.pf-asset-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.pf-asset-text b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pf-asset-text small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Quantity over its ticker, so the unit never wraps away from the number */
+.pf-stacked {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.3;
+}
+
+.pf-stacked b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pf-stacked small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* --- Delta pill --- */
+.pf-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pf-delta.is-up {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+.pf-delta.is-down {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* --- Allocation bar ---
+   Tinted with the asset's own brand colour, so the row, the doughnut slice
+   and the legend all agree at a glance */
+.pf-alloc-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 104px;
+}
+
+.pf-alloc-track {
+  flex: 1 1 auto;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  overflow: hidden;
+}
+
+.pf-alloc-track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.pf-alloc-cell small {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* --- P&L --- */
+.pf-pnl {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.3;
+}
+
+.pf-pnl b {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.pf-pnl small {
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.pf-pnl.is-up {
+  color: var(--up);
+}
+
+.pf-pnl.is-down {
+  color: var(--down);
+}
+
+/* --- Empty state --- */
+.pf-empty-row td {
+  border-bottom: none;
+}
+
+.pf-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  white-space: normal;
+}
+
+.pf-empty p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ============================= ALLOCATION =========================== */
+
+.pf-alloc {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2cqi, 18px);
+  flex-wrap: wrap;
+}
+
+.pf-donut {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  flex-shrink: 0;
+  margin-inline: auto;
+}
+
+/* Centred label as a plain overlay rather than a Chart.js plugin: the text is
+   static, and a plugin would have to redraw it on every theme change */
+.pf-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.pf-donut-center strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pf-donut-center span {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pf-legend {
+  list-style: none;
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 120px;
+  min-width: 108px;
+}
+
+.pf-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.pf-legend i {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.pf-legend b {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* =========================== BEST & WORST =========================== */
+
+.pf-movers {
+  display: grid;
+  gap: 8px;
+}
+
+.pf-movers-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.pf-mover-list {
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  margin: 0 0 4px;
+  padding: 0;
+}
+
+.pf-mover-list li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.pf-mover-list li:hover {
+  background: var(--surface-hover);
+}
+
+.pf-mover-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pf-mover-list b {
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* =========================== ACCOUNT SUMMARY ======================== */
+
+.pf-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.pf-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.pf-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.pf-summary dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pf-summary dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* ============================== FOCUS =============================== */
+
+.pf-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Eight nowrap columns cannot fit a phone at a readable size, so each holding
+   becomes its own block and every cell prints its own label. Nothing is
+   clipped and nothing scrolls sideways - same pattern as the other tables in
+   the app. */
+@container (max-width: 800px) {
+  .pf-table-scroll {
+    overflow-x: visible;
+  }
+
+  .pf-table,
+  .pf-table tbody,
+  .pf-table tr,
+  .pf-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .pf-table thead {
+    display: none;
+  }
+
+  .pf-table {
+    white-space: normal;
+  }
+
+  .pf-table tbody tr {
+    margin-bottom: 10px;
+    padding: 13px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+
+  .pf-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .pf-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .pf-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .pf-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The asset is the block's heading, so it spans the row unlabelled */
+  .pf-table tbody td.pf-cell-asset {
+    justify-content: flex-start;
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .pf-table tbody td.pf-cell-asset::before {
+    content: none;
+  }
+
+  .pf-empty-row td,
+  .pf-empty-row td::before {
+    display: block;
+    content: none;
+  }
+}
+
+@container (max-width: 560px) {
+  .pf-header-actions,
+  .pf-tools {
+    width: 100%;
+  }
+
+  .pf-header-actions .pf-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .pf-search {
+    flex: 1 1 auto;
+  }
+
+  .pf-search input {
+    width: 100%;
+  }
+
+  .pf-range {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-card {
+    animation: none;
+  }
+
+  .pf-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .pf-card:hover,
+  .pf-metric:hover,
+  .pf-btn:hover {
+    transform: none;
+  }
+
+  .pf-tab::after,
+  .pf-alloc-track i {
+    transition: none;
+  }
+}

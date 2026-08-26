@@ -1,0 +1,886 @@
+/* =====================================================================
+   BANK ACCOUNTS
+
+   Same material as the other pages: every colour comes from the tokens in
+   index.css, so this page themes with the rest of the app. No literal
+   rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.ba-page {
+  width: 100%;
+  container-type: inline-size;
+  font-variant-numeric: tabular-nums;
+
+  --ba-radius: 16px;
+  --ba-gap: 14px;
+  --ba-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.ba-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.ba-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.ba-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.ba-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.ba-subtitle {
+  margin: 5px 0 0;
+  max-width: 58ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* --- Buttons --- */
+.ba-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.ba-btn:hover {
+  transform: translateY(-2px);
+}
+
+.ba-btn--primary {
+  border-color: transparent;
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+  box-shadow: 0 8px 20px var(--accent-glow);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.ba-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--ba-pad);
+  border-radius: var(--ba-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: baRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes baRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.ba-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: baSweep 7s ease-in-out infinite;
+}
+
+@keyframes baSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.ba-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.ba-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ba-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.ba-card:hover::after {
+  opacity: 1;
+}
+
+.ba-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.ba-metrics {
+  display: grid;
+  gap: var(--ba-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--ba-gap);
+}
+
+@container (min-width: 1040px) {
+  .ba-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.ba-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ba-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.ba-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.ba-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.ba-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.ba-metric:hover {
+  transform: translateY(-4px);
+}
+
+.ba-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.ba-metric.is-up .ba-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.ba-metric.is-warn .ba-metric-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.ba-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.ba-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.ba-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.ba-metric.is-up .ba-metric-value {
+  color: var(--up);
+}
+
+.ba-metric.is-warn .ba-metric-value {
+  color: var(--warn);
+}
+
+.ba-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.ba-grid {
+  display: grid;
+  gap: var(--ba-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.ba-col-main,
+.ba-side {
+  display: grid;
+  gap: var(--ba-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a long IBAN would push the whole column out */
+.ba-grid > *,
+.ba-col-main > *,
+.ba-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .ba-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .ba-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .ba-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1200px) {
+  .ba-grid {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+  .ba-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1480px) {
+  .ba-grid {
+    grid-template-columns: minmax(0, 1fr) 350px;
+  }
+}
+
+/* =============================== FORM =============================== */
+
+.ba-form-card {
+  border-color: var(--accent-line);
+  background:
+    radial-gradient(circle at 10% 0%, var(--accent-wash), transparent 55%),
+    var(--card-gradient);
+}
+
+.ba-form {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 640px) {
+  .ba-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ba-field {
+  min-width: 0;
+}
+
+.ba-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ba-field input,
+.ba-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  outline: none;
+  font-family: var(--font-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.ba-field input::placeholder {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.ba-field input:focus,
+.ba-field select:focus {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.ba-field select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.ba-form-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 13px 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.ba-form-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ============================== ACCOUNTS ============================ */
+
+.ba-list {
+  list-style: none;
+  display: grid;
+  gap: 11px;
+  margin: 0;
+  padding: 0;
+}
+
+.ba-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+/* Status colours the left edge, so an account's state is readable without
+   parsing its badge */
+.ba-item.is-done {
+  box-shadow: inset 3px 0 0 var(--up);
+}
+
+.ba-item.is-warn {
+  box-shadow: inset 3px 0 0 var(--warn);
+}
+
+.ba-item.is-bad {
+  box-shadow: inset 3px 0 0 var(--down);
+}
+
+.ba-item.is-default {
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.ba-item-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.ba-bank-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.ba-item.is-default .ba-bank-icon {
+  background: var(--accent-soft);
+  color: var(--primary);
+}
+
+.ba-item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.ba-item-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ba-item-top b {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ba-default-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* --- Status pill --- */
+.ba-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--surface-3);
+  color: var(--text-muted);
+}
+
+.ba-status.is-done {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.ba-status.is-warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.ba-status.is-bad {
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.ba-number {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* --- Meta grid --- */
+.ba-meta {
+  display: grid;
+  gap: 4px 16px;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  margin: 4px 0 0;
+}
+
+.ba-meta > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ba-meta dt {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.ba-meta dd {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.ba-item-alert {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--down-line);
+  background: var(--down-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--down);
+}
+
+/* --- Row actions --- */
+.ba-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.ba-mini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.ba-mini-btn:hover {
+  color: var(--primary);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.ba-mini-btn.is-danger {
+  color: var(--down);
+  border-color: var(--down-line);
+  background: var(--down-soft);
+}
+
+.ba-mini-btn.is-danger:hover {
+  color: var(--down);
+  border-color: var(--down);
+  background: var(--down-soft);
+}
+
+/* Removal asks first: the confirmation replaces the button in place rather
+   than opening a dialog that would cover the account being removed */
+.ba-confirm {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 5px 5px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--down-line);
+  background: var(--down-soft);
+}
+
+.ba-confirm > span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--down);
+}
+
+/* --- Empty state --- */
+.ba-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.ba-empty p {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* =========================== DEFAULT ACCOUNT ======================== */
+
+.ba-default-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 12px;
+  padding: 11px;
+  border-radius: 11px;
+  border: 1px solid var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.ba-default-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.ba-default-text b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ba-default-text small {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+/* ============================== SUMMARY ============================= */
+
+.ba-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.ba-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.ba-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.ba-summary dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.ba-summary dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* ============================== HELPERS ============================= */
+
+.ba-checklist {
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+}
+
+.ba-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.ba-checklist svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--primary);
+}
+
+.ba-note {
+  margin: 12px 0 0;
+  padding-top: 11px;
+  border-top: 1px solid var(--border-light);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.ba-muted {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.ba-up {
+  color: var(--up);
+}
+
+/* ============================== FOCUS =============================== */
+
+.ba-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+@container (max-width: 620px) {
+  /* Actions drop below the account rather than squeezing the details into a
+     narrow column beside them */
+  .ba-item-actions {
+    width: 100%;
+    padding-top: 11px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .ba-mini-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .ba-confirm {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@container (max-width: 560px) {
+  .ba-header .ba-btn {
+    width: 100%;
+  }
+
+  .ba-meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .ba-card {
+    animation: none;
+  }
+
+  .ba-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .ba-card:hover,
+  .ba-metric:hover,
+  .ba-btn:hover {
+    transform: none;
+  }
+}

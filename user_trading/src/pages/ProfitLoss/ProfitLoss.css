@@ -1,0 +1,1126 @@
+/* =====================================================================
+   PROFIT & LOSS
+
+   Same material as the other trading pages: every colour comes from the
+   tokens in index.css, so this page themes with the rest of the app. No
+   literal rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.pl-page {
+  width: 100%;
+  container-type: inline-size;
+  /* Figures must not jitter as they update, and columns of numbers should
+     line up digit for digit */
+  font-variant-numeric: tabular-nums;
+
+  --pl-radius: 16px;
+  --pl-gap: 14px;
+  --pl-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.pl-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.pl-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.pl-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.pl-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.pl-subtitle {
+  margin: 5px 0 0;
+  max-width: 58ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pl-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+/* --- Period switch --- */
+.pl-period {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+
+.pl-period button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color 0.22s ease,
+    background 0.22s ease;
+}
+
+.pl-period button:hover {
+  color: var(--text-secondary);
+}
+
+.pl-period button.is-active {
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+}
+
+/* --- Buttons --- */
+.pl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.pl-btn:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+/* Spelled out rather than left as an invisible fallthrough, so the variant
+   is greppable from the markup */
+.pl-btn--ghost {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.pl-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--pl-pad);
+  border-radius: var(--pl-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: plRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes plRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.pl-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: plSweep 7s ease-in-out infinite;
+}
+
+@keyframes plSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.pl-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.pl-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pl-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.pl-card:hover::after {
+  opacity: 1;
+}
+
+.pl-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.pl-metrics {
+  display: grid;
+  gap: var(--pl-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--pl-gap);
+}
+
+@container (min-width: 1040px) {
+  .pl-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.pl-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pl-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.pl-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.pl-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.pl-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.pl-metric:hover {
+  transform: translateY(-4px);
+}
+
+.pl-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.pl-metric.is-up .pl-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.pl-metric.is-down .pl-metric-icon {
+  background: var(--down-soft);
+  color: var(--down);
+}
+
+.pl-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.pl-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.pl-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.pl-metric.is-up .pl-metric-value {
+  color: var(--up);
+}
+
+.pl-metric.is-down .pl-metric-value {
+  color: var(--down);
+}
+
+.pl-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.pl-grid {
+  display: grid;
+  gap: var(--pl-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.pl-col-main,
+.pl-side {
+  display: grid;
+  gap: var(--pl-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a wide table would push the whole column out */
+.pl-grid > *,
+.pl-col-main > *,
+.pl-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the three rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .pl-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .pl-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .pl-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1240px) {
+  .pl-grid {
+    grid-template-columns: minmax(0, 1fr) 310px;
+  }
+
+  .pl-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1520px) {
+  .pl-grid {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+
+/* ============================== CHART =============================== */
+
+.pl-chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pl-chart-figure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.pl-chart-figure strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(20px, 2.6vw, 27px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pl-chart-figure .pl-muted {
+  font-size: 11.5px;
+}
+
+.pl-cum {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 8px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+}
+
+.pl-cum .pl-muted {
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pl-cum b {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pl-chart-body {
+  position: relative;
+  height: clamp(210px, 28vh, 280px);
+}
+
+/* ============================== TOOLBAR ============================= */
+
+.pl-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 11px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pl-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pl-tab {
+  position: relative;
+  padding: 8px 12px 10px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.pl-tab:hover {
+  color: var(--text-secondary);
+}
+
+.pl-tab.is-active {
+  color: var(--primary);
+}
+
+/* Underline on a pseudo-element so switching tabs cannot shift row height */
+.pl-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary-vivid);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.pl-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.pl-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pl-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.pl-sort select {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.pl-sort select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.pl-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.pl-search:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.pl-search input {
+  width: 140px;
+  max-width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.pl-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Chrome's own clear button sits oddly inside a custom field */
+.pl-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* =============================== TABLE ============================== */
+
+.pl-table-scroll {
+  overflow-x: auto;
+  margin: 0 calc(var(--pl-pad) * -1) calc(var(--pl-pad) * -1);
+  padding: 0 var(--pl-pad) 2px;
+}
+
+.pl-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+
+.pl-table thead th {
+  padding: 12px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pl-table .pl-num {
+  text-align: right;
+}
+
+.pl-table tbody td {
+  padding: 12px 9px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pl-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pl-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.pl-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+/* Win or loss shows as a coloured edge, so the outcome is readable without
+   parsing the P&L column */
+.pl-table tbody tr.is-win td:first-child {
+  box-shadow: inset 2px 0 0 var(--up);
+}
+
+.pl-table tbody tr.is-loss td:first-child {
+  box-shadow: inset 2px 0 0 var(--down);
+}
+
+.pl-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.pl-muted {
+  color: var(--text-muted);
+}
+
+.pl-up {
+  color: var(--up);
+}
+
+.pl-down {
+  color: var(--down);
+}
+
+/* --- Date cell --- */
+.pl-cell-date b {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pl-cell-date small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* --- Pair cell --- */
+.pl-cell-pair {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.pl-cell-pair b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pl-coin {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  font-style: normal;
+  /* White on a saturated brand fill: correct in BOTH themes, so this one is
+     deliberately literal rather than a token */
+  color: #ffffff;
+  box-shadow: var(--shadow-pop);
+}
+
+.pl-coin--sm {
+  width: 24px;
+  height: 24px;
+  font-size: 10.5px;
+  box-shadow: none;
+}
+
+/* --- Side pill --- */
+span.pl-side {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+span.pl-side.is-long {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+span.pl-side.is-short {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* --- ROI pill --- */
+.pl-roi {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pl-roi.is-up {
+  color: var(--up);
+  background: var(--up-soft);
+}
+
+.pl-roi.is-down {
+  color: var(--down);
+  background: var(--down-soft);
+}
+
+/* --- Empty state --- */
+.pl-empty-row td {
+  border-bottom: none;
+}
+
+.pl-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  white-space: normal;
+}
+
+.pl-empty p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ============================== WIN RATE ============================ */
+
+.pl-alloc {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2cqi, 18px);
+  flex-wrap: wrap;
+}
+
+.pl-donut {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  flex-shrink: 0;
+  margin-inline: auto;
+}
+
+/* Centred label as a plain overlay rather than a Chart.js plugin: the text is
+   static, and a plugin would have to redraw it on every theme change */
+.pl-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.pl-donut-center strong {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pl-donut-center span {
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pl-legend {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 110px;
+  min-width: 100px;
+}
+
+.pl-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.pl-legend i {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.pl-dot-up {
+  background: var(--up);
+}
+
+.pl-dot-down {
+  background: var(--down);
+}
+
+.pl-legend b {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* =========================== BEST & WORST =========================== */
+
+.pl-extremes {
+  display: grid;
+  gap: 9px;
+}
+
+.pl-extreme {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+}
+
+.pl-extreme.is-up {
+  border-color: var(--accent-line);
+  background: var(--up-soft);
+}
+
+.pl-extreme.is-down {
+  border-color: var(--down-line);
+  background: var(--down-soft);
+}
+
+.pl-extreme-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.pl-extreme-body b {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pl-extreme-body small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.pl-extreme > b {
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* =========================== TRADE STATISTICS ======================= */
+
+.pl-stats {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.pl-stats > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.pl-stats > div:hover {
+  background: var(--surface-hover);
+}
+
+.pl-stats dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pl-stats dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* ============================== FOCUS =============================== */
+
+.pl-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Nine nowrap columns cannot fit a phone at a readable size, so each trade
+   becomes its own block and every cell prints its own label. Nothing is
+   clipped and nothing scrolls sideways - same pattern as the other tables in
+   the app. */
+@container (max-width: 820px) {
+  .pl-table-scroll {
+    overflow-x: visible;
+  }
+
+  .pl-table,
+  .pl-table tbody,
+  .pl-table tr,
+  .pl-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .pl-table thead {
+    display: none;
+  }
+
+  .pl-table {
+    white-space: normal;
+  }
+
+  .pl-table tbody tr {
+    position: relative;
+    margin-bottom: 10px;
+    padding: 13px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--surface-1);
+  }
+
+  .pl-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .pl-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* The inset edge marker relies on a first cell that is no longer a table
+     cell here, so the whole card takes the cue instead */
+  .pl-table tbody tr.is-win td:first-child,
+  .pl-table tbody tr.is-loss td:first-child {
+    box-shadow: none;
+  }
+
+  .pl-table tbody tr.is-win {
+    border-color: var(--accent-line);
+  }
+
+  .pl-table tbody tr.is-loss {
+    border-color: var(--down-line);
+  }
+
+  .pl-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .pl-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* The pair is the block's heading, so it spans the row unlabelled - and the
+     close date rides in the corner instead of taking a row of its own */
+  .pl-table tbody td.pl-cell-pair {
+    justify-content: flex-start;
+    padding: 0 0 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .pl-table tbody td.pl-cell-pair::before,
+  .pl-table tbody td.pl-cell-date::before {
+    content: none;
+  }
+
+  .pl-table tbody td.pl-cell-date {
+    position: absolute;
+    top: 13px;
+    right: 13px;
+    width: auto;
+    padding: 0;
+    display: block;
+    text-align: right;
+  }
+
+  .pl-empty-row td,
+  .pl-empty-row td::before {
+    display: block;
+    content: none;
+  }
+}
+
+@container (max-width: 560px) {
+  .pl-header-actions,
+  .pl-tools {
+    width: 100%;
+  }
+
+  .pl-period {
+    flex: 1 1 auto;
+    justify-content: space-between;
+  }
+
+  .pl-search {
+    flex: 1 1 auto;
+  }
+
+  .pl-search input {
+    width: 100%;
+  }
+
+  .pl-cum {
+    width: 100%;
+    align-items: flex-start;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-card {
+    animation: none;
+  }
+
+  .pl-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .pl-card:hover,
+  .pl-metric:hover,
+  .pl-btn:hover {
+    transform: none;
+  }
+
+  .pl-tab::after {
+    transition: none;
+  }
+}

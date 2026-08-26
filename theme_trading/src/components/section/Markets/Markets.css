@@ -1,0 +1,288 @@
+/* ---------- TABS ---------- */
+.markets-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 5px;
+  margin-bottom: 26px;
+  border-radius: 100px;
+  border: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.markets-tab {
+  position: relative;
+  padding: 9px 26px;
+  border: none;
+  border-radius: 100px;
+  background: transparent;
+  font-family: var(--font-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.markets-tab:hover {
+  color: var(--text-primary);
+}
+
+.markets-tab.is-active {
+  color: var(--btn-primary-text);
+}
+
+/* The moving pill is a sibling behind the label, so the text keeps its own
+   colour instead of inheriting the gradient. */
+.markets-tab-pill {
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  background: var(--primary-gradient);
+  box-shadow: 0 4px 18px rgba(0, 255, 178, 0.28);
+}
+
+.markets-tab-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- PANEL ---------- */
+.markets-panel {
+  border-radius: 20px;
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.markets-head,
+.markets-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 0.9fr) 110px 100px;
+  align-items: center;
+  gap: 16px;
+  padding: 0 26px;
+}
+
+.markets-head {
+  height: 46px;
+  border-bottom: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.02);
+  font-family: var(--font-primary);
+  font-size: 0.74rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.markets-row {
+  height: 72px;
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.3s ease;
+}
+
+.markets-row:last-child {
+  border-bottom: none;
+}
+
+.markets-row:hover {
+  background: rgba(0, 255, 178, 0.04);
+}
+
+.markets-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.markets-trend {
+  display: flex;
+  justify-content: center;
+}
+
+/* ---------- ASSET CELL ---------- */
+.markets-asset {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.markets-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 255, 178, 0.2);
+  background: rgba(0, 255, 178, 0.08);
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Pair names such as EUR/USD are long; min-width:0 lets them ellipsise
+   rather than force the grid columns apart. */
+.markets-names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.markets-sym,
+.markets-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.markets-sym {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.markets-name {
+  font-family: var(--font-primary);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.markets-price {
+  font-family: var(--font-primary);
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ---------- CHANGE CHIP ---------- */
+.markets-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.markets-chip.is-up {
+  background: rgba(0, 255, 178, 0.1);
+  color: var(--primary);
+}
+
+.markets-chip.is-down {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--accent-red);
+}
+
+/* ---------- ACTION ---------- */
+.markets-action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.markets-trade {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  font-family: var(--font-primary);
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.markets-trade::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(0, 255, 178, 0.22), transparent);
+  transform: translateX(-150%) skewX(-18deg);
+  pointer-events: none;
+}
+
+/* Fifteen of these sit on screen at once, so the sweep only runs on hover —
+   fifteen looping highlights would be noise. */
+.markets-trade:hover::before {
+  animation: nxSheen 1s ease-out;
+}
+
+.markets-trade:hover {
+  border-color: rgba(0, 255, 178, 0.45);
+  background: rgba(0, 255, 178, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 255, 178, 0.18);
+  transform: translateY(-1px);
+  color: var(--primary);
+}
+
+.markets-note {
+  margin: 18px 0 0;
+  text-align: center;
+  font-family: var(--font-primary);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ---------- RESPONSIVE ----------
+   Columns are dropped rather than squeezed: the sparkline goes first, then
+   the trade button, so the price and the change always survive. */
+@media (max-width: 991px) {
+  .markets-head,
+  .markets-row {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 0.9fr) 100px;
+    padding: 0 20px;
+  }
+
+  .markets-trend {
+    display: none;
+  }
+}
+
+@media (max-width: 575px) {
+  .markets-head,
+  .markets-row {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 0 16px;
+  }
+
+  .markets-action {
+    display: none;
+  }
+
+  .markets-row {
+    height: 66px;
+  }
+
+  .markets-tabs {
+    display: flex;
+    width: 100%;
+  }
+
+  .markets-tab {
+    flex: 1;
+    padding: 9px 12px;
+  }
+
+  .markets-badge {
+    width: 32px;
+    height: 32px;
+  }
+}

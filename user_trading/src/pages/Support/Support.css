@@ -1,0 +1,1190 @@
+/* =====================================================================
+   SUPPORT
+
+   Same material as the other pages: every colour comes from the tokens in
+   index.css, so this page themes with the rest of the app. No literal
+   rgba(255,255,255,x) surfaces - those cannot invert for light mode.
+
+   Layout is driven by CONTAINER queries, because the sidebar collapses
+   independently of the window: a viewport breakpoint would fire at the wrong
+   moment every time the rail is toggled.
+   ===================================================================== */
+
+.sp-page {
+  width: 100%;
+  container-type: inline-size;
+  font-variant-numeric: tabular-nums;
+
+  --sp-radius: 16px;
+  --sp-gap: 14px;
+  --sp-pad: clamp(13px, 1.5vw, 18px);
+}
+
+/* ============================== HEADER ============================== */
+
+.sp-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.sp-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.sp-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-3);
+  color: var(--primary);
+}
+
+.sp-title {
+  margin: 0;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 29px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.sp-subtitle {
+  margin: 5px 0 0;
+  max-width: 60ch;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* --- Buttons --- */
+.sp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-2);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.22s ease,
+    opacity 0.2s ease;
+}
+
+.sp-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.sp-btn--primary {
+  border-color: transparent;
+  background: var(--primary-gradient);
+  color: var(--text-on-accent);
+  box-shadow: 0 8px 20px var(--accent-glow);
+}
+
+/* Nothing typed means nothing to send - disabled rather than silently
+   posting an empty reply */
+.sp-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.sp-mini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.sp-mini-btn:hover {
+  color: var(--primary);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+/* ============================ CARD SHELL ============================ */
+
+.sp-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--sp-pad);
+  border-radius: var(--sp-radius);
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  /* `backwards` holds the opening frame through the stagger delay. Unlike
+     `forwards` it releases the element afterwards, so :hover transforms are
+     not permanently outranked by the animation. */
+  animation: spRise 0.5s cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+
+@keyframes spRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gloss sweeping across the glass, on the same 7s cadence as every other
+   card in the app so the surfaces breathe together */
+.sp-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    var(--sweep-highlight) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: spSweep 7s ease-in-out infinite;
+}
+
+@keyframes spSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  /* Crosses early then rests, so cards stay calm between passes */
+  35%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hairline of light along the top edge */
+.sp-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-line-strong),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.sp-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.sp-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-hover);
+}
+
+.sp-card:hover::after {
+  opacity: 1;
+}
+
+.sp-card-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 13px;
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================== METRICS ============================= */
+
+.sp-metrics {
+  display: grid;
+  gap: var(--sp-gap);
+  /* Two per row on phones keeps the four summaries comparable at a glance,
+     matching the dashboard overview */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: var(--sp-gap);
+}
+
+@container (min-width: 1040px) {
+  .sp-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.sp-metric {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sp-metric:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.sp-metric:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.sp-metric:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.sp-metric:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.sp-metric:hover {
+  transform: translateY(-4px);
+}
+
+.sp-metric-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.sp-metric.is-up .sp-metric-icon {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.sp-metric.is-warn .sp-metric-icon {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.sp-metric-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.sp-metric-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.sp-metric-value {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.sp-metric.is-up .sp-metric-value {
+  color: var(--up);
+}
+
+.sp-metric.is-warn .sp-metric-value {
+  color: var(--warn);
+}
+
+.sp-metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* =============================== GRID =============================== */
+
+.sp-grid {
+  display: grid;
+  gap: var(--sp-gap);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.sp-col-main,
+.sp-side {
+  display: grid;
+  gap: var(--sp-gap);
+  min-width: 0;
+  grid-auto-rows: min-content;
+}
+
+/* Grid items default to min-width:auto and refuse to shrink below their
+   content, so a long subject line would push the whole column out */
+.sp-grid > *,
+.sp-col-main > *,
+.sp-side > * {
+  min-width: 0;
+}
+
+/* Full width below the split: the rail cards share a row rather than
+   stacking into a very long scroll */
+@container (min-width: 680px) {
+  .sp-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .sp-side {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The split. Measured against .sp-page, so it fires on real content width
+   whether the sidebar is expanded, collapsed or overlaid. Must come AFTER
+   the rules above, which it resets back to a single column. */
+@container (min-width: 1200px) {
+  .sp-grid {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+  .sp-side {
+    grid-template-columns: minmax(0, 1fr);
+    position: sticky;
+    top: 14px;
+  }
+}
+
+@container (min-width: 1480px) {
+  .sp-grid {
+    grid-template-columns: minmax(0, 1fr) 350px;
+  }
+}
+
+/* ============================== COMPOSE ============================= */
+
+.sp-compose {
+  border-color: var(--accent-line);
+  background:
+    radial-gradient(circle at 10% 0%, var(--accent-wash), transparent 55%),
+    var(--card-gradient);
+}
+
+.sp-form {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 640px) {
+  .sp-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Subject and body need the full row; the selects sit side by side */
+  .sp-field--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.sp-field {
+  min-width: 0;
+}
+
+.sp-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sp-field input,
+.sp-field select,
+.sp-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  outline: none;
+  font-family: var(--font-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.sp-field textarea {
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.sp-field input::placeholder,
+.sp-field textarea::placeholder {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.sp-field input:focus,
+.sp-field select:focus,
+.sp-field textarea:focus {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.sp-field select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.sp-compose-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 13px;
+}
+
+/* ============================== TOOLBAR ============================= */
+
+.sp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 11px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.sp-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sp-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px 10px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.sp-tab:hover {
+  color: var(--text-secondary);
+}
+
+.sp-tab.is-active {
+  color: var(--primary);
+}
+
+/* Underline on a pseudo-element so switching tabs cannot shift row height */
+.sp-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary-vivid);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.sp-tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.sp-tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.sp-tab.is-active .sp-tab-count {
+  background: var(--accent-soft);
+  color: var(--primary);
+}
+
+.sp-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.sp-search:focus-within {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.sp-search input {
+  width: 160px;
+  max-width: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+.sp-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Chrome's own clear button sits oddly inside a custom field */
+.sp-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ============================== TICKETS ============================= */
+
+.sp-tickets {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.sp-ticket {
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  overflow: hidden;
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+/* Priority colours the left edge, so urgency reads before the badge does.
+   --pri-rgb is set inline per ticket, so the edge, the pill and the response
+   target legend all read from one source rather than three colour lists. */
+.sp-ticket {
+  box-shadow: inset 3px 0 0 rgb(var(--pri-rgb));
+}
+
+.sp-ticket.is-open {
+  border-color: var(--border-medium);
+  background: var(--surface-2);
+}
+
+/* Resolved and closed recede: they are history, not work in progress */
+.sp-ticket.is-done,
+.sp-ticket.is-idle {
+  opacity: 0.78;
+}
+
+.sp-ticket-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sp-ticket-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.sp-ticket-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.sp-ticket-top b {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sp-unread {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sp-ticket-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.sp-id {
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.sp-dot-sep {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  opacity: 0.6;
+}
+
+.sp-ticket-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.sp-priority {
+  padding: 3px 9px;
+  border-radius: 7px;
+  border: 1px solid rgba(var(--pri-rgb), 0.4);
+  background: rgba(var(--pri-rgb), 0.13);
+  color: rgb(var(--pri-rgb));
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--surface-3);
+  color: var(--text-muted);
+}
+
+.sp-status.is-warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.sp-status.is-info {
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--accent-blue);
+}
+
+.sp-status.is-done {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.sp-chev {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform 0.25s ease;
+}
+
+.sp-chev.is-flipped {
+  transform: rotate(180deg);
+}
+
+/* ============================== THREAD ============================== */
+
+.sp-thread {
+  padding: 0 14px 14px;
+}
+
+.sp-sla {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.sp-messages {
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.sp-msg {
+  padding: 11px 13px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  max-width: 88%;
+}
+
+/* Your messages align right and take the accent tint, the agent's stay left -
+   so the conversation reads as a conversation */
+.sp-msg.is-you {
+  margin-left: auto;
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.sp-msg-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.sp-msg-head b {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sp-msg-head small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.sp-msg p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* --- Reply box --- */
+.sp-reply {
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+}
+
+.sp-reply textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  outline: none;
+  resize: vertical;
+  font-family: var(--font-primary);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-primary);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.sp-reply textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.sp-reply textarea:focus {
+  border-color: var(--accent-line-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.sp-reply-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sp-closed-note {
+  margin: 0;
+  padding: 11px 13px;
+  border-radius: 11px;
+  border: 1px dashed var(--border-medium);
+  background: var(--surface-1);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* --- Empty state --- */
+.sp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 44px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.sp-empty p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ============================== CHANNELS ============================ */
+
+.sp-channels {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.sp-channels li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 11px;
+  border: 1px solid var(--border-light);
+  background: var(--surface-1);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.sp-channels li:hover {
+  border-color: var(--accent-line);
+  background: var(--surface-2);
+}
+
+.sp-channel-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--surface-3);
+  color: var(--text-secondary);
+}
+
+.sp-channel-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.sp-channel-body b {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sp-channel-body small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.sp-channel-status {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.sp-channel-status.is-up {
+  color: var(--up);
+}
+
+/* ============================== SUMMARY ============================= */
+
+.sp-summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.sp-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.sp-summary > div:hover {
+  background: var(--surface-hover);
+}
+
+.sp-summary dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.sp-summary dd {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.sp-pri-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+/* ============================== ARTICLES ============================ */
+
+.sp-articles {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.sp-articles a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.sp-articles a:hover {
+  background: var(--surface-hover);
+  color: var(--primary);
+}
+
+.sp-article-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.sp-article-body b {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sp-article-body small {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.sp-rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid var(--border-light);
+}
+
+.sp-stars {
+  display: inline-flex;
+  gap: 3px;
+  color: var(--text-muted);
+}
+
+.sp-stars svg {
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.sp-stars:hover svg {
+  color: var(--warn);
+}
+
+/* ============================== HELPERS ============================= */
+
+.sp-note {
+  margin: 12px 0 0;
+  padding-top: 11px;
+  border-top: 1px solid var(--border-light);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.sp-muted {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+/* ============================== FOCUS =============================== */
+
+.sp-page :focus-visible {
+  outline: 2px solid var(--accent-line-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+@container (max-width: 640px) {
+  /* Tags drop beneath the subject rather than squeezing it to a few
+     characters */
+  .sp-ticket-tags {
+    width: 100%;
+    justify-content: flex-start;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .sp-chev {
+    margin-left: auto;
+  }
+
+  .sp-msg {
+    max-width: 100%;
+  }
+
+  .sp-msg.is-you {
+    margin-left: 0;
+  }
+}
+
+@container (max-width: 560px) {
+  .sp-header .sp-btn {
+    width: 100%;
+  }
+
+  .sp-search {
+    width: 100%;
+  }
+
+  .sp-search input {
+    width: 100%;
+  }
+
+  .sp-compose-foot,
+  .sp-reply-foot {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .sp-compose-foot .sp-mini-btn,
+  .sp-reply-foot .sp-mini-btn {
+    justify-content: center;
+  }
+}
+
+/* =========================== MOTION OPT-OUT ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-card {
+    animation: none;
+  }
+
+  .sp-card::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .sp-card:hover,
+  .sp-metric:hover,
+  .sp-btn:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .sp-tab::after,
+  .sp-chev {
+    transition: none;
+  }
+}

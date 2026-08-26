@@ -1,0 +1,69 @@
+/* The shared .nx-card carries the shell; this is the Features-only part.
+   Bootstrap's .row g-4 handles gutters, but equal-height cards need the
+   column itself to stretch — .nx-card is height:100%, and this gives it
+   something to fill. */
+.features-sec .row > [class*="col-"] {
+  display: flex;
+}
+
+.features-sec .nx-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- TWO-UP ON MOBILE ----------
+   At 390px the container leaves 366px, so each of the two columns is ~183px.
+   The default 24px gutter and 22px card padding would cut the text column
+   down to ~115px, which wraps "Sub-second execution" onto four lines. The
+   gutter, padding and type all step down together so the card still reads
+   as a card rather than a cramped box. */
+@media (max-width: 767px) {
+  .features-sec .row {
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
+  }
+
+  .features-sec .nx-card {
+    padding: 16px 14px;
+    border-radius: 15px;
+  }
+
+  .features-sec .nx-ico {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 14px;
+    border-radius: 10px;
+  }
+
+  .features-sec .nx-ico svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .features-sec .nx-card-title {
+    font-size: 0.92rem;
+    line-height: 1.3;
+    margin-bottom: 7px;
+  }
+
+  .features-sec .nx-card-text {
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+}
+
+/* Below ~360px two columns still fit, but only with the type stepped down
+   once more — otherwise long words start overflowing their card. */
+@media (max-width: 400px) {
+  .features-sec .nx-card {
+    padding: 14px 12px;
+  }
+
+  .features-sec .nx-card-title {
+    font-size: 0.86rem;
+  }
+
+  .features-sec .nx-card-text {
+    font-size: 0.74rem;
+  }
+}

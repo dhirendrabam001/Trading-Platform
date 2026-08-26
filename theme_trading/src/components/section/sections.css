@@ -1,0 +1,401 @@
+.nx-sec {
+  position: relative;
+  padding: 50px 0;
+  overflow: hidden;
+}
+
+.nx-sec--tight {
+  padding: 72px 0;
+}
+
+/* Ambient accent wash. Sits behind content and never intercepts clicks. */
+.nx-sec-glow {
+  position: absolute;
+  width: 620px;
+  height: 620px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.nx-sec-glow--tl {
+  top: -220px;
+  left: -180px;
+  background: radial-gradient(circle, rgba(0, 255, 178, 0.13), transparent 70%);
+}
+
+.nx-sec-glow--br {
+  right: -200px;
+  bottom: -240px;
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.13),
+    transparent 70%
+  );
+}
+
+.nx-sec > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- SECTION HEADER ---------- */
+.nx-head {
+  max-width: 720px;
+  margin: 0 auto 60px;
+  text-align: center;
+}
+
+.nx-head--left {
+  margin-left: 0;
+  text-align: left;
+}
+
+.nx-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  margin-bottom: 22px;
+  border-radius: 100px;
+  border: 1px solid var(--border-light);
+  background: rgba(0, 255, 178, 0.05);
+  font-family: var(--font-primary);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.nx-eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.nx-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 3.3vw, 2.9rem);
+  line-height: 1.12;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+}
+
+.nx-grad {
+  background: linear-gradient(
+    120deg,
+    var(--primary) 10%,
+    var(--accent-blue) 90%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nx-sub {
+  font-family: var(--font-primary);
+  font-size: 1.03rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ---------- CARD SHELL ---------- */
+.nx-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  height: 100%;
+  padding: 26px;
+  border-radius: 18px;
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  backdrop-filter: blur(14px);
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+/* Top hairline */
+.nx-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 178, 0.45),
+    transparent
+  );
+  opacity: 0.7;
+}
+
+/* Gloss sweep, fired on hover rather than looping so a page full of cards
+   is not permanently repainting. */
+.nx-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 80%
+  );
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.nx-card:hover {
+  /* transform: translateY(-6px); */
+  border-color: rgba(0, 255, 178, 0.3);
+  box-shadow: var(--shadow-card), var(--glow-soft);
+}
+
+.nx-card:hover::before {
+  animation: nxSweep 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes nxSweep {
+  to {
+    transform: translateX(120%);
+  }
+}
+
+/* ---------- ICON TILE ---------- */
+.nx-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 20px;
+  border-radius: 13px;
+  border: 1px solid rgba(0, 255, 178, 0.22);
+  background: rgba(0, 255, 178, 0.08);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.nx-ico--violet {
+  border-color: rgba(139, 92, 246, 0.24);
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--accent-purple);
+}
+
+.nx-ico--blue {
+  border-color: rgba(59, 130, 246, 0.24);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-blue);
+}
+
+.nx-ico--amber {
+  border-color: rgba(245, 158, 11, 0.24);
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--accent-orange);
+}
+
+/* ---------- CARD TEXT ---------- */
+.nx-card-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.12rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.nx-card-text {
+  font-family: var(--font-primary);
+  font-size: 0.93rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ---------- BUTTONS (unscoped twins of the hero pair) ---------- */
+.nx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 26px;
+  border-radius: 11px;
+  border: 1px solid transparent;
+  font-family: var(--font-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.3s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.nx-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.nx-btn-primary {
+  background: var(--btn-primary-bg);
+  background-size: 220% auto;
+  color: var(--btn-primary-text);
+  animation:
+    nxFlow 7s linear infinite,
+    nxHalo 3.4s ease-in-out infinite;
+}
+
+.nx-btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: translateX(-150%) skewX(-18deg);
+  pointer-events: none;
+  animation: nxSheen 5.5s ease-in-out infinite;
+}
+
+.nx-btn-primary:hover {
+  /* halo dropped so this shadow is not overwritten mid-cycle */
+  animation: nxFlow 2.6s linear infinite;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 34px rgba(0, 255, 178, 0.55);
+  color: var(--btn-primary-text);
+}
+
+.nx-btn-ghost {
+  background: transparent;
+  border-color: var(--border-light);
+  color: var(--text-primary);
+  animation: nxEdge 4.5s ease-in-out infinite;
+}
+
+.nx-btn-ghost::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(0, 255, 178, 0.18), transparent);
+  transform: translateX(-150%) skewX(-18deg);
+  pointer-events: none;
+}
+
+.nx-btn-ghost:hover::before {
+  animation: nxSheen 1.1s ease-out;
+}
+
+.nx-btn-ghost:hover {
+  animation: none;
+  border-color: rgba(0, 255, 178, 0.45);
+  background: rgba(0, 255, 178, 0.05);
+  box-shadow: 0 6px 22px rgba(0, 255, 178, 0.16);
+  transform: translateY(-2px);
+  color: var(--text-primary);
+}
+
+/* ---------- SCROLL REVEAL ----------
+   GSAP animates .nx-reveal from this state. The class only hides content
+   once JS has confirmed it will run: without .nx-ready on <html>, or under
+   reduced-motion, everything stays visible — so a JS failure can never
+   leave the page blank. */
+.nx-ready .nx-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-ready .nx-reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .nx-card,
+  .nx-card:hover {
+    transform: none;
+  }
+
+  .nx-card:hover::before {
+    animation: none;
+  }
+}
+
+/* ---------- UP / DOWN ---------- */
+.nx-up {
+  color: var(--primary);
+}
+
+.nx-down {
+  color: var(--accent-red);
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 991px) {
+  .nx-sec {
+    padding: 84px 0;
+  }
+
+  .nx-sec--tight {
+    padding: 56px 0;
+  }
+
+  .nx-head {
+    margin-bottom: 46px;
+  }
+}
+
+@media (max-width: 575px) {
+  .nx-sec {
+    padding: 66px 0;
+  }
+
+  .nx-card {
+    padding: 22px;
+  }
+}
+
+/* ---------- ANCHOR OFFSET ----------
+   The navbar is position:sticky, so an #anchor jump would otherwise land with
+   the section heading hidden behind it.
+
+   Note there is deliberately no `scroll-behavior: smooth` here. Lenis drives
+   the scroll position itself and CSS smooth scrolling fights it, leaving the
+   page stranded between the two. SmoothScroll routes anchor clicks through
+   lenis.scrollTo instead; scroll-margin-top below is the fallback for
+   reduced-motion users, who get the browser's native instant jump. */
+[id="markets"],
+[id="features"],
+[id="pricing"],
+[id="security"],
+[id="how-it-works"],
+[id="faq"] {
+  scroll-margin-top: 92px;
+}
+
+/* Bootstrap's reboot sets `:root { scroll-behavior: smooth }` inside a
+   prefers-reduced-motion: no-preference query. That fights Lenis — the
+   browser animates the scroll position while Lenis is also driving it, and
+   anchor jumps land somewhere between the two. Same selector and the same
+   query, declared later, so this wins on order.
+   Reduced-motion users never match this query, and Lenis does not start for
+   them either, so they keep the browser's native instant jump. */
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    scroll-behavior: auto;
+  }
+}

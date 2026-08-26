@@ -1,0 +1,222 @@
+/* ---------- HEADER + CONTROLS ---------- */
+.tst-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 44px;
+}
+
+.tst-head {
+  margin-bottom: 0;
+  max-width: 620px;
+}
+
+.tst-head .nx-title {
+  margin-bottom: 0;
+}
+
+.tst-nav {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.tst-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--card-gradient);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.tst-arrow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 178, 0.25),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.tst-arrow:hover::before {
+  opacity: 1;
+}
+
+.tst-arrow:hover {
+  border-color: rgba(0, 255, 178, 0.4);
+  background: rgba(0, 255, 178, 0.08);
+  color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 255, 178, 0.18);
+}
+
+/* the chevron nudges in its travel direction while hovered */
+.tst-arrow:hover svg {
+  animation: nxArrow 1.1s ease-in-out infinite;
+}
+
+.tst-arrow:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Swiper adds this class at either end of a non-looping track. Without an
+   explicit style the button looks identical to an active one and reads as
+   broken when it stops responding. */
+.tst-arrow.swiper-button-disabled {
+  opacity: 0.35;
+  cursor: default;
+  transform: none;
+  border-color: var(--border-light);
+  background: var(--card-gradient);
+  color: var(--text-muted);
+}
+
+/* ---------- SLIDER ---------- */
+.tst-slider {
+  /* Cards lift on hover and the focus ring sits outside the border, so the
+     track needs a little room or both get clipped by overflow:hidden. */
+  margin: -10px;
+  padding: 10px;
+}
+
+.tst-slider .swiper {
+  padding-bottom: 52px;
+}
+
+/* Slides are equal-height columns so every quote's attribution row lines up,
+   regardless of how long the quote is. */
+.tst-slider .swiper-slide {
+  height: auto;
+  display: flex;
+}
+
+.tst-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 30px 28px;
+}
+
+/* ---------- PAGINATION ---------- */
+.tst-slider .swiper-pagination {
+  bottom: 8px;
+}
+
+.tst-slider .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: var(--text-muted);
+  opacity: 0.4;
+  transition:
+    opacity 0.3s ease,
+    background 0.3s ease;
+}
+
+.tst-slider .swiper-pagination-bullet-active {
+  background: var(--primary);
+  opacity: 1;
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* ---------- CARD CONTENT ---------- */
+.tst-stars {
+  display: inline-flex;
+  gap: 3px;
+  margin-bottom: 18px;
+  color: var(--accent-orange);
+}
+
+.tst-quote {
+  margin: 0 0 24px;
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  line-height: 1.72;
+  color: var(--text-primary);
+  /* Pushes the attribution to the bottom so avatars line up across a row of
+     quotes of differing lengths. */
+  flex: 1;
+}
+
+.tst-person {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-light);
+}
+
+.tst-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--btn-primary-text);
+}
+
+.tst-name,
+.tst-role {
+  display: block;
+}
+
+.tst-name {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tst-role {
+  font-family: var(--font-primary);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 767px) {
+  .tst-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  /* Arrows are small touch targets next to a swipeable track; the swipe
+     gesture and the pagination bullets carry navigation on phones. */
+  .tst-nav {
+    display: none;
+  }
+
+  .tst-card {
+    padding: 26px 22px;
+  }
+
+  .tst-quote {
+    font-size: 0.95rem;
+  }
+}
