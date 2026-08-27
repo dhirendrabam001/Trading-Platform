@@ -47,7 +47,7 @@ const Navbar = ({ toggleSidebar }) => {
 
       if (res.data.success) {
         dispatch(setUser(null));
-        window.location.href = THEME_APP_URL;
+        window.location.href = `${THEME_APP_URL}/login`;
       }
     } catch (error) {
       console.error(error);
