@@ -8,8 +8,10 @@ import { Provider } from "react-redux";
 import store from "./redux/store.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// Runs before render so the token is out of the URL and in storage
-// before the first paint or API call.
+import { installAuthInterceptor } from "./apis/authInterceptor";
+
+// Registered before render so the very first request already has it
+installAuthInterceptor();
 
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
