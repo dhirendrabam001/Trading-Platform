@@ -1,5 +1,11 @@
 import { useMemo, useState } from "react";
 import {
+  useGetNotificationsQuery,
+  useMarkNotificationReadMutation,
+  useMarkAllNotificationsReadMutation,
+  useDeleteNotificationMutation,
+} from "../../redux/api/tradingApi";
+import {
   Bell,
   BellOff,
   CheckCheck,
@@ -31,21 +37,6 @@ const CATEGORIES = {
   System: { icon: Megaphone, label: "System", rgb: "139, 92, 246" },
 };
 
-const INITIAL = [
-  { id: "n1",  category: "Alert",    title: "BTC crossed $67,000",            body: "Bitcoin is up 2.45% in the last 24 hours and has passed your price alert.", time: "10:24", day: "Today",     read: false },
-  { id: "n2",  category: "Trade",    title: "Order filled — BTC / USDT",      body: "Your limit buy for 0.485 BTC filled at $65,120.40.",                       time: "09:41", day: "Today",     read: false },
-  { id: "n3",  category: "Security", title: "New sign-in from Kathmandu",     body: "Chrome on Windows. If this was not you, secure your account now.",         time: "09:12", day: "Today",     read: false },
-  { id: "n4",  category: "Wallet",   title: "Deposit credited",               body: "10,000 USDT arrived over TRC-20 and is available to trade.",               time: "08:55", day: "Today",     read: false },
-  { id: "n5",  category: "Trade",    title: "Order partially filled — BNB",   body: "8.5 of 14.2 BNB filled at $618.40. The rest is still working.",             time: "08:02", day: "Today",     read: true  },
-  { id: "n6",  category: "System",   title: "Scheduled maintenance",          body: "Withdrawals pause for 30 minutes on Sunday 03:00 UTC.",                    time: "21:30", day: "Yesterday", read: false },
-  { id: "n7",  category: "Alert",    title: "ETH fell below $3,500",          body: "Ethereum dropped 1.2% and crossed your lower alert band.",                  time: "18:47", day: "Yesterday", read: true  },
-  { id: "n8",  category: "Wallet",   title: "Withdrawal completed",           body: "0.15 BTC was sent to bc1q…f5mdq and has confirmed on-chain.",              time: "18:22", day: "Yesterday", read: true  },
-  { id: "n9",  category: "Security", title: "Two-factor authentication on",   body: "2FA was enabled for this account from a trusted device.",                  time: "14:05", day: "Yesterday", read: true  },
-  { id: "n10", category: "Trade",    title: "Stop-loss triggered — AVAX",     body: "Your stop at $33.90 executed, closing 180 AVAX.",                          time: "11:18", day: "Earlier",   read: true  },
-  { id: "n11", category: "System",   title: "New fee tier unlocked",          body: "Your 30-day volume moved you to the 0.02% maker tier.",                    time: "09:40", day: "Earlier",   read: true  },
-  { id: "n12", category: "Wallet",   title: "Bank account verified",          body: "Standard Chartered ••••9037 is ready for fiat withdrawals.",               time: "16:11", day: "Earlier",   read: true  },
-];
-
 /* Order matters: the list is grouped in this sequence, so a day with nothing
    in it is simply skipped rather than rendering an empty heading. */
 const DAY_ORDER = ["Today", "Yesterday", "Earlier"];
@@ -71,7 +62,15 @@ const CHANNELS = [
 /* ============================================================= component ===*/
 
 const Notifications = () => {
-  const [items, setItems] = useState(INITIAL);
+  /* The list comes from the server. Every action below calls the API and
+     RTK Query refetches, so the badge, the tabs and the metrics all update
+     from one source instead of from local state that could drift. */
+  const { data, isLoading } = useGetNotificationsQuery({ limit: 100 });
+  const items = useMemo(() => data?.notifications ?? [], [data]);
+
+  const [markReadOnServer] = useMarkNotificationReadMutation();
+  const [markAllOnServer] = useMarkAllNotificationsReadMutation();
+  const [dismissOnServer] = useDeleteNotificationMutation();
   const [tab, setTab] = useState("all");
   const [prefs, setPrefs] = useState(() =>
     Object.fromEntries(
@@ -81,7 +80,9 @@ const Notifications = () => {
 
   /* Counts are computed from the list itself, never tracked alongside it -
      a separate counter is how a badge ends up disagreeing with its list. */
-  const unread = useMemo(() => items.filter((n) => !n.read).length, [items]);
+  /* Taken from the response rather than counted locally: the server knows
+     about notifications beyond the page we asked for. */
+  const unread = data?.unread ?? 0;
 
   const perCategory = useMemo(() => {
     const counts = new Map();
@@ -91,18 +92,13 @@ const Notifications = () => {
     return counts;
   }, [items]);
 
-  const markRead = (id) =>
-    setItems((list) =>
-      list.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
+  /* Each action is one call. The list refreshes itself afterwards, and so
+     does the bell in the navbar — both read the same cached data. */
+  const markRead = (id) => markReadOnServer(id);
 
-  const markAllRead = () =>
-    setItems((list) => list.map((n) => ({ ...n, read: true })));
+  const markAllRead = () => markAllOnServer();
 
-  /* Dismissing removes the item outright. Because the count is derived,
-     dropping an unread one lowers the badge automatically - there is no
-     separate decrement that could be forgotten. */
-  const dismiss = (id) => setItems((list) => list.filter((n) => n.id !== id));
+  const dismiss = (id) => dismissOnServer(id);
 
   const togglePref = (channel, kind) =>
     setPrefs((p) => ({
@@ -160,6 +156,15 @@ const Notifications = () => {
       tone: "neutral",
     },
   ];
+
+
+  if (isLoading) {
+    return (
+      <section className="nt-page">
+        <div className="nt-loading">Loading notifications…</div>
+      </section>
+    );
+  }
 
   return (
     <section className="nt-page">

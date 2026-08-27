@@ -11,6 +11,10 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import useChartTheme from "../../utils/chartTheme";
+import {
+  useGetPortfolioSummaryQuery,
+  useGetOrdersQuery,
+} from "../../redux/api/tradingApi";
 
 /* Sparkline series colours.
    The dark set is tuned for a near-black ground. On white, mint, lilac and
@@ -117,15 +121,34 @@ const CHART_OPTS = {
 /* ─────────────────────────────────────────────────────────
    Card definitions
 ───────────────────────────────────────────────────────── */
-const CARDS = [
+/* ── Formatting helpers ─────────────────────────────────── */
+
+const money = (value) =>
+  `$${Number(value || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+
+const signed = (value) => `${value >= 0 ? "+" : "−"} ${money(Math.abs(value))}`;
+
+const pct = (value) =>
+  `${value >= 0 ? "▲" : "▼"} ${Math.abs(value || 0).toFixed(2)}%`;
+
+/**
+ * Builds the four cards from live figures.
+ *
+ * Written as a function of the API response rather than a fixed array, so
+ * the layout stays in one place and only the numbers change.
+ */
+const buildCards = (summary, openOrders) => [
   {
     id: "portfolio",
     title: "Total Portfolio Value",
-    value: "$847,234.56",
-    badge: "▲ 12.45%",
-    badgeType: "up",
-    sub: "+ $93,654.32 from last week",
-    subColor: "green",
+    value: money(summary.netWorth),
+    badge: pct(summary.change24Percent),
+    badgeType: summary.change24Percent >= 0 ? "up" : "down",
+    sub: `${signed(summary.change24)} in 24h`,
+    subColor: summary.change24 >= 0 ? "green" : "red",
     icon: <Wallet size={18} />,
     iconCls: "green",
     series: "green",
@@ -134,9 +157,9 @@ const CARDS = [
   {
     id: "balance",
     title: "Available Balance",
-    value: "$24,562.34",
-    badge: "▲ 8.32%",
-    badgeType: "up",
+    value: money(summary.cash),
+    badge: summary.quote || "USDT",
+    badgeType: "neutral",
     sub: "Available to trade",
     subColor: "muted",
     icon: <BarChart2 size={18} />,
@@ -146,11 +169,11 @@ const CARDS = [
   },
   {
     id: "positions",
-    title: "Open Positions",
-    value: "28",
-    badge: "Active",
+    title: "Open Orders",
+    value: String(openOrders),
+    badge: openOrders > 0 ? "Working" : "None",
     badgeType: "neutral",
-    sub: "Across 12 assets",
+    sub: `Across ${summary.holdingsCount} held assets`,
     subColor: "muted",
     icon: <Briefcase size={18} />,
     iconCls: "purple",
@@ -159,12 +182,12 @@ const CARDS = [
   },
   {
     id: "pnl",
-    title: "Today's P&L",
-    value: "$12,456.78",
-    badge: "▲ 4.25%",
-    badgeType: "up",
-    sub: "+ $512.35 from yesterday",
-    subColor: "green",
+    title: "Unrealised P&L",
+    value: money(summary.unrealisedPnl),
+    badge: pct(summary.unrealisedPercent),
+    badgeType: summary.unrealisedPnl >= 0 ? "up" : "down",
+    sub: `${signed(summary.realisedPnl)} realised`,
+    subColor: summary.realisedPnl >= 0 ? "green" : "red",
     icon: <TrendingUp size={18} />,
     iconCls: "red",
     series: "red",
@@ -179,10 +202,31 @@ const DashboardCard = () => {
   const { theme } = useChartTheme();
   const palette = SERIES[theme] || SERIES.dark;
 
+  /* Live figures from the API. While the first request is in flight the
+     fallback below keeps every field a number, so the cards render their
+     real layout with zeros rather than blanking out or crashing on
+     undefined. */
+  const { data: summaryData } = useGetPortfolioSummaryQuery();
+  const { data: ordersData } = useGetOrdersQuery({ status: "open", limit: 1 });
+
+  const summary = summaryData?.summary ?? {
+    netWorth: 0,
+    cash: 0,
+    unrealisedPnl: 0,
+    unrealisedPercent: 0,
+    realisedPnl: 0,
+    change24: 0,
+    change24Percent: 0,
+    holdingsCount: 0,
+    quote: "USDT",
+  };
+
+  const cards = buildCards(summary, ordersData?.total ?? 0);
+
   return (
   <section className="dashboard-info">
     <div className="row g-3">
-      {CARDS.map((c) => (
+      {cards.map((c) => (
         <div className="col-6 col-lg-3 col-md-6" key={c.id}>
           <div className="dc-card">
 

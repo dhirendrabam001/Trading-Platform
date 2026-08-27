@@ -20,10 +20,16 @@ import { setUser } from "../../redux/authSlice";
 import { useNavigate } from "react-router-dom";
 import useTheme from "../../hooks/useTheme";
 import useCurrentUser from "../../hooks/useCurrentUser";
+import { useGetUnreadCountQuery } from "../../redux/api/tradingApi";
 
 const Navbar = ({ toggleSidebar }) => {
   const { fullName, email, initials } = useCurrentUser();
   const [theme, toggleTheme] = useTheme();
+
+  // The badge was a hardcoded 5. This is the real number, and it refreshes
+  // by itself whenever anything creates a notification.
+  const { data: unreadData } = useGetUnreadCountQuery();
+  const unread = unreadData?.unread ?? 0;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -93,9 +99,16 @@ const Navbar = ({ toggleSidebar }) => {
           <Zap size={18} />
         </div>
 
-        <div className="nav-icon position-relative">
+        <div
+          className="nav-icon position-relative"
+          onClick={() => navigate("/notifications")}
+          style={{ cursor: "pointer" }}
+        >
           <Bell size={18} />
-          <span className="nav-badge">5</span>
+          {/* Hidden entirely at zero — a badge showing "0" looks broken */}
+          {unread > 0 && (
+            <span className="nav-badge">{unread > 99 ? "99+" : unread}</span>
+          )}
         </div>
 
         <button

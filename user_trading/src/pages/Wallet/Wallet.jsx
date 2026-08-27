@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react";
 import {
+  useGetWalletBalancesQuery,
+  useGetLedgerQuery,
+} from "../../redux/api/tradingApi";
+import {
   Chart as ChartJS,
   ArcElement,
   Tooltip as ChartTooltip,
@@ -33,17 +37,6 @@ ChartJS.register(ArcElement, ChartTooltip);
    never display a total that disagrees with its own available and locked
    figures. */
 
-const BALANCES = [
-  { sym: "USDT", name: "Tether",    key: "usdt", available: 24562.34, inOrders: 8225.0,  price: 1 },
-  { sym: "BTC",  name: "Bitcoin",   key: "btc",  available: 0.842,    inOrders: 0.125,   price: 67245.8 },
-  { sym: "ETH",  name: "Ethereum",  key: "eth",  available: 9.15,     inOrders: 2.5,     price: 3512.75 },
-  { sym: "SOL",  name: "Solana",    key: "sol",  available: 148.2,    inOrders: 46.0,    price: 142.35 },
-  { sym: "BNB",  name: "BNB",       key: "bnb",  available: 21.4,     inOrders: 8.0,     price: 602.45 },
-  { sym: "XRP",  name: "XRP",       key: "xrp",  available: 14200,    inOrders: 0,       price: 0.5987 },
-  { sym: "LINK", name: "Chainlink", key: "link", available: 486,      inOrders: 320,     price: 16.25 },
-  { sym: "ADA",  name: "Cardano",   key: "ada",  available: 18500,    inOrders: 9800,    price: 0.4567 },
-];
-
 /* Asset-brand colours: these identify a coin, not a surface, so they are
    deliberately literal and stay fixed in both themes. */
 const COIN_COLORS = {
@@ -56,14 +49,6 @@ const COIN_COLORS = {
   link: "#2a5ada",
   ada: "#0033ad",
 };
-
-const TRANSACTIONS = [
-  { id: "x1", type: "Deposit",  sym: "USDT", key: "usdt", amount: 10000,  status: "Completed", time: "12 Aug, 09:41" },
-  { id: "x2", type: "Withdraw", sym: "BTC",  key: "btc",  amount: 0.15,   status: "Completed", time: "11 Aug, 18:22" },
-  { id: "x3", type: "Deposit",  sym: "ETH",  key: "eth",  amount: 4.2,    status: "Pending",   time: "11 Aug, 14:05" },
-  { id: "x4", type: "Deposit",  sym: "USDT", key: "usdt", amount: 5000,   status: "Completed", time: "10 Aug, 21:38" },
-  { id: "x5", type: "Withdraw", sym: "SOL",  key: "sol",  amount: 62,     status: "Completed", time: "09 Aug, 11:17" },
-];
 
 const TABS = [
   { id: "all", label: "All Assets" },
@@ -91,14 +76,6 @@ const derive = (balance) => {
 
   return { ...balance, total, value, lockedValue, lockedPct };
 };
-
-const ROWS = BALANCES.map(derive);
-
-const TOTAL_VALUE = ROWS.reduce((sum, r) => sum + r.value, 0);
-const LOCKED_VALUE = ROWS.reduce((sum, r) => sum + r.lockedValue, 0);
-const FREE_VALUE = TOTAL_VALUE - LOCKED_VALUE;
-/* Portfolio expressed in BTC, the way an exchange quotes account size */
-const BTC_PRICE = BALANCES.find((b) => b.sym === "BTC").price;
 
 /* =============================================================== format ===*/
 
@@ -137,6 +114,69 @@ const Wallet = () => {
 
   const chart = useChartTheme();
 
+  /* ------------------------------------------------------ live data ---
+     One hook each. RTK Query handles loading, errors and caching, and
+     refetches on its own whenever a trade or transfer changes a balance. */
+  const { data: walletData, isLoading } = useGetWalletBalancesQuery();
+  const { data: ledgerData } = useGetLedgerQuery({ limit: 5 });
+
+  /* The API returns { symbol, available, locked, ... }; this page was
+     written around { sym, inOrders }. Renaming here keeps the rest of the
+     component untouched. */
+  const allRows = useMemo(() => {
+    const balances = walletData?.balances ?? [];
+
+    return balances
+      .filter((b) => b.available + b.locked > 0)
+      .map((b) =>
+        derive({
+          sym: b.symbol,
+          name: b.name,
+          key: b.key,
+          available: b.available,
+          inOrders: b.locked,
+          // A missing price means the feed cannot value it right now. Zero
+          // keeps the maths safe; the row still shows the real quantity.
+          price: b.price ?? 0,
+        }),
+      );
+  }, [walletData]);
+
+  const totalValue = useMemo(
+    () => allRows.reduce((sum, r) => sum + r.value, 0),
+    [allRows],
+  );
+  const lockedTotal = useMemo(
+    () => allRows.reduce((sum, r) => sum + r.lockedValue, 0),
+    [allRows],
+  );
+  const freeValue = totalValue - lockedTotal;
+
+  /* Account size quoted in BTC, the way an exchange shows it */
+  const btcPrice = allRows.find((r) => r.sym === "BTC")?.price || 0;
+
+  /* Last few transfers for the side panel */
+  const transactions = useMemo(
+    () =>
+      (ledgerData?.entries ?? [])
+        .filter((e) => e.type === "deposit" || e.type === "withdrawal")
+        .map((e) => ({
+          id: e._id,
+          type: e.type === "deposit" ? "Deposit" : "Withdraw",
+          sym: e.asset,
+          key: e.asset.toLowerCase(),
+          amount: Math.abs(e.availableDelta),
+          status: "Completed",
+          time: new Date(e.createdAt).toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        })),
+    [ledgerData],
+  );
+
   /* Privacy mode masks every figure in one place, so a balance cannot leak
      through a card that forgot to check the flag */
   const mask = (text) => (hidden ? "••••••" : text);
@@ -144,7 +184,7 @@ const Wallet = () => {
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
 
-    return ROWS.filter((r) => {
+    return allRows.filter((r) => {
       if (q && !`${r.sym} ${r.name}`.toLowerCase().includes(q)) return false;
       if (tab === "held") return r.total > 0;
       if (tab === "locked") return r.inOrders > 0;
@@ -155,18 +195,18 @@ const Wallet = () => {
       if (sortBy === "name") return a.sym.localeCompare(b.sym);
       return b.value - a.value;
     });
-  }, [tab, query, sortBy]);
+  }, [allRows, tab, query, sortBy]);
 
   const allocation = useMemo(
     () =>
-      [...ROWS]
+      [...allRows]
         .sort((a, b) => b.value - a.value)
         .map((r) => ({
           label: r.sym,
-          pct: TOTAL_VALUE > 0 ? (r.value / TOTAL_VALUE) * 100 : 0,
+          pct: totalValue > 0 ? (r.value / totalValue) * 100 : 0,
           color: COIN_COLORS[r.key],
         })),
-    [],
+    [allRows, totalValue],
   );
 
   const doughnutData = {
@@ -206,35 +246,46 @@ const Wallet = () => {
       key: "total",
       icon: WalletIcon,
       label: "Total Balance",
-      value: mask(`$${money(TOTAL_VALUE)}`),
-      sub: mask(`≈ ${(TOTAL_VALUE / BTC_PRICE).toFixed(4)} BTC`),
+      value: mask(`$${money(totalValue)}`),
+      sub: mask(`≈ ${(totalValue / btcPrice).toFixed(4)} BTC`),
       tone: "neutral",
     },
     {
       key: "free",
       icon: CheckCircle2,
       label: "Available",
-      value: mask(`$${money(FREE_VALUE)}`),
-      sub: `${((FREE_VALUE / TOTAL_VALUE) * 100).toFixed(1)}% free to trade`,
+      value: mask(`$${money(freeValue)}`),
+      sub: `${((freeValue / totalValue) * 100).toFixed(1)}% free to trade`,
       tone: "up",
     },
     {
       key: "locked",
       icon: Lock,
       label: "In Open Orders",
-      value: mask(`$${money(LOCKED_VALUE)}`),
-      sub: `${((LOCKED_VALUE / TOTAL_VALUE) * 100).toFixed(1)}% reserved`,
+      value: mask(`$${money(lockedTotal)}`),
+      sub: `${((lockedTotal / totalValue) * 100).toFixed(1)}% reserved`,
       tone: "warn",
     },
     {
       key: "assets",
       icon: ArrowLeftRight,
       label: "Assets Held",
-      value: String(ROWS.filter((r) => r.total > 0).length),
-      sub: `${ROWS.filter((r) => r.inOrders > 0).length} with open orders`,
+      value: String(allRows.filter((r) => r.total > 0).length),
+      sub: `${allRows.filter((r) => r.inOrders > 0).length} with open orders`,
       tone: "neutral",
     },
   ];
+
+
+  // Shown while the first request is in flight, so the page never flashes
+  // zeros and then jumps to real numbers.
+  if (isLoading) {
+    return (
+      <section className="wa-page">
+        <div className="wa-loading">Loading your wallet…</div>
+      </section>
+    );
+  }
 
   return (
     <section className="wa-page">
@@ -296,7 +347,7 @@ const Wallet = () => {
             <div className="wa-split-head">
               <h2 className="wa-card-title">Funds Breakdown</h2>
               <span className="wa-muted">
-                {mask(`$${money(TOTAL_VALUE)}`)} total
+                {mask(`$${money(totalValue)}`)} total
               </span>
             </div>
 
@@ -305,11 +356,11 @@ const Wallet = () => {
             <div className="wa-split-bar">
               <span
                 className="wa-split-free"
-                style={{ width: `${(FREE_VALUE / TOTAL_VALUE) * 100}%` }}
+                style={{ width: `${(freeValue / totalValue) * 100}%` }}
               />
               <span
                 className="wa-split-locked"
-                style={{ width: `${(LOCKED_VALUE / TOTAL_VALUE) * 100}%` }}
+                style={{ width: `${(lockedTotal / totalValue) * 100}%` }}
               />
             </div>
 
@@ -317,12 +368,12 @@ const Wallet = () => {
               <div>
                 <span className="wa-dot wa-dot--free" />
                 <span className="wa-muted">Available</span>
-                <b>{mask(`$${money(FREE_VALUE)}`)}</b>
+                <b>{mask(`$${money(freeValue)}`)}</b>
               </div>
               <div>
                 <span className="wa-dot wa-dot--locked" />
                 <span className="wa-muted">In open orders</span>
-                <b>{mask(`$${money(LOCKED_VALUE)}`)}</b>
+                <b>{mask(`$${money(lockedTotal)}`)}</b>
               </div>
             </div>
           </div>
@@ -425,13 +476,13 @@ const Wallet = () => {
                           <span className="wa-alloc-track">
                             <i
                               style={{
-                                width: `${Math.max(3, (row.value / TOTAL_VALUE) * 100)}%`,
+                                width: `${Math.max(3, (row.value / totalValue) * 100)}%`,
                                 backgroundColor: COIN_COLORS[row.key],
                               }}
                             />
                           </span>
                           <small>
-                            {((row.value / TOTAL_VALUE) * 100).toFixed(1)}%
+                            {((row.value / totalValue) * 100).toFixed(1)}%
                           </small>
                         </span>
                       </td>
@@ -481,7 +532,7 @@ const Wallet = () => {
               <div className="wa-donut">
                 <Doughnut data={doughnutData} options={doughnutOptions} />
                 <div className="wa-donut-center">
-                  <strong>{mask(`$${money(TOTAL_VALUE, 0)}`)}</strong>
+                  <strong>{mask(`$${money(totalValue, 0)}`)}</strong>
                   <span>Total</span>
                 </div>
               </div>
@@ -504,7 +555,7 @@ const Wallet = () => {
             </h2>
 
             <ul className="wa-tx-list">
-              {TRANSACTIONS.map((tx) => {
+              {transactions.map((tx) => {
                 const isDeposit = tx.type === "Deposit";
                 return (
                   <li key={tx.id}>

@@ -204,10 +204,6 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileSidebar }) => {
           <HelpCircle size={20} />
           <span>Help Center</span>
         </NavLink>
-        <a href="#" className="menu-item">
-          <Settings size={20} />
-          <span>Settings</span>
-        </a>
       </div>
       <hr />
       {/* USER PROFILE */}

@@ -67,6 +67,7 @@
 .sub {
   font-size: 12px;
   color: var(--text-muted);
+  margin: 0px 0px;
 }
 
 .sidebar.collapsed .sub,
@@ -134,11 +135,6 @@
     align-items: center;
     justify-content: center;
   }
-}
-
-/* SECTION */
-.sidebar-section {
-  margin-bottom: 25px;
 }
 
 .section-title {

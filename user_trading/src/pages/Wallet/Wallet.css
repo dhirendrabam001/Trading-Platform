@@ -1212,3 +1212,13 @@
     transition: none;
   }
 }
+
+/* Shown while the first balances request is in flight */
+.wa-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}

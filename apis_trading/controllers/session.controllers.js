@@ -68,7 +68,53 @@ const getSessions = async (req, res) => {
   }
 };
 
+/**
+ * Revoke Session — the "sign out this device" button on the Security page.
+ *
+ * The session is marked revoked rather than deleted, so the security log
+ * still shows that the device existed and when it was cut off.
+ *
+ * The current session cannot be revoked here: that is what Logout is for,
+ * and letting it happen would leave the user on a page whose session no
+ * longer exists.
+ */
+const revokeSession = async (req, res) => {
+  try {
+    const session = await Session.findOne({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+
+    if (!session) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Session not found" });
+    }
+
+    if (session.isCurrent) {
+      return res.status(400).json({
+        success: false,
+        message: "Use Logout to end the session you are using right now",
+      });
+    }
+
+    session.status = "revoked";
+    await session.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Device signed out",
+    });
+  } catch (error) {
+    console.error("Revoke session error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to revoke session" });
+  }
+};
+
 module.exports = {
   createSession,
   getSessions,
+  revokeSession,
 };
